@@ -5,7 +5,7 @@
  * with proper coverage reporting and test environment setup.
  */
 
-export default {
+module.exports = {
   testEnvironment: 'node',
   roots: ['<rootDir>/tests'],
   testMatch: ['**/__tests__/**/*.js', '**/?(*.)+(spec|test).js'],
@@ -31,8 +31,9 @@ export default {
   bail: false,
   detectOpenHandles: true,
   forceExit: true,
+  extensionsToTreatAsEsm: ['.js'],
   transform: {
-    '^.+\\.jsx?$': 'babel-jest',
+    '^.+\\.jsx?$': ['babel-jest', { configFile: './babel.config.cjs' }],
   },
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
