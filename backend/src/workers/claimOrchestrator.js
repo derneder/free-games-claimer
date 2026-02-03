@@ -207,7 +207,7 @@ async function logClaimedGame(userId, provider, game) {
       ]
     );
   } catch (error) {
-    logger.error(`Failed to log claimed game:`, error);
+    logger.error('Failed to log claimed game:', error);
   }
 }
 
@@ -235,7 +235,7 @@ async function logClaimAttempt(userId, provider, result) {
       [userId, provider, action, JSON.stringify(metadata)]
     );
   } catch (error) {
-    logger.error(`Failed to log claim attempt:`, error);
+    logger.error('Failed to log claim attempt:', error);
   }
 }
 

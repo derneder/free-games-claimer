@@ -7,9 +7,8 @@
  * @module src/workers/claimers/baseClaimer
  */
 
-import { chromium, firefox } from 'playwright';
+import { firefox } from 'playwright';
 import { logger } from '../../config/logger.js';
-import { maskSensitiveData } from '../../utils/encryption.js';
 import * as OTPAuth from 'otplib';
 
 export class BaseClaimer {
@@ -113,23 +112,25 @@ export class BaseClaimer {
   async addStealthMeasures() {
     if (!this.page) return;
 
-    // Override navigator properties
+    // Override navigator properties (runs in browser context)
+    /* eslint-disable no-undef */
     await this.page.addInitScript(() => {
       // Override webdriver property
-      Object.defineProperty(navigator, 'webdriver', {
+      Object.defineProperty(Object.getPrototypeOf(navigator), 'webdriver', {
         get: () => undefined,
       });
 
       // Override plugins
-      Object.defineProperty(navigator, 'plugins', {
+      Object.defineProperty(Object.getPrototypeOf(navigator), 'plugins', {
         get: () => [1, 2, 3, 4, 5],
       });
 
       // Override languages
-      Object.defineProperty(navigator, 'languages', {
+      Object.defineProperty(Object.getPrototypeOf(navigator), 'languages', {
         get: () => ['en-US', 'en'],
       });
     });
+    /* eslint-enable no-undef */
   }
 
   /**
@@ -186,7 +187,7 @@ export class BaseClaimer {
       await this.page.screenshot({ path });
       logger.debug(`Screenshot saved: ${path}`);
     } catch (error) {
-      logger.warn(`Failed to take screenshot:`, error.message);
+      logger.warn('Failed to take screenshot:', error.message);
     }
   }
 
@@ -218,11 +219,10 @@ export class BaseClaimer {
   /**
    * Claim free games (to be implemented by subclasses)
    *
-   * @param {Object} credentials - User credentials
-   * @param {Object} options - Claim options
+   * @param {Object} _credentials - User credentials
    * @returns {Promise<Object>} Claim result
    */
-  async claim(credentials, options = {}) {
+  async claim(_credentials) {
     throw new Error('claim() must be implemented by subclass');
   }
 }

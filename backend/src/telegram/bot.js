@@ -215,10 +215,10 @@ bot.action(/connect_(.+)/, async (ctx) => {
   await ctx.answerCbQuery();
   await ctx.reply(
     `📝 Connecting ${PROVIDER_NAMES[provider]}\n\n` +
-      `Please send your credentials in JSON format:\n\n` +
-      `For email/password:\n` +
-      `{"email": "your@email.com", "password": "yourpassword"}\n\n` +
-      `Or use /cancel to abort.`
+      'Please send your credentials in JSON format:\n\n' +
+      'For email/password:\n' +
+      '{"email": "your@email.com", "password": "yourpassword"}\n\n' +
+      'Or use /cancel to abort.'
   );
 });
 
@@ -376,7 +376,7 @@ bot.action(/claim_(.+)/, async (ctx) => {
       message += `❌ Failed: ${result.failed?.length || 0}\n`;
 
       if (result.errors?.length > 0) {
-        message += `\n⚠️ Errors:\n`;
+        message += '\n⚠️ Errors:\n';
         result.errors.slice(0, 3).forEach((err) => {
           message += `• ${err.error}\n`;
         });
@@ -413,7 +413,7 @@ bot.on('text', async (ctx) => {
     delete ctx.session.connectingProvider;
     await ctx.reply(
       `✅ ${PROVIDER_NAMES[provider]} credentials saved successfully!\n\n` +
-        `Use /claim to start claiming games.`
+        'Use /claim to start claiming games.'
     );
   } catch (error) {
     if (error instanceof SyntaxError) {
