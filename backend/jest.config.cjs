@@ -1,10 +1,3 @@
-/**
- * Jest Configuration for Backend Testing
- * 
- * Configures Jest to run unit and integration tests
- * with proper coverage reporting and test environment setup.
- */
-
 module.exports = {
   testEnvironment: 'node',
   roots: ['<rootDir>/tests'],
@@ -31,10 +24,6 @@ module.exports = {
   bail: false,
   detectOpenHandles: true,
   forceExit: true,
-  extensionsToTreatAsEsm: ['.js'],
-  transform: {
-    '^.+\\.jsx?$': ['babel-jest', { configFile: './babel.config.cjs' }],
-  },
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     '^@tests/(.*)$': '<rootDir>/tests/$1',
