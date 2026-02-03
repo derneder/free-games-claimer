@@ -1,1 +1,100 @@
-import express from 'express';\nimport cors from 'cors';\nimport dotenv from 'dotenv';\nimport db from './config/database.js';\nimport logger from './config/logger.js';\nimport bot from './telegram/bot.js';\nimport { jobQueue } from './workers/jobQueue.js';\nimport { apiLimiter, authLimiter } from './middleware/rateLimiter.js';\nimport { errorHandler } from './middleware/errorHandler.js';\nimport { authenticate } from './middleware/auth.js';\nimport authRoutes from './api/auth.js';\nimport gamesRoutes from './api/games.js';\nimport analyticsRoutes from './api/analytics.js';\nimport adminRoutes from './api/admin.js';\n\ndotenv.config();\n\nconst app = express();\nconst PORT = process.env.PORT || 3000;\nconst TELEGRAM_BOT_WEBHOOK = process.env.TELEGRAM_BOT_WEBHOOK === 'true';\n\n// Middleware\napp.use(express.json({ limit: '10mb' }));\napp.use(express.urlencoded({ limit: '10mb', extended: true }));\napp.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:5173' }));\napp.use(apiLimiter);\n\n// Health check\napp.get('/api/health', (req, res) => {\n  res.json({\n    status: 'ok',\n    timestamp: new Date(),\n    jobQueue: jobQueue.getStatus(),\n  });\n});\n\n// Auth routes (with rate limiting)\napp.use('/api/auth', authLimiter, authRoutes);\n\n// Protected routes\napp.use('/api/games', authenticate, gamesRoutes);\napp.use('/api/analytics', authenticate, analyticsRoutes);\napp.use('/api/admin', authenticate, adminRoutes);\n\n// Telegram webhook (if enabled)\nif (TELEGRAM_BOT_WEBHOOK) {\n  app.post('/telegram', (req, res) => {\n    bot.handleUpdate(req.body, res);\n  });\n  logger.info('\ud83d\udeab Telegram webhook mode enabled');\n} else {\n  // Start bot with polling\n  bot.launch().catch((error) => {\n    logger.error('Failed to launch Telegram bot:', error);\n  });\n}\n\n// Error handler\napp.use(errorHandler);\n\n// Start server\nconst server = app.listen(PORT, async () => {\n  logger.info(`\ud83d\ude80 Server running on http://localhost:${PORT}`);\n\n  try {\n    await db.raw('SELECT 1');\n    logger.info('\u2705 Database connected');\n  } catch (error) {\n    logger.error('\u274c Database connection failed:', error.message);\n    process.exit(1);\n  }\n\n  // Start job queue\n  try {\n    jobQueue.run();\n    logger.info('\ud83c\udf1a Job queue started');\n  } catch (error) {\n    logger.error('Failed to start job queue:', error.message);\n  }\n});\n\n// Graceful shutdown\nprocess.on('SIGTERM', async () => {\n  logger.info('\ud83d\udeab SIGTERM received, shutting down gracefully...');\n\n  jobQueue.stop();\n\n  if (!TELEGRAM_BOT_WEBHOOK) {\n    await bot.stop();\n  }\n\n  server.close(() => {\n    logger.info('\u2705 Server closed');\n    process.exit(0);\n  });\n});\n\nprocess.on('SIGINT', async () => {\n  logger.info('\ud83d\udeab SIGINT received, shutting down gracefully...');\n\n  jobQueue.stop();\n\n  if (!TELEGRAM_BOT_WEBHOOK) {\n    await bot.stop();\n  }\n\n  server.close(() => {\n    logger.info('\u2705 Server closed');\n    process.exit(0);\n  });\n});\n\nexport default app;\n
+/**
+ * Free Games Claimer - Backend Entry Point
+ * 
+ * Initializes Express application, sets up middleware,
+ * connects to databases, and starts the HTTP server.
+ * 
+ * @module src/index
+ */
+
+import express from 'express';
+import compression from 'compression';
+import cors from 'cors';
+import helmet from 'helmet';
+import morgan from 'morgan';
+import { config } from './config/env.js';
+import { logger } from './config/logger.js';
+import { initializeDatabase } from './config/database.js';
+import { initializeRedis } from './config/redis.js';
+
+const app = express();
+
+/**
+ * Middleware Stack
+ * Order matters - security middleware first
+ */
+
+// Security headers
+app.use(helmet());
+
+// CORS
+app.use(
+  cors({
+    origin: config.corsOrigin,
+    credentials: true,
+    optionsSuccessStatus: 200,
+  })
+);
+
+// Compression
+app.use(compression());
+
+// Request logging
+app.use(morgan('combined', { stream: { write: (msg) => logger.info(msg.trim()) } }));
+
+// Body parsing
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
+
+// Health check
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Root endpoint
+app.get('/', (req, res) => {
+  res.json({
+    name: 'Free Games Claimer API',
+    version: '1.0.0',
+    env: config.nodeEnv,
+    docs: '/api-docs',
+  });
+});
+
+/**
+ * Initialize application and start server
+ */
+async function startServer() {
+  try {
+    // Connect to PostgreSQL
+    await initializeDatabase();
+    logger.info('✓ Database connected');
+
+    // Connect to Redis
+    await initializeRedis();
+    logger.info('✓ Redis connected');
+
+    // Start listening
+    const server = app.listen(config.port, config.host, () => {
+      logger.info(
+        `🚀 Server running at http://${config.host}:${config.port} [${config.nodeEnv}]`
+      );
+    });
+
+    // Graceful shutdown
+    process.on('SIGTERM', () => {
+      logger.info('SIGTERM signal received: closing HTTP server');
+      server.close(() => {
+        logger.info('HTTP server closed');
+        process.exit(0);
+      });
+    });
+  } catch (error) {
+    logger.error('Failed to start server:', error);
+    process.exit(1);
+  }
+}
+
+startServer();
+
+export default app;
