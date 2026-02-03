@@ -13,8 +13,5 @@ dotenv.config({ path: '.env.test' });
 process.env.NODE_ENV = 'test';
 
 // Suppress logging during tests
-global.console.log = jest.fn();
-global.console.error = jest.fn();
-
-// Set timeouts
-jest.setTimeout(30000);
+global.console.log = () => {};
+global.console.error = () => {};

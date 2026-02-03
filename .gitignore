@@ -139,3 +139,6 @@ share/python-wheels/
 .installed.cfg
 *.egg
 PIPFILE.lock
+
+# TypeScript
+*.tsbuildinfo
