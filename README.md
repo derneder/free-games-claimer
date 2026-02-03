@@ -3,6 +3,9 @@
 </p>
 
 [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=vogler_free-games-claimer&metric=code_smells)](https://sonarcloud.io/project/overview?id=vogler_free-games-claimer)
+
+<!-- Test comment by Perplexity AI - Проверка интеграции с GitHub -->
+
 # free-games-claimer
 
 Claims free games periodically on
@@ -28,7 +31,7 @@ docker run --rm -it -p 6080:6080 -v fgc:/fgc/data --pull=always ghcr.io/vogler/f
 
 _This currently gives you a captcha challenge for epic-games. Until [issue #183](https://github.com/vogler/free-games-claimer/issues/183) is fixed, it is recommended to just run `node epic-games` without docker (see below)._
 
-This will run `node epic-games; node prime-gaming; node gog` - if you only want to claim games for one of the stores, you can override the default command by appending e.g. `node epic-games` at the end of the `docker run` command, or if you want several `bash -c "node epic-games.js; node gog.js"`.
+This will run `node epic-games; node prime-gaming; node gog` - if you only want to claim games for one of the stores, you can override the default command by appending e.g. `node epic-games` at the end of the `docker run` command, or if you want several `bash -c \"node epic-games.js; node gog.js\"`.
 Data (including json files with claimed games, codes to redeem, screenshots) is stored in the Docker volume `fgc`.
 
 <details>
@@ -159,7 +162,7 @@ If you want it to run regularly, you have to schedule the runs yourself:
 - macOS: [launchd](https://stackoverflow.com/questions/132955/how-do-i-set-a-task-to-run-every-so-often)
 - Windows: [task scheduler](https://active-directory-wp.com/docs/Usage/How_to_add_a_cron_job_on_Windows/Scheduled_tasks_and_cron_jobs_on_Windows/index.html) ([example](https://github.com/vogler/free-games-claimer/wiki/%5BHowTo%5D-Schedule-runs-on-Windows)), [other options](https://stackoverflow.com/questions/132971/what-is-the-windows-version-of-cron), or just put the command in a `.bat` file in Autostart if you restart often...
 - any OS: use a process manager like [pm2](https://pm2.keymetrics.io/docs/usage/restart-strategies/)
-- Docker Compose `command: bash -c "node epic-games; node prime-gaming; node gog; echo sleeping; sleep 1d"` additionally add `restart: unless-stopped` to it.
+- Docker Compose `command: bash -c \"node epic-games; node prime-gaming; node gog; echo sleeping; sleep 1d\"` additionally add `restart: unless-stopped` to it.
 
 TODO: ~~add some server-mode where the script just keeps running and claims games e.g. every day.~~
 
