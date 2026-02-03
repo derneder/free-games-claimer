@@ -24,10 +24,7 @@ export const apiLimiter = rateLimit({
 export const authLimiter = rateLimit({
   store: new RedisStore({
     client: redis,
-    prefix: 'rl:auth:', // Rate limit: auth
-    sendCommand: async (client, args) => {
-      return client.sendCommand(args);
-    },
+    prefix: 'rl:auth:',
   }),
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 5, // Only 5 attempts per 15 minutes
@@ -47,9 +44,6 @@ export const twoFactorLimiter = rateLimit({
   store: new RedisStore({
     client: redis,
     prefix: 'rl:2fa:',
-    sendCommand: async (client, args) => {
-      return client.sendCommand(args);
-    },
   }),
   windowMs: 10 * 60 * 1000, // 10 minutes
   max: 3, // Only 3 attempts
@@ -69,9 +63,6 @@ export const scrapingLimiter = rateLimit({
   store: new RedisStore({
     client: redis,
     prefix: 'rl:scrape:',
-    sendCommand: async (client, args) => {
-      return client.sendCommand(args);
-    },
   }),
   windowMs: 60 * 60 * 1000, // 1 hour
   max: 3, // Only 3 scraping operations per hour
@@ -90,13 +81,16 @@ export const downloadLimiter = rateLimit({
   store: new RedisStore({
     client: redis,
     prefix: 'rl:download:',
-    sendCommand: async (client, args) => {
-      return client.sendCommand(args);
-    },
   }),
   windowMs: 10 * 60 * 1000, // 10 minutes
   max: 10, // 10 downloads per 10 minutes
   message: 'Too many downloads. Please wait before downloading again.',
+  handler: (req, res) => {
+    logger.warn(`Download rate limit hit for IP: ${req.ip}`);
+    res.status(429).json({
+      error: 'Too many downloads. Please wait.',
+    });
+  },
 });
 
 // ============ ADMIN OPERATIONS LIMITER ============
@@ -104,13 +98,16 @@ export const adminLimiter = rateLimit({
   store: new RedisStore({
     client: redis,
     prefix: 'rl:admin:',
-    sendCommand: async (client, args) => {
-      return client.sendCommand(args);
-    },
   }),
   windowMs: 60 * 60 * 1000, // 1 hour
   max: 50, // 50 operations per hour
   message: 'Admin operation rate limit exceeded',
+  handler: (req, res) => {
+    logger.warn(`Admin rate limit hit for IP: ${req.ip}`);
+    res.status(429).json({
+      error: 'Admin operation rate limit exceeded',
+    });
+  },
 });
 
 // ============ TELEGRAM WEBHOOK LIMITER ============
@@ -118,9 +115,6 @@ export const telegramLimiter = rateLimit({
   store: new RedisStore({
     client: redis,
     prefix: 'rl:telegram:',
-    sendCommand: async (client, args) => {
-      return client.sendCommand(args);
-    },
   }),
   windowMs: 1 * 60 * 1000, // 1 minute
   max: 30, // 30 webhook calls per minute
@@ -135,9 +129,6 @@ export const globalLimiter = rateLimit({
   store: new RedisStore({
     client: redis,
     prefix: 'rl:global:',
-    sendCommand: async (client, args) => {
-      return client.sendCommand(args);
-    },
   }),
   windowMs: 1 * 60 * 1000, // 1 minute
   max: 300, // 300 requests per minute
@@ -154,9 +145,6 @@ export function createLimiter(options = {}) {
     store: new RedisStore({
       client: redis,
       prefix: options.prefix || 'rl:custom:',
-      sendCommand: async (client, args) => {
-        return client.sendCommand(args);
-      },
     }),
     windowMs: options.windowMs || 15 * 60 * 1000,
     max: options.max || 100,
