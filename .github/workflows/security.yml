@@ -1,0 +1,81 @@
+name: Security Scanning
+
+on:
+  push:
+    branches: [main, implementation]
+  pull_request:
+    branches: [main, implementation]
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly
+
+jobs:
+  # Dependency scanning
+  dependencies:
+    name: Check Dependencies
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Check backend dependencies
+        working-directory: backend
+        run: npm audit --production
+        continue-on-error: true
+
+      - name: Check frontend dependencies
+        working-directory: frontend
+        run: npm audit --production
+        continue-on-error: true
+
+  # Code scanning with CodeQL
+  codeql:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        language: ['javascript']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: ${{ matrix.language }}
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v2
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+
+  # SAST scanning
+  sast:
+    name: SAST Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Check for common vulnerabilities
+        run: |
+          # Check for SQL injection patterns
+          if grep -r "query(.*\+" backend/src --include="*.js" | grep -v node_modules; then
+            echo "⚠️  Potential SQL injection found"
+          fi
+          
+          # Check for hardcoded secrets
+          if grep -r "secret.*=.*['\"]" backend/src --include="*.js" | grep -v node_modules | grep -v example; then
+            echo "⚠️  Potential hardcoded secret found"
+          fi
