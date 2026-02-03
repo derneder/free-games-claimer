@@ -9,12 +9,29 @@
 
 import { Router } from 'express';
 import Joi from 'joi';
+import rateLimit from 'express-rate-limit';
 import * as authController from '../controllers/authController.js';
 import { validate } from '../middleware/validation.js';
 import { asyncHandler } from '../middleware/error.js';
 import { verifyToken } from '../middleware/auth.js';
 
 const router = Router();
+
+// Rate limiters for authentication routes
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 auth requests per windowMs
+});
+
+const strictAuthLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20, // tighter limit for sensitive operations like login and 2FA
+});
+
+const profileLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 200, // allow more frequent profile access but still bounded
+});
 
 /**
  * @route POST /api/auth/register
@@ -23,6 +40,7 @@ const router = Router();
  */
 router.post(
   '/register',
+  authLimiter,
   validate({
     body: Joi.object({
       email: Joi.string().email().required(),
@@ -40,6 +58,7 @@ router.post(
  */
 router.post(
   '/login',
+  strictAuthLimiter,
   validate({
     body: Joi.object({
       email: Joi.string().email().required(),
@@ -56,6 +75,7 @@ router.post(
  */
 router.post(
   '/refresh',
+  authLimiter,
   validate({
     body: Joi.object({
       refreshToken: Joi.string().required(),
@@ -69,16 +89,27 @@ router.post(
  * @desc Get current user profile
  * @access Private
  */
-router.get('/profile', verifyToken, asyncHandler(authController.getProfile));
+router.get(
+  '/profile',
+  profileLimiter,
+  verifyToken,
+  asyncHandler(authController.getProfile),
+);
 
 /**
  * @route POST /api/auth/2fa/setup
  * @desc Setup two-factor authentication
  * @access Private
  */
-router.post('/2fa/setup', verifyToken, asyncHandler(authController.setup2FA));
+router.post(
+  '/2fa/setup',
+  authLimiter,
+  verifyToken,
+  asyncHandler(authController.setup2FA),
+);
 
 /**
+  strictAuthLimiter,
  * @route POST /api/auth/2fa/verify
  * @desc Verify 2FA token
  * @access Private
@@ -99,6 +130,11 @@ router.post(
  * @desc Logout user
  * @access Private
  */
-router.post('/logout', verifyToken, asyncHandler(authController.logout));
+router.post(
+  '/logout',
+  authLimiter,
+  verifyToken,
+  asyncHandler(authController.logout),
+);
 
 export default router;
