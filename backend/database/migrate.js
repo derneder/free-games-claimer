@@ -6,10 +6,19 @@
  * Usage: node database/migrate.js
  */
 
+import dotenv from 'dotenv';
 import { readdir, readFile } from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import pg from 'pg';
+
+// Load environment variables before importing config
+if (process.env.NODE_ENV === 'test') {
+  dotenv.config({ path: '.env.test' });
+} else {
+  dotenv.config();
+}
+
 import { config } from '../src/config/env.js';
 import { logger } from '../src/config/logger.js';
 
