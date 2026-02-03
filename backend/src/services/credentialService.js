@@ -14,7 +14,6 @@ import {
   decryptCredentials,
   maskSensitiveData,
   rotateEncryption,
-  getCurrentKeyVersion,
 } from '../utils/encryption.js';
 import { validateCredentials, VALID_PROVIDERS } from '../validators/credentials.js';
 

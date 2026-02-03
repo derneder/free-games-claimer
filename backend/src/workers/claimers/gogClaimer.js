@@ -19,11 +19,10 @@ export class GOGClaimer extends BaseClaimer {
   /**
    * Claim free games from GOG
    *
-   * @param {Object} credentials - User credentials
-   * @param {Object} options - Claim options
+   * @param {Object} _credentials - User credentials
    * @returns {Promise<Object>} Claim result
    */
-  async claim(credentials, options = {}) {
+  async claim(_credentials) {
     const result = {
       success: false,
       claimed: [],
@@ -39,7 +38,7 @@ export class GOGClaimer extends BaseClaimer {
       // 3. Handle optional OTP
       // 4. Find and claim giveaway games
       // 5. Unsubscribe from marketing if configured
-      
+
       throw new Error('GOG claimer not yet implemented');
     } catch (error) {
       logger.error('GOG claim process failed:', error);

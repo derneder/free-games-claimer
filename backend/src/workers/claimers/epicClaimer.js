@@ -25,10 +25,9 @@ export class EpicClaimer extends BaseClaimer {
    * Claim free games from Epic Games Store
    *
    * @param {Object} credentials - User credentials
-   * @param {Object} options - Claim options
    * @returns {Promise<Object>} Claim result
    */
-  async claim(credentials, options = {}) {
+  async claim(credentials) {
     const result = {
       success: false,
       claimed: [],

@@ -29,7 +29,6 @@ export async function getAllStatuses(req, res, next) {
     const statuses = await getAllCredentialStatuses(userId);
 
     // Add providers without credentials
-    const providersWithCredentials = statuses.map((s) => s.provider);
     const allProviders = VALID_PROVIDERS.map((provider) => {
       const existing = statuses.find((s) => s.provider === provider);
       if (existing) {

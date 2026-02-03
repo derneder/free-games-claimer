@@ -19,11 +19,10 @@ export class SteamClaimer extends BaseClaimer {
   /**
    * Claim free games from Steam
    *
-   * @param {Object} credentials - User credentials
-   * @param {Object} options - Claim options
+   * @param {Object} _credentials - User credentials
    * @returns {Promise<Object>} Claim result
    */
-  async claim(credentials, options = {}) {
+  async claim(_credentials) {
     const result = {
       success: false,
       claimed: [],
@@ -39,7 +38,7 @@ export class SteamClaimer extends BaseClaimer {
       // 3. Handle Steam Guard if needed
       // 4. Claim free games
       // 5. Check ownership status
-      
+
       throw new Error('Steam claimer not yet implemented');
     } catch (error) {
       logger.error('Steam claim process failed:', error);

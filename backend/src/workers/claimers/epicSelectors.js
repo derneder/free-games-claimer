@@ -1,14 +1,14 @@
 /**
  * Epic Games Selectors
- * 
+ *
  * Centralized selectors for Epic Games Store elements.
  * These may need to be updated when Epic changes their UI.
- * 
+ *
  * NOTE: Text-based selectors are fragile and may break with:
  * - Localization (different languages)
  * - UI updates
  * - A/B testing
- * 
+ *
  * @module src/workers/claimers/epicSelectors
  */
 
@@ -56,7 +56,7 @@ export const EPIC_SELECTORS_FALLBACK = {
 
 /**
  * Get selector with fallback
- * 
+ *
  * @param {Object} page - Playwright page
  * @param {string} primary - Primary selector
  * @param {string} fallback - Fallback selector
@@ -66,11 +66,11 @@ export async function getSelectorWithFallback(page, primary, fallback) {
   try {
     const element = await page.$(primary);
     if (element) return element;
-    
+
     if (fallback) {
       return await page.$(fallback);
     }
-    
+
     return null;
   } catch (error) {
     if (fallback) {
