@@ -1,123 +1,142 @@
 import React from 'react';
 
 export default function SystemStats({ stats }) {
-  const StatCard = ({ icon, label, value, trend, color }) => (
-    <div className="bg-gray-700 rounded-lg p-6 flex-1 min-w-[200px]">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-gray-400 text-sm">{label}</p>
-          <p className="text-3xl font-bold mt-2">{value}</p>
-          {trend && (
-            <p className={`text-sm mt-1 ${
-              trend > 0 ? 'text-green-400' : 'text-red-400'
-            }`}>
-              {trend > 0 ? '↑' : '↓'} {Math.abs(trend)}% this week
-            </p>
-          )}
-        </div>
-        <div className={`text-3xl ${color}`}>{icon}</div>
+  if (!stats) return null;
+
+  const StatCard = ({ icon, label, value, change }) => (
+    <div className="bg-gray-700 rounded-lg p-4">
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-2xl">{icon}</span>
+        <span className={`text-sm font-semibold ${
+          change >= 0 ? 'text-green-400' : 'text-red-400'
+        }`}>
+          {change >= 0 ? '+' : ''}{change}%
+        </span>
       </div>
+      <p className="text-gray-400 text-sm">{label}</p>
+      <p className="text-2xl font-bold">{value}</p>
     </div>
   );
 
   return (
-    <div>
-      <h2 className="text-2xl font-bold mb-6">System Overview</h2>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           icon="👥"
           label="Total Users"
-          value={stats?.users?.total || 0}
-          trend={stats?.users?.trend}
-          color="text-blue-400"
-        />
-        <StatCard
-          icon="🟢"
-          label="Active Users"
-          value={stats?.users?.active || 0}
-          trend={stats?.users?.activeTrend}
-          color="text-green-400"
+          value={stats.totalUsers || 0}
+          change={stats.userGrowth || 0}
         />
         <StatCard
           icon="🎮"
-          label="Total Games"
-          value={stats?.games?.total || 0}
-          trend={stats?.games?.trend}
-          color="text-purple-400"
+          label="Games Claimed"
+          value={stats.totalGamesClaimed || 0}
+          change={stats.gamesGrowth || 0}
         />
         <StatCard
-          icon="💵"
+          icon="💰"
           label="Total Value"
-          value={`$${stats?.games?.totalValue || 0}`}
-          trend={stats?.games?.valueTrend}
-          color="text-green-400"
+          value={`$${(stats.totalValue || 0).toFixed(2)}`}
+          change={stats.valueGrowth || 0}
+        />
+        <StatCard
+          icon="🔄"
+          label="Active Sessions"
+          value={stats.activeSessions || 0}
+          change={stats.sessionGrowth || 0}
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Game Distribution */}
-        <div className="bg-gray-700 rounded-lg p-6">
-          <h3 className="text-lg font-bold mb-4">Games by Source</h3>
-          <div className="space-y-3">
-            {stats?.gamesBySource?.map((source) => (
-              <div key={source.name} className="flex items-center justify-between">
-                <span className="text-gray-300">{source.name}</span>
-                <div className="flex items-center gap-2">
-                  <div className="w-32 bg-gray-600 rounded-full h-2">
-                    <div
-                      className="bg-blue-500 h-2 rounded-full"
-                      style={{
-                        width: `${(source.count / stats?.games?.total) * 100}%`
-                      }}
-                    ></div>
-                  </div>
-                  <span className="text-right w-12 text-sm">{source.count}</span>
-                </div>
-              </div>
-            ))}
+      {/* Server Health */}
+      <div className="bg-gray-700 rounded-lg p-4">
+        <h3 className="text-lg font-bold mb-4">🔧 Server Health</h3>
+        <div className="space-y-3">
+          <div>
+            <div className="flex justify-between mb-1">
+              <span>CPU Usage</span>
+              <span className="font-semibold">{stats.cpuUsage || 0}%</span>
+            </div>
+            <div className="w-full bg-gray-600 rounded-full h-2">
+              <div
+                className="bg-blue-600 h-2 rounded-full"
+                style={{ width: `${stats.cpuUsage || 0}%` }}
+              ></div>
+            </div>
           </div>
-        </div>
 
-        {/* Recent Activity */}
-        <div className="bg-gray-700 rounded-lg p-6">
-          <h3 className="text-lg font-bold mb-4">Recent Activity</h3>
-          <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <span className="text-gray-300">Registrations (7d)</span>
-              <span className="font-bold">{stats?.activity?.registrations || 0}</span>
+          <div>
+            <div className="flex justify-between mb-1">
+              <span>Memory Usage</span>
+              <span className="font-semibold">{stats.memoryUsage || 0}%</span>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-gray-300">Logins (24h)</span>
-              <span className="font-bold">{stats?.activity?.logins || 0}</span>
+            <div className="w-full bg-gray-600 rounded-full h-2">
+              <div
+                className="bg-yellow-600 h-2 rounded-full"
+                style={{ width: `${stats.memoryUsage || 0}%` }}
+              ></div>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-gray-300">Games Added (7d)</span>
-              <span className="font-bold">{stats?.activity?.gamesAdded || 0}</span>
+          </div>
+
+          <div>
+            <div className="flex justify-between mb-1">
+              <span>Database Usage</span>
+              <span className="font-semibold">{stats.dbUsage || 0}%</span>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-gray-300">Failed Logins (24h)</span>
-              <span className="font-bold text-red-400">{stats?.activity?.failedLogins || 0}</span>
+            <div className="w-full bg-gray-600 rounded-full h-2">
+              <div
+                className="bg-green-600 h-2 rounded-full"
+                style={{ width: `${stats.dbUsage || 0}%` }}
+              ></div>
+            </div>
+          </div>
+
+          <div>
+            <div className="flex justify-between mb-1">
+              <span>Redis Cache</span>
+              <span className="font-semibold">{stats.cacheHitRate || 0}% Hit Rate</span>
+            </div>
+            <div className="w-full bg-gray-600 rounded-full h-2">
+              <div
+                className="bg-purple-600 h-2 rounded-full"
+                style={{ width: `${stats.cacheHitRate || 0}%` }}
+              ></div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Database Size */}
-      <div className="mt-6 bg-gray-700 rounded-lg p-6">
-        <h3 className="text-lg font-bold mb-4">Database & Cache</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <p className="text-gray-400 text-sm">Database Size</p>
-            <p className="text-xl font-bold mt-1">{stats?.db?.size || 'N/A'}</p>
+      {/* API Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="bg-gray-700 rounded-lg p-4">
+          <h3 className="text-lg font-bold mb-4">📊 API Requests (24h)</h3>
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span>Total Requests</span>
+              <span className="font-semibold">{stats.apiRequests24h || 0}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Avg Response Time</span>
+              <span className="font-semibold">{stats.avgResponseTime || 0}ms</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Error Rate</span>
+              <span className="font-semibold text-red-400">{stats.errorRate || 0}%</span>
+            </div>
           </div>
-          <div>
-            <p className="text-gray-400 text-sm">Cache Keys</p>
-            <p className="text-xl font-bold mt-1">{stats?.cache?.keys || 0}</p>
-          </div>
-          <div>
-            <p className="text-gray-400 text-sm">Cache Hit Rate</p>
-            <p className="text-xl font-bold mt-1">{stats?.cache?.hitRate || 0}%</p>
+        </div>
+
+        <div className="bg-gray-700 rounded-lg p-4">
+          <h3 className="text-lg font-bold mb-4">⚠️ System Alerts</h3>
+          <div className="space-y-2">
+            {stats.alerts && stats.alerts.length > 0 ? (
+              stats.alerts.map((alert, i) => (
+                <div key={i} className="text-sm p-2 bg-red-900/50 rounded text-red-200">
+                  {alert}
+                </div>
+              ))
+            ) : (
+              <p className="text-green-400 text-sm">✅ No active alerts</p>
+            )}
           </div>
         </div>
       </div>
