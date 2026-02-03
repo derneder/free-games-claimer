@@ -120,3 +120,9 @@ export function generateRefreshToken(payload) {
     expiresIn: config.jwt.refreshExpiration,
   });
 }
+
+/**
+ * Authenticate - Alias for verifyToken middleware
+ * Exported for backward compatibility with routes that use 'authenticate'
+ */
+export const authenticate = verifyToken;

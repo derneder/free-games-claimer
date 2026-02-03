@@ -44,6 +44,8 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: free-games-api
+    env_file:
+      - .env
     environment:
       NODE_ENV: development
       DATABASE_URL: postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@postgres:5432/${DB_NAME:-free_games_dev}

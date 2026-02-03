@@ -29,6 +29,10 @@ COPY --from=builder /app/package*.json ./
 
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001
+
+# Create logs directory and set ownership
+RUN mkdir -p /app/logs && chown -R nodejs:nodejs /app
+
 USER nodejs
 
 # Health check
