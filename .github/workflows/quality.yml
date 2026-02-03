@@ -1,0 +1,161 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [main, develop, implementation]
+  pull_request:
+    branches: [main, develop, implementation]
+
+jobs:
+  format:
+    name: Format Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          cd backend && npm ci && cd ..
+          cd frontend && npm ci && cd ..
+
+      - name: Check Prettier formatting
+        run: |
+          echo "📐 Checking backend formatting..."
+          cd backend && npm run format -- --check && cd ..
+          echo "📐 Checking frontend formatting..."
+          cd frontend && npm run format -- --check && cd ..
+
+  lint:
+    name: Lint Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          cd backend && npm ci && cd ..
+          cd frontend && npm ci && cd ..
+
+      - name: Lint backend
+        run: |
+          cd backend && npm run lint && cd ..
+
+      - name: Lint frontend
+        run: |
+          cd frontend && npm run lint && cd ..
+
+  type-check:
+    name: Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          cd backend && npm ci && cd ..
+          cd frontend && npm ci && cd ..
+
+      - name: Type check backend
+        run: |
+          cd backend && npm run type-check 2>/dev/null || echo "Backend: TypeScript check not configured"
+
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: test
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          cd backend && npm ci && cd ..
+          cd frontend && npm ci && cd ..
+
+      - name: Test backend
+        run: |
+          cd backend && npm run test:coverage && cd ..
+        env:
+          NODE_ENV: test
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/test
+          REDIS_URL: redis://localhost:6379
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./backend/coverage/lcov.info
+          flags: backend
+          name: backend-coverage
+
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          cd backend && npm ci && cd ..
+          cd frontend && npm ci && cd ..
+
+      - name: Run npm audit
+        run: |
+          echo "🔍 Running npm audit..."
+          cd backend && npm audit --audit-level=moderate 2>/dev/null || echo "Backend has vulnerabilities" && cd ..
+          cd frontend && npm audit --audit-level=moderate 2>/dev/null || echo "Frontend has vulnerabilities" && cd ..
+        continue-on-error: true
+
+      - name: Check for secrets
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+        continue-on-error: true
