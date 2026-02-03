@@ -106,5 +106,9 @@ export async function closeDatabase() {
   }
 }
 
-// Export pool as default to support both import styles
+/**
+ * Export pool as default to support both import styles
+ * Note: Pool is null until initializeDatabase() is called.
+ * Always call initializeDatabase() before using the pool.
+ */
 export default pool;

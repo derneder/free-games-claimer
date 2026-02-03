@@ -34,7 +34,8 @@ jobs:
     -
       name: Run ESLint on backend
       working-directory: backend
-      run: npx eslint . --ext .js,.ts -f json -o ../eslint_report.json || true
+      run: |
+        npx eslint . --ext .js,.ts -f json -o ../eslint_report.json || echo "ESLint completed with warnings/errors"
     -
       name: Fix ESLint paths
       run: |
