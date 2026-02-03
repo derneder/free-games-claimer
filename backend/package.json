@@ -14,7 +14,7 @@
     "test": "NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest --passWithNoTests",
     "test:watch": "NODE_ENV=test jest --watch",
     "test:coverage": "NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest --coverage",
-    "lint": "eslint src tests --fix",
+    "lint": "eslint src tests",
     "format": "npx prettier --write \"src/**/*.js\" \"tests/**/*.js\"",
     "format:check": "npx prettier --check \"src/**/*.js\" \"tests/**/*.js\"",
     "type-check": "tsc --noEmit",
