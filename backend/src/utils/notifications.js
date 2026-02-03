@@ -74,7 +74,7 @@ export async function notifyAdmins(notification) {
  */
 async function sendTelegramNotification(chatId, notification) {
   try {
-    const { type, title, message, severity } = notification;
+    const { title, message, severity } = notification;
 
     // Emoji based on severity
     const severityEmoji = {

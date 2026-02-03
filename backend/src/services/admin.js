@@ -8,7 +8,6 @@
  */
 
 import { User } from '../models/User.js';
-import { Game } from '../models/Game.js';
 import { ActivityLog } from '../models/ActivityLog.js';
 import { query } from '../config/database.js';
 

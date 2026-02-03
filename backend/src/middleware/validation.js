@@ -7,8 +7,6 @@
  * @module src/middleware/validation
  */
 
-import Joi from 'joi';
-
 /**
  * Create validation middleware
  *
