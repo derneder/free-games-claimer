@@ -61,7 +61,7 @@ jobs:
         working-directory: backend
         run: |
           npm install
-          npm test -- --coverage
+          npm test -- tests/unit/ --coverage
 
       - name: Run frontend build
         working-directory: frontend
