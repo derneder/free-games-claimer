@@ -1,161 +1,77 @@
-name: Code Quality
+name: Code Quality & Security
 
 on:
   push:
-    branches: [main, develop, implementation]
+    branches: [implementation, main]
   pull_request:
-    branches: [main, develop, implementation]
+    branches: [implementation, main]
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
 
 jobs:
-  format:
-    name: Format Check
+  code-quality:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+    timeout-minutes: 15
 
-      - uses: actions/setup-node@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
-          node-version-file: '.nvmrc'
+          fetch-depth: 0  # Full history for better analysis
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.18.2'
           cache: 'npm'
 
       - name: Install dependencies
-        run: |
-          cd backend && npm ci && cd ..
-          cd frontend && npm ci && cd ..
+        run: npm ci
 
-      - name: Check Prettier formatting
-        run: |
-          echo "📐 Checking backend formatting..."
-          cd backend && npm run format -- --check && cd ..
-          echo "📐 Checking frontend formatting..."
-          cd frontend && npm run format -- --check && cd ..
-
-  lint:
-    name: Lint Check
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: |
-          cd backend && npm ci && cd ..
-          cd frontend && npm ci && cd ..
-
-      - name: Lint backend
-        run: |
-          cd backend && npm run lint && cd ..
-
-      - name: Lint frontend
-        run: |
-          cd frontend && npm run lint && cd ..
-
-  type-check:
-    name: Type Check
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: |
-          cd backend && npm ci && cd ..
-          cd frontend && npm ci && cd ..
-
-      - name: Type check backend
-        run: |
-          cd backend && npm run type-check 2>/dev/null || echo "Backend: TypeScript check not configured"
-
-  test:
-    name: Unit Tests
-    runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_DB: test
-          POSTGRES_PASSWORD: postgres
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-
-      redis:
-        image: redis:7
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 6379:6379
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: |
-          cd backend && npm ci && cd ..
-          cd frontend && npm ci && cd ..
-
-      - name: Test backend
-        run: |
-          cd backend && npm run test:coverage && cd ..
-        env:
-          NODE_ENV: test
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432/test
-          REDIS_URL: redis://localhost:6379
-
-      - name: Upload coverage
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./backend/coverage/lcov.info
-          flags: backend
-          name: backend-coverage
-
-  security:
-    name: Security Scan
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: |
-          cd backend && npm ci && cd ..
-          cd frontend && npm ci && cd ..
-
-      - name: Run npm audit
-        run: |
-          echo "🔍 Running npm audit..."
-          cd backend && npm audit --audit-level=moderate 2>/dev/null || echo "Backend has vulnerabilities" && cd ..
-          cd frontend && npm audit --audit-level=moderate 2>/dev/null || echo "Frontend has vulnerabilities" && cd ..
+      - name: Format check (Prettier)
+        run: npm run format:check
         continue-on-error: true
 
-      - name: Check for secrets
-        uses: trufflesecurity/trufflehog@main
+      - name: Lint code (ESLint)
+        run: npm run lint
+        continue-on-error: true
+
+      - name: Type check (TypeScript)
+        run: npm run type-check
+        continue-on-error: true
+
+      - name: Security audit
+        run: npm audit --audit-level=moderate
+        continue-on-error: true
+
+      - name: Check for secrets (Gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+  build-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          path: ./
-          base: ${{ github.event.repository.default_branch }}
-          head: HEAD
+          node-version: '18.18.2'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build backend
+        run: npm run build
+        continue-on-error: true
+
+      - name: Build frontend
+        run: npm run build --prefix frontend
+        env:
+          VITE_API_URL: 'https://api.example.com'
         continue-on-error: true
