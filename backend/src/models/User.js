@@ -45,6 +45,17 @@ export class User {
   }
 
   /**
+   * Find user by username
+   *
+   * @param {string} username - Username
+   * @returns {Promise<User|null>} User object or null
+   */
+  static async findByUsername(username) {
+    const result = await query('SELECT * FROM users WHERE username = $1', [username]);
+    return result.rows[0] ? new User(result.rows[0]) : null;
+  }
+
+  /**
    * Find user by ID
    *
    * @param {string} id - User ID
