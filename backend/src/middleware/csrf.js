@@ -60,8 +60,7 @@ const { doubleCsrfProtection, generateToken } = doubleCsrf({
 /**
  * Export CSRF protection middleware and token generator
  */
-export { doubleCsrfProtection };
-export { generateToken };
+export { doubleCsrfProtection, generateToken };
 
 /**
  * Middleware для логирования CSRF ошибок

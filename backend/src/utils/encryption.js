@@ -163,9 +163,12 @@ export function maskSensitiveData(
   for (const field of sensitiveFields) {
     if (masked[field]) {
       if (typeof masked[field] === 'string') {
-        // Show first 2 and last 2 characters
         const value = masked[field];
-        if (value.length > 8) {
+        // Always mask passwords completely for security
+        if (field === 'password') {
+          masked[field] = '***';
+        } else if (value.length > 8) {
+          // Show first 2 and last 2 characters for other sensitive fields
           masked[field] = `${value.substring(0, 2)}...${value.substring(value.length - 2)}`;
         } else {
           masked[field] = '***';
