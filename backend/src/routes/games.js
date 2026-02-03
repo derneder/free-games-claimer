@@ -37,7 +37,9 @@ router.get(
   validate({
     query: Joi.object({
       page: Joi.number().integer().min(1).default(1),
+      limit: Joi.number().integer().min(1).max(100).optional(),
       pageSize: Joi.number().integer().min(1).max(100).default(20),
+      source: Joi.string().optional(),
       sortBy: Joi.string().valid('claimedAt', 'title', 'price').default('claimedAt'),
       sortOrder: Joi.string().valid('asc', 'desc').default('desc'),
     }),
@@ -56,7 +58,7 @@ router.get(
   gamesRateLimiter,
   validate({
     params: Joi.object({
-      id: Joi.string().uuid().required(),
+      id: Joi.string().required(),
     }),
   }),
   asyncHandler(gamesController.getGame)
@@ -75,11 +77,15 @@ router.post(
     body: Joi.object({
       title: Joi.string().required(),
       description: Joi.string().optional(),
-      price: Joi.number().min(0).required(),
+      price: Joi.number().min(0).optional(),
+      steamPrice: Joi.number().min(0).optional(),
       image: Joi.string().uri().optional(),
+      platform: Joi.string().optional(),
       platforms: Joi.array().items(Joi.string()).optional(),
+      source: Joi.string().optional(),
       sources: Joi.array().items(Joi.string()).optional(),
       url: Joi.string().uri().optional(),
+      sourceUrl: Joi.string().uri().optional(),
       claimedAt: Joi.date().optional(),
       expiresAt: Joi.date().optional(),
     }),
@@ -98,10 +104,39 @@ router.delete(
   gamesRateLimiter,
   validate({
     params: Joi.object({
-      id: Joi.string().uuid().required(),
+      id: Joi.string().required(),
     }),
   }),
   asyncHandler(gamesController.deleteGame)
+);
+
+/**
+ * @route POST /api/games/import/bulk
+ * @desc Bulk import games
+ * @access Private
+ */
+router.post(
+  '/import/bulk',
+  verifyToken,
+  gamesRateLimiter,
+  validate({
+    body: Joi.object({
+      games: Joi.array()
+        .items(
+          Joi.object({
+            title: Joi.string().required(),
+            description: Joi.string().optional(),
+            source: Joi.string().optional(),
+            sourceUrl: Joi.string().uri().optional(),
+            platform: Joi.string().optional(),
+            steamPrice: Joi.number().min(0).optional(),
+            price: Joi.number().min(0).optional(),
+          })
+        )
+        .required(),
+    }),
+  }),
+  asyncHandler(gamesController.bulkImport)
 );
 
 /**

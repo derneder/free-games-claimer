@@ -37,10 +37,16 @@ export async function registerUser(email, username, password) {
     throw new AppError('Password does not meet requirements', 400, 'WEAK_PASSWORD');
   }
 
-  // Check if user exists
-  const existingUser = await User.findByEmail(email);
-  if (existingUser) {
+  // Check if email exists
+  const existingEmail = await User.findByEmail(email);
+  if (existingEmail) {
     throw new AppError('User with this email already exists', 409, 'USER_EXISTS');
+  }
+
+  // Check if username exists
+  const existingUsername = await User.findByUsername(username);
+  if (existingUsername) {
+    throw new AppError('User with this username already exists', 409, 'USERNAME_EXISTS');
   }
 
   // Create user

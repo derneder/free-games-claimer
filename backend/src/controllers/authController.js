@@ -10,11 +10,13 @@
 import { User } from '../models/User.js';
 import { ActivityLog } from '../models/ActivityLog.js';
 import * as authService from '../services/auth.js';
-import { generateToken, generateRefreshToken } from '../middleware/auth.js';
+import { generateToken } from '../middleware/auth.js';
 import { AppError } from '../middleware/error.js';
-import { formatSuccess, formatError } from '../utils/formatters.js';
 import { logger } from '../config/logger.js';
+import { config } from '../config/env.js';
+import jwt from 'jsonwebtoken';
 import speakeasy from 'speakeasy';
+import crypto from 'crypto';
 import { getRedisClient } from '../config/redis.js';
 
 /**
@@ -26,28 +28,40 @@ import { getRedisClient } from '../config/redis.js';
  */
 export async function register(req, res) {
   try {
-    const { email, username, password } = req.body;
+    const { email, username, password, confirmPassword } = req.body;
+
+    // Check password confirmation
+    if (password !== confirmPassword) {
+      return res.status(400).json({ error: 'Passwords do not match' });
+    }
 
     const result = await authService.registerUser(email, username, password);
 
-    res.status(201).json(
-      formatSuccess(
-        {
-          user: result.user,
-          tokens: {
-            accessToken: result.accessToken,
-            refreshToken: result.refreshToken,
-          },
-        },
-        'User registered successfully'
-      )
-    );
+    res.status(201).json({
+      user: result.user,
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken,
+    });
   } catch (error) {
     logger.error('Registration error:', error);
-    if (error instanceof AppError) {
-      return res.status(error.statusCode).json(formatError(error.code, error.message));
+
+    // Handle Postgres unique constraint violations
+    if (error.code === '23505') {
+      let message = 'User already exists';
+      if (error.constraint === 'users_email_key') {
+        message = 'User with this email already exists';
+      } else if (error.constraint === 'users_username_key') {
+        message = 'User with this username already exists';
+      }
+      return res.status(400).json({ error: message });
     }
-    res.status(500).json(formatError('INTERNAL_ERROR', 'Registration failed'));
+
+    if (error instanceof AppError) {
+      // Return 400 for all user-facing errors during registration
+      const statusCode = error.statusCode === 409 ? 400 : error.statusCode;
+      return res.status(statusCode).json({ error: error.message });
+    }
+    res.status(500).json({ error: 'Registration failed' });
   }
 }
 
@@ -64,24 +78,17 @@ export async function login(req, res) {
 
     const result = await authService.loginUser(email, password);
 
-    res.json(
-      formatSuccess(
-        {
-          user: result.user,
-          tokens: {
-            accessToken: result.accessToken,
-            refreshToken: result.refreshToken,
-          },
-        },
-        'Login successful'
-      )
-    );
+    res.json({
+      user: result.user,
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken,
+    });
   } catch (error) {
     logger.error('Login error:', error);
     if (error instanceof AppError) {
-      return res.status(error.statusCode).json(formatError(error.code, error.message));
+      return res.status(error.statusCode).json({ error: error.message });
     }
-    res.status(500).json(formatError('INTERNAL_ERROR', 'Login failed'));
+    res.status(500).json({ error: 'Login failed' });
   }
 }
 
@@ -99,8 +106,6 @@ export async function refreshToken(req, res) {
     // Verify refresh token
     let decoded;
     try {
-      const jwt = await import('jsonwebtoken');
-      const { config } = await import('../config/env.js');
       decoded = jwt.verify(refreshToken, config.jwt.secret);
     } catch (error) {
       throw new AppError('Invalid refresh token', 401, 'INVALID_TOKEN');
@@ -114,25 +119,16 @@ export async function refreshToken(req, res) {
 
     // Generate new tokens
     const accessToken = generateToken({ id: user.id, email: user.email, role: user.role });
-    const newRefreshToken = generateRefreshToken({ id: user.id });
 
-    res.json(
-      formatSuccess(
-        {
-          tokens: {
-            accessToken,
-            refreshToken: newRefreshToken,
-          },
-        },
-        'Tokens refreshed'
-      )
-    );
+    res.json({
+      accessToken,
+    });
   } catch (error) {
     logger.error('Token refresh error:', error);
     if (error instanceof AppError) {
-      return res.status(error.statusCode).json(formatError(error.code, error.message));
+      return res.status(error.statusCode).json({ error: error.message });
     }
-    res.status(500).json(formatError('INTERNAL_ERROR', 'Token refresh failed'));
+    res.status(500).json({ error: 'Token refresh failed' });
   }
 }
 
@@ -151,8 +147,8 @@ export async function getProfile(req, res) {
       throw new AppError('User not found', 404, 'USER_NOT_FOUND');
     }
 
-    res.json(
-      formatSuccess({
+    res.json({
+      user: {
         id: user.id,
         email: user.email,
         username: user.username,
@@ -160,14 +156,14 @@ export async function getProfile(req, res) {
         twoFaEnabled: user.twoFaEnabled,
         isActive: user.isActive,
         createdAt: user.createdAt,
-      })
-    );
+      },
+    });
   } catch (error) {
     logger.error('Get profile error:', error);
     if (error instanceof AppError) {
-      return res.status(error.statusCode).json(formatError(error.code, error.message));
+      return res.status(error.statusCode).json({ error: error.message });
     }
-    res.status(500).json(formatError('INTERNAL_ERROR', 'Failed to get profile'));
+    res.status(500).json({ error: 'Failed to get profile' });
   }
 }
 
@@ -192,29 +188,31 @@ export async function setup2FA(req, res) {
       length: 32,
     });
 
+    // Generate 10 backup codes
+    const backupCodes = [];
+    for (let i = 0; i < 10; i++) {
+      backupCodes.push(crypto.randomBytes(4).toString('hex').toUpperCase());
+    }
+
     // Store temporary secret in Redis
     const redis = getRedisClient();
     await redis.setEx(
       `2fa_temp:${user.id}`,
       300, // 5 minutes
-      JSON.stringify(secret)
+      JSON.stringify({ secret, backupCodes })
     );
 
-    res.json(
-      formatSuccess(
-        {
-          secret: secret.base32,
-          qrCode: secret.otpauth_url,
-        },
-        '2FA setup initiated'
-      )
-    );
+    res.json({
+      secret: secret.base32,
+      qrCode: secret.otpauth_url,
+      backupCodes,
+    });
   } catch (error) {
     logger.error('2FA setup error:', error);
     if (error instanceof AppError) {
-      return res.status(error.statusCode).json(formatError(error.code, error.message));
+      return res.status(error.statusCode).json({ error: error.message });
     }
-    res.status(500).json(formatError('INTERNAL_ERROR', '2FA setup failed'));
+    res.status(500).json({ error: '2FA setup failed' });
   }
 }
 
@@ -271,13 +269,13 @@ export async function verify2FA(req, res) {
       description: 'Two-factor authentication enabled',
     });
 
-    res.json(formatSuccess({ message: '2FA enabled successfully' }, '2FA is now active'));
+    res.json({ message: '2FA enabled successfully' });
   } catch (error) {
     logger.error('2FA verification error:', error);
     if (error instanceof AppError) {
-      return res.status(error.statusCode).json(formatError(error.code, error.message));
+      return res.status(error.statusCode).json({ error: error.message });
     }
-    res.status(500).json(formatError('INTERNAL_ERROR', '2FA verification failed'));
+    res.status(500).json({ error: '2FA verification failed' });
   }
 }
 
@@ -297,9 +295,9 @@ export async function logout(req, res) {
       description: 'User logged out',
     });
 
-    res.json(formatSuccess({ message: 'Logged out successfully' }, 'Logout successful'));
+    res.json({ message: 'Logged out successfully' });
   } catch (error) {
     logger.error('Logout error:', error);
-    res.status(500).json(formatError('INTERNAL_ERROR', 'Logout failed'));
+    res.status(500).json({ error: 'Logout failed' });
   }
 }
