@@ -1,0 +1,34 @@
+{
+  "testGame": {
+    "title": "Test Game",
+    "description": "A test game",
+    "price": 29.99,
+    "image": "https://example.com/game.jpg",
+    "platforms": ["PC", "PlayStation"],
+    "sources": ["Epic Games"],
+    "url": "https://example.com/game"
+  },
+  "games": [
+    {
+      "title": "Fortnite",
+      "description": "Battle royale game",
+      "price": 0,
+      "platforms": ["PC", "PlayStation", "Xbox"],
+      "sources": ["Epic Games"]
+    },
+    {
+      "title": "The Witcher 3",
+      "description": "Open-world RPG",
+      "price": 39.99,
+      "platforms": ["PC", "PlayStation", "Xbox"],
+      "sources": ["GOG"]
+    },
+    {
+      "title": "Cyberpunk 2077",
+      "description": "Sci-fi RPG",
+      "price": 49.99,
+      "platforms": ["PC", "PlayStation", "Xbox"],
+      "sources": ["GOG"]
+    }
+  ]
+}

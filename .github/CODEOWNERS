@@ -1,0 +1,24 @@
+# Global owners
+* @derneder
+
+# Backend
+/backend/ @derneder
+/backend/src/api/ @derneder
+/backend/src/services/ @derneder
+/backend/database/ @derneder
+/backend/migrations/ @derneder
+
+# Frontend  
+/frontend/ @derneder
+/frontend/src/ @derneder
+
+# Infrastructure
+/docker-compose.yml @derneder
+/.github/workflows/ @derneder
+deploy.sh @derneder
+rollback.sh @derneder
+
+# Documentation
+/docs/ @derneder
+README.md @derneder
+CONTRIBUTING.md @derneder

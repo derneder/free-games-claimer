@@ -1,0 +1,91 @@
+module.exports = {
+  apps: [
+    {
+      name: 'free-games-api',
+      script: './src/index.js',
+      instances: 'max',
+      exec_mode: 'cluster',
+      env: {
+        NODE_ENV: 'production',
+        PORT: 3000
+      },
+      error_file: './logs/error.log',
+      out_file: './logs/out.log',
+      log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
+      merge_logs: true,
+      autorestart: true,
+      max_memory_restart: '1G',
+      watch: false,
+      max_restarts: 10,
+      min_uptime: '10s',
+      listen_timeout: 10000,
+      kill_timeout: 5000,
+      wait_ready: true,
+      shutdown_with_message: true,
+      ignore_watch: [
+        'node_modules',
+        'logs',
+        'dist',
+        '.git',
+        '.env'
+      ],
+      node_args: '--max-old-space-size=2048',
+      time_zone: 'UTC'
+    },
+    {
+      name: 'telegram-bot',
+      script: './src/telegram/bot.js',
+      instances: 1,
+      exec_mode: 'fork',
+      env: {
+        NODE_ENV: 'production'
+      },
+      error_file: './logs/telegram-error.log',
+      out_file: './logs/telegram-out.log',
+      autorestart: true,
+      max_memory_restart: '256M',
+      watch: false
+    },
+    {
+      name: 'recommendations-engine',
+      script: './src/workers/recommendationsWorker.js',
+      instances: 1,
+      exec_mode: 'fork',
+      env: {
+        NODE_ENV: 'production'
+      },
+      cron_restart: '0 2 * * *', // Train model at 2 AM daily
+      error_file: './logs/recommendations-error.log',
+      out_file: './logs/recommendations-out.log',
+      autorestart: true,
+      max_memory_restart: '512M'
+    },
+    {
+      name: 'notification-worker',
+      script: './src/workers/notificationWorker.js',
+      instances: 1,
+      exec_mode: 'fork',
+      env: {
+        NODE_ENV: 'production'
+      },
+      error_file: './logs/notification-error.log',
+      out_file: './logs/notification-out.log',
+      autorestart: true,
+      max_memory_restart: '256M'
+    }
+  ],
+  deploy: {
+    production: {
+      user: 'ubuntu',
+      host: process.env.DEPLOY_HOST || 'your-server.com',
+      ref: 'origin/main',
+      repo: 'https://github.com/derneder/free-games-claimer.git',
+      path: '/var/www/free-games-claimer',
+      'post-deploy': 'npm install && npm run migrate && pm2 startOrRestart ecosystem.config.js'
+    }
+  },
+  monit: {
+    min_uptime: '10s',
+    max_restarts: 3
+  }
+};

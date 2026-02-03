@@ -1,0 +1,30 @@
+{
+  "testUser": {
+    "email": "test@example.com",
+    "username": "testuser",
+    "password": "Test@1234"
+  },
+  "adminUser": {
+    "email": "admin@example.com",
+    "username": "admin",
+    "password": "Admin@1234",
+    "role": "admin"
+  },
+  "invalidUsers": [
+    {
+      "email": "invalid",
+      "username": "test",
+      "password": "Test@1234"
+    },
+    {
+      "email": "test@example.com",
+      "username": "a",
+      "password": "Test@1234"
+    },
+    {
+      "email": "test@example.com",
+      "username": "testuser",
+      "password": "weak"
+    }
+  ]
+}
