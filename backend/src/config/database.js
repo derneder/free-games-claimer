@@ -77,6 +77,20 @@ export function getPool() {
 }
 
 /**
+ * Get database connection pool (alias for getPool)
+ * 
+ * Provides a more semantic alias for getPool() when the focus is on 
+ * database operations rather than connection pooling. Both functions
+ * return the same pool instance.
+ *
+ * @returns {pg.Pool} PostgreSQL connection pool
+ * @throws {Error} If pool is not initialized
+ */
+export function getDatabase() {
+  return getPool();
+}
+
+/**
  * Execute query on database
  *
  * @param {string} query - SQL query string
@@ -102,6 +116,7 @@ export async function query(query, values = []) {
 export async function closeDatabase() {
   if (pool) {
     await pool.end();
+    pool = null;
     logger.info('Database connection pool closed');
   }
 }
