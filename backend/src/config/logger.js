@@ -32,7 +32,7 @@ export const logger = winston.createLogger({
   format: combine(
     timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
     errors({ stack: true }),
-    config.nodeEnv === 'development' ? devFormat : json(),
+    config.nodeEnv === 'development' ? devFormat : json()
   ),
   defaultMeta: { service: 'free-games-claimer-api' },
   transports: [
@@ -44,16 +44,16 @@ export const logger = winston.createLogger({
     // File transports (production)
     ...(config.nodeEnv !== 'test'
       ? [
-        new winston.transports.File({
-          filename: 'logs/error.log',
-          level: 'error',
-          format: json(),
-        }),
-        new winston.transports.File({
-          filename: 'logs/combined.log',
-          format: json(),
-        }),
-      ]
+          new winston.transports.File({
+            filename: 'logs/error.log',
+            level: 'error',
+            format: json(),
+          }),
+          new winston.transports.File({
+            filename: 'logs/combined.log',
+            format: json(),
+          }),
+        ]
       : []),
   ],
 });

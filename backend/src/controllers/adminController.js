@@ -33,8 +33,8 @@ export async function getSystemStats(req, res) {
           ...stats,
           timestamp: new Date().toISOString(),
         },
-        'System statistics retrieved',
-      ),
+        'System statistics retrieved'
+      )
     );
   } catch (error) {
     logger.error('Get system stats error:', error);
@@ -124,7 +124,7 @@ export async function getUser(req, res) {
         twoFaEnabled: user.twoFaEnabled,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
-      }),
+      })
     );
   } catch (error) {
     logger.error('Get user error:', error);
@@ -166,7 +166,7 @@ export async function deactivateUser(req, res) {
     });
 
     res.json(
-      formatSuccess({ message: 'User account deactivated' }, 'User deactivated successfully'),
+      formatSuccess({ message: 'User account deactivated' }, 'User deactivated successfully')
     );
   } catch (error) {
     logger.error('Deactivate user error:', error);

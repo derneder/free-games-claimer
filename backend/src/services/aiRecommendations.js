@@ -64,15 +64,15 @@ export async function getCollaborativeFilteringRecommendations(userId, limit = 5
     const userVector =
       userGames.length > 0
         ? userGames[0]
-          .map((g) => buildGameVector(g))
-          .reduce((acc, v) => acc.map((a, i) => a + v[i]))
+            .map((g) => buildGameVector(g))
+            .reduce((acc, v) => acc.map((a, i) => a + v[i]))
         : [];
 
     // Get all games
     const allGames = await db('games')
       .whereNotIn(
         'id',
-        userGames.map((g) => g.id),
+        userGames.map((g) => g.id)
       )
       .limit(100);
 

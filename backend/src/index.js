@@ -40,7 +40,7 @@ app.use(
     origin: config.corsOrigin,
     credentials: true,
     optionsSuccessStatus: 200,
-  }),
+  })
 );
 
 // Compression

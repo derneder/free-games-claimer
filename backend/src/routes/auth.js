@@ -68,7 +68,7 @@ router.post(
       password: Joi.string().min(8).required(),
     }),
   }),
-  asyncHandler(authController.register),
+  asyncHandler(authController.register)
 );
 
 /**
@@ -85,7 +85,7 @@ router.post(
       password: Joi.string().required(),
     }),
   }),
-  asyncHandler(authController.login),
+  asyncHandler(authController.login)
 );
 
 /**
@@ -101,7 +101,7 @@ router.post(
       refreshToken: Joi.string().required(),
     }),
   }),
-  asyncHandler(authController.refreshToken),
+  asyncHandler(authController.refreshToken)
 );
 
 /**
@@ -132,7 +132,7 @@ router.post(
       token: Joi.string().length(6).required(),
     }),
   }),
-  asyncHandler(authController.verify2FA),
+  asyncHandler(authController.verify2FA)
 );
 
 /**

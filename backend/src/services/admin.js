@@ -73,7 +73,7 @@ export async function getActivityLogs(page = 1, pageSize = 50) {
   const offset = (page - 1) * pageSize;
   const result = await query(
     'SELECT * FROM activityLogs ORDER BY createdAt DESC LIMIT $1 OFFSET $2',
-    [pageSize, offset],
+    [pageSize, offset]
   );
   const countResult = await query('SELECT COUNT(*) FROM activityLogs');
 
