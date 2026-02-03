@@ -16,6 +16,13 @@ import { config } from './config/env.js';
 import { logger } from './config/logger.js';
 import { initializeDatabase } from './config/database.js';
 import { initializeRedis } from './config/redis.js';
+import { globalErrorHandler } from './middleware/error.js';
+
+// Import routes
+import authRoutes from './routes/auth.js';
+import gamesRoutes from './routes/games.js';
+import usersRoutes from './routes/users.js';
+import adminRoutes from './routes/admin.js';
 
 const app = express();
 
@@ -46,12 +53,16 @@ app.use(morgan('combined', { stream: { write: (msg) => logger.info(msg.trim()) }
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
-// Health check
+/**
+ * Health check
+ */
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Root endpoint
+/**
+ * Root endpoint
+ */
 app.get('/', (req, res) => {
   res.json({
     name: 'Free Games Claimer API',
@@ -60,6 +71,31 @@ app.get('/', (req, res) => {
     docs: '/api-docs',
   });
 });
+
+/**
+ * API Routes
+ */
+const apiPrefix = config.api.prefix;
+
+app.use(`${apiPrefix}/auth`, authRoutes);
+app.use(`${apiPrefix}/games`, gamesRoutes);
+app.use(`${apiPrefix}/users`, usersRoutes);
+app.use(`${apiPrefix}/admin`, adminRoutes);
+
+/**
+ * 404 Handler
+ */
+app.use((req, res) => {
+  res.status(404).json({
+    error: 'NOT_FOUND',
+    message: `Route ${req.method} ${req.path} not found`,
+  });
+});
+
+/**
+ * Global Error Handler
+ */
+app.use(globalErrorHandler);
 
 /**
  * Initialize application and start server
@@ -79,6 +115,8 @@ async function startServer() {
       logger.info(
         `🚀 Server running at http://${config.host}:${config.port} [${config.nodeEnv}]`
       );
+      logger.info(`📚 API Documentation: http://${config.host}:${config.port}/api-docs`);
+      logger.info(`API Prefix: ${apiPrefix}`);
     });
 
     // Graceful shutdown
