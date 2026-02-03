@@ -16,10 +16,7 @@ import { logger } from '../config/logger.js';
 import { config } from '../config/env.js';
 import jwt from 'jsonwebtoken';
 import speakeasy from 'speakeasy';
-import crypto from 'crypto';
 import { getRedisClient } from '../config/redis.js';
-import jwt from 'jsonwebtoken';
-import { config } from '../config/env.js';
 
 /**
  * Register new user
@@ -34,11 +31,6 @@ export async function register(req, res) {
 
     const result = await authService.registerUser(email, username, password, confirmPassword);
 
-    res.status(201).json({
-      user: result.user,
-      accessToken: result.accessToken,
-      refreshToken: result.refreshToken,
-    });
     res.status(201).json({
       user: result.user,
       accessToken: result.accessToken,
@@ -62,7 +54,6 @@ export async function register(req, res) {
       return res.status(error.statusCode).json({ error: error.message });
     }
     res.status(500).json({ error: 'Registration failed' });
-    res.status(500).json({ error: 'Registration failed' });
   }
 }
 
@@ -84,18 +75,11 @@ export async function login(req, res) {
       accessToken: result.accessToken,
       refreshToken: result.refreshToken,
     });
-    res.json({
-      user: result.user,
-      accessToken: result.accessToken,
-      refreshToken: result.refreshToken,
-    });
   } catch (error) {
     logger.error('Login error:', error);
     if (error instanceof AppError) {
       return res.status(error.statusCode).json({ error: error.message });
-      return res.status(error.statusCode).json({ error: error.message });
     }
-    res.status(500).json({ error: 'Login failed' });
     res.status(500).json({ error: 'Login failed' });
   }
 }
@@ -127,18 +111,15 @@ export async function refreshToken(req, res) {
 
     // Generate new tokens
     const accessToken = generateToken({ id: user.id, email: user.email, role: user.role });
-
     res.json({
       accessToken,
-      refreshToken: newRefreshToken,
+      refreshToken, // возвращаем входной токен без лишней переменной
     });
   } catch (error) {
     logger.error('Token refresh error:', error);
     if (error instanceof AppError) {
       return res.status(error.statusCode).json({ error: error.message });
-      return res.status(error.statusCode).json({ error: error.message });
     }
-    res.status(500).json({ error: 'Token refresh failed' });
     res.status(500).json({ error: 'Token refresh failed' });
   }
 }
@@ -160,8 +141,6 @@ export async function getProfile(req, res) {
 
     res.json({
       user: {
-    res.json({
-      user: {
         id: user.id,
         email: user.email,
         username: user.username,
@@ -171,15 +150,11 @@ export async function getProfile(req, res) {
         createdAt: user.createdAt,
       },
     });
-      },
-    });
   } catch (error) {
     logger.error('Get profile error:', error);
     if (error instanceof AppError) {
       return res.status(error.statusCode).json({ error: error.message });
-      return res.status(error.statusCode).json({ error: error.message });
     }
-    res.status(500).json({ error: 'Failed to get profile' });
     res.status(500).json({ error: 'Failed to get profile' });
   }
 }
@@ -215,14 +190,8 @@ export async function setup2FA(req, res) {
       `2fa_temp:${user.id}`,
       300, // 5 minutes
       JSON.stringify({ secret, backupCodes })
-      JSON.stringify({ secret, backupCodes })
     );
 
-    res.json({
-      secret: secret.base32,
-      qrCode: secret.otpauth_url,
-      backupCodes,
-    });
     res.json({
       secret: secret.base32,
       qrCode: secret.otpauth_url,
@@ -232,9 +201,7 @@ export async function setup2FA(req, res) {
     logger.error('2FA setup error:', error);
     if (error instanceof AppError) {
       return res.status(error.statusCode).json({ error: error.message });
-      return res.status(error.statusCode).json({ error: error.message });
     }
-    res.status(500).json({ error: '2FA setup failed' });
     res.status(500).json({ error: '2FA setup failed' });
   }
 }
@@ -293,14 +260,11 @@ export async function verify2FA(req, res) {
     });
 
     res.json({ message: '2FA enabled successfully' });
-    res.json({ message: '2FA enabled successfully' });
   } catch (error) {
     logger.error('2FA verification error:', error);
     if (error instanceof AppError) {
       return res.status(error.statusCode).json({ error: error.message });
-      return res.status(error.statusCode).json({ error: error.message });
     }
-    res.status(500).json({ error: '2FA verification failed' });
     res.status(500).json({ error: '2FA verification failed' });
   }
 }
@@ -322,10 +286,8 @@ export async function logout(req, res) {
     });
 
     res.json({ message: 'Logged out successfully' });
-    res.json({ message: 'Logged out successfully' });
   } catch (error) {
     logger.error('Logout error:', error);
-    res.status(500).json({ error: 'Logout failed' });
     res.status(500).json({ error: 'Logout failed' });
   }
 }
