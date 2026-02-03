@@ -2,12 +2,26 @@
  * Auth Service Unit Tests
  */
 
-import * as authService from '../../src/services/auth.js';
-import { User } from '../../src/models/User.js';
-import { AppError } from '../../src/middleware/error.js';
+import { jest } from '@jest/globals';
 
-jest.mock('../../src/models/User.js');
-jest.mock('../../src/models/ActivityLog.js');
+const { User } = await (async () => {
+  await jest.unstable_mockModule('../../src/models/User.js', () => ({
+    User: {
+      findByEmail: jest.fn(),
+      findByUsername: jest.fn(),
+      create: jest.fn(),
+    },
+  }));
+  await jest.unstable_mockModule('../../src/models/ActivityLog.js', () => ({
+    ActivityLog: {
+      log: jest.fn(),
+    },
+  }));
+  return import('../../src/models/User.js');
+})();
+
+import * as authService from '../../src/services/auth.js';
+import { AppError } from '../../src/middleware/error.js';
 
 describe('AuthService', () => {
   afterEach(() => {
@@ -17,13 +31,19 @@ describe('AuthService', () => {
   describe('registerUser', () => {
     it('should register a new user with valid data', async () => {
       User.findByEmail.mockResolvedValue(null);
+      User.findByUsername.mockResolvedValue(null);
       User.create.mockResolvedValue({
         id: 'test-id',
         email: 'test@example.com',
         username: 'testuser',
       });
 
-      const result = await authService.registerUser('test@example.com', 'testuser', 'Test@1234');
+      const result = await authService.registerUser(
+        'test@example.com',
+        'testuser',
+        'Test@1234',
+        'Test@1234'
+      );
 
       expect(result.user.email).toBe('test@example.com');
       expect(result.accessToken).toBeDefined();
@@ -33,13 +53,19 @@ describe('AuthService', () => {
 
     it('should throw error for invalid email', async () => {
       await expect(
-        authService.registerUser('invalid-email', 'testuser', 'Test@1234')
+        authService.registerUser('invalid-email', 'testuser', 'Test@1234', 'Test@1234')
       ).rejects.toThrow(AppError);
     });
 
     it('should throw error for weak password', async () => {
       await expect(
-        authService.registerUser('test@example.com', 'testuser', 'weak')
+        authService.registerUser('test@example.com', 'testuser', 'weak', 'weak')
+      ).rejects.toThrow(AppError);
+    });
+
+    it('should throw error for password mismatch', async () => {
+      await expect(
+        authService.registerUser('test@example.com', 'testuser', 'Test@1234', 'Different@1234')
       ).rejects.toThrow(AppError);
     });
 
@@ -47,7 +73,16 @@ describe('AuthService', () => {
       User.findByEmail.mockResolvedValue({ email: 'test@example.com' });
 
       await expect(
-        authService.registerUser('test@example.com', 'testuser', 'Test@1234')
+        authService.registerUser('test@example.com', 'testuser', 'Test@1234', 'Test@1234')
+      ).rejects.toThrow(AppError);
+    });
+
+    it('should throw error if username already exists', async () => {
+      User.findByEmail.mockResolvedValue(null);
+      User.findByUsername.mockResolvedValue({ username: 'testuser' });
+
+      await expect(
+        authService.registerUser('test@example.com', 'testuser', 'Test@1234', 'Test@1234')
       ).rejects.toThrow(AppError);
     });
   });

@@ -12,7 +12,6 @@ import { ActivityLog } from '../models/ActivityLog.js';
 import * as authService from '../services/auth.js';
 import { generateToken, generateRefreshToken } from '../middleware/auth.js';
 import { AppError } from '../middleware/error.js';
-import { formatSuccess, formatError } from '../utils/formatters.js';
 import { logger } from '../config/logger.js';
 import speakeasy from 'speakeasy';
 import { getRedisClient } from '../config/redis.js';
@@ -221,7 +220,7 @@ export async function verify2FA(req, res) {
       throw new AppError('2FA setup expired. Please try again.', 400, 'SETUP_EXPIRED');
     }
 
-    const { secret, backupCodes } = JSON.parse(tempData);
+    const { secret } = JSON.parse(tempData);
 
     // Verify token
     const verified = speakeasy.totp.verify({

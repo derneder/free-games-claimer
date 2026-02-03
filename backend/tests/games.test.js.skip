@@ -19,7 +19,8 @@ describe('Games API', () => {
   });
 
   afterEach(async () => {
-    await query('TRUNCATE TABLE "games", "users" RESTART IDENTITY CASCADE');
+    await query('TRUNCATE TABLE "games" RESTART IDENTITY CASCADE');
+    await query('TRUNCATE TABLE "users" RESTART IDENTITY CASCADE');
   });
 
   describe('GET /api/games', () => {
