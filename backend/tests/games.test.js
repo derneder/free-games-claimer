@@ -1,6 +1,6 @@
 import request from 'supertest';
 import app from '../src/index.js';
-import db from '../src/config/database.js';
+import { query } from '../src/config/database.js';
 
 describe('Games API', () => {
   let userId, token;
@@ -21,8 +21,7 @@ describe('Games API', () => {
   });
 
   afterEach(async () => {
-    await db('games').truncate();
-    await db('users').truncate();
+    await query('TRUNCATE TABLE "games", "users" RESTART IDENTITY CASCADE');
   });
 
   describe('GET /api/games', () => {

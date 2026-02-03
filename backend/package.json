@@ -18,6 +18,9 @@
     "format": "prettier --write src tests",
     "format:check": "prettier --check src tests",
     "type-check": "tsc --noEmit",
+    "migrate": "node database/migrate.js migrate",
+    "seed": "node database/migrate.js seed",
+    "migrate:all": "node database/migrate.js all",
     "db:migrate": "node src/database/migrate.js",
     "db:seed": "node src/database/seed.js"
   },

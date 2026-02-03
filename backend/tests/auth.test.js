@@ -1,11 +1,11 @@
 import request from 'supertest';
 import app from '../src/index.js';
-import db from '../src/config/database.js';
+import { query } from '../src/config/database.js';
 
 describe('Auth API', () => {
   afterEach(async () => {
     // Очистка БД после каждого теста
-    await db('users').truncate();
+    await query('TRUNCATE TABLE "users" RESTART IDENTITY CASCADE');
   });
 
   describe('POST /api/auth/register', () => {
