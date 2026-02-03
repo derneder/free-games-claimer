@@ -22,7 +22,9 @@
     "seed": "node database/migrate.js seed",
     "migrate:all": "node database/migrate.js all",
     "db:migrate": "node src/database/migrate.js",
-    "db:seed": "node src/database/seed.js"
+    "db:seed": "node src/database/seed.js",
+    "generate:key": "node scripts/generate-key.js",
+    "playwright:install": "npx playwright install firefox"
   },
   "keywords": [
     "free-games",
