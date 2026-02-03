@@ -9,7 +9,7 @@
 
 import express from 'express';
 import { authenticate } from '../middleware/auth.js';
-import { csrfProtection } from '../middleware/csrf.js';
+import { doubleCsrfProtection } from '../middleware/csrf.js';
 import { rateLimiter } from '../middleware/rateLimiter.js';
 import {
   getAllStatuses,
@@ -111,7 +111,7 @@ router.get('/:provider', authenticate, getStatus);
 router.post(
   '/:provider',
   authenticate,
-  csrfProtection,
+  doubleCsrfProtection,
   credentialRateLimiter,
   saveProviderCredentials
 );
@@ -149,7 +149,7 @@ router.post(
 router.put(
   '/:provider',
   authenticate,
-  csrfProtection,
+  doubleCsrfProtection,
   credentialRateLimiter,
   saveProviderCredentials
 );
@@ -178,7 +178,7 @@ router.put(
 router.delete(
   '/:provider',
   authenticate,
-  csrfProtection,
+  doubleCsrfProtection,
   credentialRateLimiter,
   deleteProviderCredentials
 );

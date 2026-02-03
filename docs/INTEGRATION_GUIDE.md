@@ -6,7 +6,7 @@ This guide walks you through integrating all Phase 1 features into your Free Gam
 
 - ✅ Jest Tests (Auth + Games APIs)
 - ✅ Swagger/OpenAPI Documentation  
-- ✅ CSRF Protection & Security Headers
+- ✅ CSRF Protection & Security Headers (using csrf-csrf)
 - ✅ Email Notifications
 - ✅ Admin Dashboard UI
 - ✅ Analytics Charts
@@ -31,7 +31,7 @@ Add these to `backend/package.json`:
   },
   "dependencies": {
     "helmet": "^7.1.0",
-    "csurf": "^1.11.0",
+    "csrf-csrf": "^4.0.3",
     "cookie-parser": "^1.4.6",
     "nodemailer": "^6.9.7"
   },
@@ -62,21 +62,21 @@ cd backend && npm install
 Add to your main app file:
 
 ```javascript
-import helmet from 'helmet';
-import cookieParser from 'cookie-parser';
-import { 
-  setupSwagger, 
-  conditionalCsrf, 
-  csrfErrorHandler,
-  helmetMiddleware,
-  cookieParserMiddleware
-} from './middleware/csrf.js';
+import { cookieParserMiddleware, conditionalCsrf, csrfErrorHandler, generateToken } from './middleware/csrf.js';
+import { setupSwagger } from './middleware/csrf.js';
 import { initEmailService } from './services/email.js';
 
-// Add security middleware (BEFORE routes)
-app.use(helmetMiddleware);
+// Add cookie parser (required for CSRF protection)
 app.use(cookieParserMiddleware);
+
+// Add CSRF protection (BEFORE routes)
 app.use(conditionalCsrf);
+
+// Add CSRF token endpoint
+app.get('/api/csrf-token', (req, res) => {
+  const token = generateToken(req, res);
+  res.json({ token });
+});
 
 // Setup Swagger
 setupSwagger(app);
@@ -84,7 +84,7 @@ setupSwagger(app);
 // Initialize email service
 initEmailService();
 
-// Add CSRF error handler (AFTER routes)
+// Add CSRF error handler (AFTER routes, BEFORE global error handler)
 app.use(csrfErrorHandler);
 ```
 
@@ -209,7 +209,7 @@ const api = axios.create({
   withCredentials: true,
 });
 
-// Get CSRF token
+// Get CSRF token using generateToken endpoint
 api.interceptors.request.use(async (config) => {
   // Only add CSRF token for state-changing requests
   if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(config.method.toUpperCase())) {
@@ -295,7 +295,7 @@ You should see:
 **Solution:** Verify swagger.js is imported and setupSwagger() is called in index.js
 
 ### Issue: CSRF token errors
-**Solution:** Ensure cookie-parser middleware is loaded BEFORE csrf middleware
+**Solution:** Ensure cookie-parser middleware is loaded BEFORE csrf middleware. The new csrf-csrf implementation uses double CSRF tokens stored in cookies.
 
 ### Issue: Email not sending
 **Solution:** Check SMTP credentials in .env file

@@ -17,6 +17,7 @@ import { logger } from './config/logger.js';
 import { initializeDatabase } from './config/database.js';
 import { initializeRedis } from './config/redis.js';
 import { globalErrorHandler } from './middleware/error.js';
+import { cookieParserMiddleware, conditionalCsrf, csrfErrorHandler, generateToken } from './middleware/csrf.js';
 
 // Import routes
 import authRoutes from './routes/auth.js';
@@ -53,6 +54,21 @@ app.use(morgan('combined', { stream: { write: (msg) => logger.info(msg.trim()) }
 // Body parsing
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
+
+// Cookie parser (required for CSRF protection)
+app.use(cookieParserMiddleware);
+
+// CSRF protection (conditional based on route)
+app.use(conditionalCsrf);
+
+/**
+ * CSRF Token endpoint
+ * Generates and returns a CSRF token for client-side use
+ */
+app.get('/api/csrf-token', (req, res) => {
+  const token = generateToken(req, res);
+  res.json({ token });
+});
 
 /**
  * Health check
@@ -93,6 +109,11 @@ app.use((req, res) => {
     message: `Route ${req.method} ${req.path} not found`,
   });
 });
+
+/**
+ * CSRF Error Handler
+ */
+app.use(csrfErrorHandler);
 
 /**
  * Global Error Handler
