@@ -43,6 +43,7 @@ docker-compose up    # Run with Docker
 - [Development Guide](./docs/DEVELOPMENT_GUIDE.md) - Development workflow
 - [Architecture](./docs/ARCHITECTURE.md) - System design
 - [API Reference](./docs/API.md) - API endpoints
+- [**Credential Storage & Auto-Claim**](./docs/CREDENTIALS.md) - **New! Automated claiming**
 - [Deployment](./docs/DEPLOYMENT.md) - Production setup
 - [Contributing](./CONTRIBUTING.md) - Code standards
 
@@ -93,15 +94,21 @@ For detailed structure, see [docs/STRUCTURE.md](./docs/STRUCTURE.md).
 ### Core
 - ✅ Track free games from Epic Games, GOG, Steam, Prime Gaming
 - ✅ User authentication with JWT + 2FA
+- ✅ **🔐 Encrypted credential storage for provider accounts**
+- ✅ **🤖 Automated game claiming with Playwright**
 - ✅ Game library management
 - ✅ Price tracking & analytics
 - ✅ Email notifications
+- ✅ **📱 Telegram bot for account management and manual claims**
 - ✅ Admin dashboard
 
 ### Technical
 - ✅ Full-stack: React 18 + Express.js
 - ✅ PostgreSQL database
 - ✅ Redis caching
+- ✅ **AES-256-GCM encryption for credentials**
+- ✅ **Playwright-based automation**
+- ✅ **Scheduled claim workers with cron**
 - ✅ Docker containerization
 - ✅ GitHub Actions CI/CD
 - ✅ **GitHub Pages deployment** for frontend
@@ -158,6 +165,8 @@ For full CI/CD functionality, configure these secrets in repository Settings →
 ✅ XSS prevention  
 ✅ Security headers  
 ✅ SSL/TLS encryption  
+✅ **AES-256-GCM credential encryption**  
+✅ **Audit logging for sensitive operations**  
 
 ---
 
