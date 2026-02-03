@@ -67,6 +67,17 @@ jobs:
         working-directory: backend
         run: npm run type-check
 
+      - name: Run database migrations
+        working-directory: backend
+        run: npm run migrate:all
+        env:
+          NODE_ENV: test
+          PGHOST: localhost
+          PGPORT: 5432
+          PGUSER: postgres
+          PGPASSWORD: postgres
+          PGDATABASE: postgres
+
       - name: Run tests
         working-directory: backend
         run: npm run test:coverage
