@@ -1,5 +1,5 @@
 import { Telegraf, session, Markup } from 'telegraf';
-import db from '../config/database.js';
+import { query } from '../config/database.js';
 import logger from '../config/logger.js';
 import { addEpicGamesForUser } from '../workers/epicGamesWorker.js';
 import { addGOGGamesForUser } from '../workers/gogWorker.js';
@@ -59,20 +59,20 @@ export function initializeTelegramBot() {
   
     try {
       // Проверяем, есть ли уже пользователь
-      let user = await db('users').where({ telegram_id: telegramId }).first();
+      let result = await query('SELECT * FROM users WHERE telegram_id = $1', [telegramId]);
+      let user = result.rows[0];
   
       if (!user) {
         // Создаём нового пользователя
-        const [userId] = await db('users').insert({
-          telegram_id: telegramId,
-          username,
-          email: `${telegramId}@telegram.local`,
-          password_hash: 'telegram-user',
-          is_active: true,
-          created_at: new Date(),
-          updated_at: new Date(),
-        });
-        user = await db('users').where({ id: userId }).first();
+        const insertResult = await query(
+          `INSERT INTO users (telegram_id, username, email, password_hash, is_active, created_at, updated_at)
+           VALUES ($1, $2, $3, $4, $5, $6, $7)
+           RETURNING id`,
+          [telegramId, username, `${telegramId}@telegram.local`, 'telegram-user', true, new Date(), new Date()]
+        );
+        const userId = insertResult.rows[0].id;
+        result = await query('SELECT * FROM users WHERE id = $1', [userId]);
+        user = result.rows[0];
         logger.info(`✅ New Telegram user: ${username}`);
       }
   
@@ -106,20 +106,21 @@ export function initializeTelegramBot() {
   // /stats - Статистика
   bot.hears('📊 Stats', async (ctx) => {
     try {
-      const user = await db('users').where({ telegram_id: ctx.from.id.toString() }).first();
+      const userResult = await query('SELECT * FROM users WHERE telegram_id = $1', [ctx.from.id.toString()]);
+      const user = userResult.rows[0];
       if (!user) return ctx.reply('❌ User not found');
   
-      const [{ totalGames }] = await db('games').where({ user_id: user.id }).count('* as totalGames');
+      const countResult = await query('SELECT COUNT(*) as total_games FROM games WHERE user_id = $1', [user.id]);
+      const totalGames = countResult.rows[0].total_games;
   
-      const [{ totalValue }] = await db('games')
-        .where({ user_id: user.id })
-        .sum('steam_price_usd as totalValue');
+      const valueResult = await query('SELECT SUM(steam_price_usd) as total_value FROM games WHERE user_id = $1', [user.id]);
+      const totalValue = valueResult.rows[0].total_value;
   
-      const distribution = await db('games')
-        .where({ user_id: user.id })
-        .select('source')
-        .count('* as count')
-        .groupBy('source');
+      const distResult = await query(
+        'SELECT source, COUNT(*) as count FROM games WHERE user_id = $1 GROUP BY source',
+        [user.id]
+      );
+      const distribution = distResult.rows;
   
       let message = '📊 Your Statistics:\n\n';
       message += `🎮 Total Games: ${totalGames}\n`;
@@ -140,13 +141,15 @@ export function initializeTelegramBot() {
   // 🎮 Recent Games
   bot.hears('🎮 Recent Games', async (ctx) => {
     try {
-      const user = await db('users').where({ telegram_id: ctx.from.id.toString() }).first();
+      const userResult = await query('SELECT * FROM users WHERE telegram_id = $1', [ctx.from.id.toString()]);
+      const user = userResult.rows[0];
       if (!user) return ctx.reply('❌ User not found');
   
-      const games = await db('games')
-        .where({ user_id: user.id })
-        .orderBy('obtained_at', 'desc')
-        .limit(5);
+      const gamesResult = await query(
+        'SELECT * FROM games WHERE user_id = $1 ORDER BY obtained_at DESC LIMIT 5',
+        [user.id]
+      );
+      const games = gamesResult.rows;
   
       if (games.length === 0) {
         return ctx.reply('📭 No games yet. Click "Run Collection" to start!');
@@ -169,7 +172,8 @@ export function initializeTelegramBot() {
   // 🔄 Run Collection
   bot.hears('🔄 Run Collection', async (ctx) => {
     try {
-      const user = await db('users').where({ telegram_id: ctx.from.id.toString() }).first();
+      const userResult = await query('SELECT * FROM users WHERE telegram_id = $1', [ctx.from.id.toString()]);
+      const user = userResult.rows[0];
       if (!user) return ctx.reply('❌ User not found');
   
       await ctx.reply('🔄 Starting collection process...');
@@ -268,7 +272,8 @@ export function initializeTelegramBot() {
   // 🗑️ Remove Account - Show provider selection
   bot.command('disconnect', async (ctx) => {
     try {
-      const user = await db('users').where({ telegram_id: ctx.from.id.toString() }).first();
+      const userResult = await query('SELECT * FROM users WHERE telegram_id = $1', [ctx.from.id.toString()]);
+      const user = userResult.rows[0];
       if (!user) return ctx.reply('❌ User not found');
   
       const statuses = await getAllCredentialStatuses(user.id);
@@ -295,7 +300,8 @@ export function initializeTelegramBot() {
     const provider = ctx.match[1];
   
     try {
-      const user = await db('users').where({ telegram_id: ctx.from.id.toString() }).first();
+      const userResult = await query('SELECT * FROM users WHERE telegram_id = $1', [ctx.from.id.toString()]);
+      const user = userResult.rows[0];
       if (!user) return ctx.answerCbQuery('User not found');
   
       const deleted = await deleteCredentials(user.id, provider);
@@ -317,7 +323,8 @@ export function initializeTelegramBot() {
   // 📋 Account Status
   bot.command('accounts', async (ctx) => {
     try {
-      const user = await db('users').where({ telegram_id: ctx.from.id.toString() }).first();
+      const userResult = await query('SELECT * FROM users WHERE telegram_id = $1', [ctx.from.id.toString()]);
+      const user = userResult.rows[0];
       if (!user) return ctx.reply('❌ User not found');
   
       const statuses = await getAllCredentialStatuses(user.id);
@@ -357,7 +364,8 @@ export function initializeTelegramBot() {
   // 🚀 Claim Now - Trigger manual claim
   bot.command('claim', async (ctx) => {
     try {
-      const user = await db('users').where({ telegram_id: ctx.from.id.toString() }).first();
+      const userResult = await query('SELECT * FROM users WHERE telegram_id = $1', [ctx.from.id.toString()]);
+      const user = userResult.rows[0];
       if (!user) return ctx.reply('❌ User not found');
   
       const statuses = await getAllCredentialStatuses(user.id);
@@ -385,7 +393,8 @@ export function initializeTelegramBot() {
     const provider = ctx.match[1];
   
     try {
-      const user = await db('users').where({ telegram_id: ctx.from.id.toString() }).first();
+      const userResult = await query('SELECT * FROM users WHERE telegram_id = $1', [ctx.from.id.toString()]);
+      const user = userResult.rows[0];
       if (!user) return ctx.answerCbQuery('User not found');
   
       await ctx.answerCbQuery('Starting claim...');
@@ -438,7 +447,8 @@ export function initializeTelegramBot() {
       const credentials = JSON.parse(ctx.message.text);
   
       // Get user
-      const user = await db('users').where({ telegram_id: ctx.from.id.toString() }).first();
+      const userResult = await query('SELECT * FROM users WHERE telegram_id = $1', [ctx.from.id.toString()]);
+      const user = userResult.rows[0];
       if (!user) {
         delete ctx.session.connectingProvider;
         return ctx.reply('❌ User not found');
