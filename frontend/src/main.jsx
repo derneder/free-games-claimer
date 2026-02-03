@@ -1,6 +1,6 @@
 /**
  * Frontend Entry Point
- * 
+ *
  * Mounts React application to DOM.
  */
 

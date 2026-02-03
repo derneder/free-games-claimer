@@ -41,18 +41,18 @@ bot.command('start', async (ctx) => {
 
     await ctx.reply(
       '🎮 Welcome to Free Games Claimer PRO!\n\n' +
-      'I\'ll help you collect free games from:\n' +
-      '• 🏴󠁥󠁳󠁣󠁴󠁿 Epic Games\n' +
-      '• 🕹️ GOG\n' +
-      '• 🚂 Steam\n' +
-      '• 👑 Prime Gaming\n\n' +
-      'Choose an action:',
+        "I'll help you collect free games from:\n" +
+        '• 🏴󠁥󠁳󠁣󠁴󠁿 Epic Games\n' +
+        '• 🕹️ GOG\n' +
+        '• 🚂 Steam\n' +
+        '• 👑 Prime Gaming\n\n' +
+        'Choose an action:',
       {
         reply_markup: {
           keyboard,
           resize_keyboard: true,
         },
-      },
+      }
     );
   } catch (error) {
     logger.error('Error in /start:', error);
@@ -66,9 +66,7 @@ bot.hears('📊 Stats', async (ctx) => {
     const user = await db('users').where({ telegram_id: ctx.from.id.toString() }).first();
     if (!user) return ctx.reply('❌ User not found');
 
-    const [{ totalGames }] = await db('games')
-      .where({ user_id: user.id })
-      .count('* as totalGames');
+    const [{ totalGames }] = await db('games').where({ user_id: user.id }).count('* as totalGames');
 
     const [{ totalValue }] = await db('games')
       .where({ user_id: user.id })

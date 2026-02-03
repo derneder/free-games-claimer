@@ -1,6 +1,6 @@
 /**
  * Games Service
- * 
+ *
  * Handles games API calls.
  */
 

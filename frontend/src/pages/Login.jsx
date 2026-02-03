@@ -11,7 +11,7 @@ export default function Login() {
   const [requires2FA, setRequires2FA] = useState(false);
   const [tempToken, setTempToken] = useState('');
   const [totp, setTotp] = useState('');
-  
+
   const navigate = useNavigate();
   const { login } = useAuthStore();
 
@@ -49,7 +49,7 @@ export default function Login() {
       });
       login(data.user, data.accessToken);
       navigate('/dashboard');
-    } catch (err) {
+    } catch {
       setError('Invalid 2FA code');
     } finally {
       setLoading(false);
@@ -61,7 +61,7 @@ export default function Login() {
       <div className="min-h-screen bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center px-4">
         <form onSubmit={handleTOTP} className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 text-center">🔐 2FA Verification</h2>
-          
+
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
               {error}

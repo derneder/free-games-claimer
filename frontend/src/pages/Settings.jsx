@@ -12,7 +12,7 @@ export default function Settings() {
   });
 
   const handleChange = (key) => {
-    setSettings(prev => ({ ...prev, [key]: !prev[key] }));
+    setSettings((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
   return (

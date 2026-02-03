@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function AuditLogs({ logs }) {
   const getSeverityColor = (severity) => {
     switch (severity) {
@@ -20,10 +18,7 @@ export default function AuditLogs({ logs }) {
       <div className="space-y-2 max-h-96 overflow-y-auto">
         {logs && logs.length > 0 ? (
           logs.map((log) => (
-            <div
-              key={log.id}
-              className={`p-3 rounded-lg ${getSeverityColor(log.severity)}`}
-            >
+            <div key={log.id} className={`p-3 rounded-lg ${getSeverityColor(log.severity)}`}>
               <div className="flex justify-between items-start">
                 <div className="flex-1">
                   <p className="font-semibold">{log.action}</p>

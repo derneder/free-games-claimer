@@ -1,6 +1,6 @@
 /**
  * Authentication Service
- * 
+ *
  * Handles authentication API calls.
  */
 

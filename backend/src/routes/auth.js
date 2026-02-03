@@ -30,7 +30,7 @@ router.post(
       password: Joi.string().min(8).required(),
     }),
   }),
-  asyncHandler(authController.register),
+  asyncHandler(authController.register)
 );
 
 /**
@@ -46,7 +46,7 @@ router.post(
       password: Joi.string().required(),
     }),
   }),
-  asyncHandler(authController.login),
+  asyncHandler(authController.login)
 );
 
 /**
@@ -61,7 +61,7 @@ router.post(
       refreshToken: Joi.string().required(),
     }),
   }),
-  asyncHandler(authController.refreshToken),
+  asyncHandler(authController.refreshToken)
 );
 
 /**
@@ -69,22 +69,14 @@ router.post(
  * @desc Get current user profile
  * @access Private
  */
-router.get(
-  '/profile',
-  verifyToken,
-  asyncHandler(authController.getProfile),
-);
+router.get('/profile', verifyToken, asyncHandler(authController.getProfile));
 
 /**
  * @route POST /api/auth/2fa/setup
  * @desc Setup two-factor authentication
  * @access Private
  */
-router.post(
-  '/2fa/setup',
-  verifyToken,
-  asyncHandler(authController.setup2FA),
-);
+router.post('/2fa/setup', verifyToken, asyncHandler(authController.setup2FA));
 
 /**
  * @route POST /api/auth/2fa/verify
@@ -99,7 +91,7 @@ router.post(
       token: Joi.string().length(6).required(),
     }),
   }),
-  asyncHandler(authController.verify2FA),
+  asyncHandler(authController.verify2FA)
 );
 
 /**
@@ -107,10 +99,6 @@ router.post(
  * @desc Logout user
  * @access Private
  */
-router.post(
-  '/logout',
-  verifyToken,
-  asyncHandler(authController.logout),
-);
+router.post('/logout', verifyToken, asyncHandler(authController.logout));
 
 export default router;

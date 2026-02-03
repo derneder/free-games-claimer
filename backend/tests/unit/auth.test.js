@@ -23,11 +23,7 @@ describe('AuthService', () => {
         username: 'testuser',
       });
 
-      const result = await authService.registerUser(
-        'test@example.com',
-        'testuser',
-        'Test@1234',
-      );
+      const result = await authService.registerUser('test@example.com', 'testuser', 'Test@1234');
 
       expect(result.user.email).toBe('test@example.com');
       expect(result.accessToken).toBeDefined();
@@ -37,13 +33,13 @@ describe('AuthService', () => {
 
     it('should throw error for invalid email', async () => {
       await expect(
-        authService.registerUser('invalid-email', 'testuser', 'Test@1234'),
+        authService.registerUser('invalid-email', 'testuser', 'Test@1234')
       ).rejects.toThrow(AppError);
     });
 
     it('should throw error for weak password', async () => {
       await expect(
-        authService.registerUser('test@example.com', 'testuser', 'weak'),
+        authService.registerUser('test@example.com', 'testuser', 'weak')
       ).rejects.toThrow(AppError);
     });
 
@@ -51,7 +47,7 @@ describe('AuthService', () => {
       User.findByEmail.mockResolvedValue({ email: 'test@example.com' });
 
       await expect(
-        authService.registerUser('test@example.com', 'testuser', 'Test@1234'),
+        authService.registerUser('test@example.com', 'testuser', 'Test@1234')
       ).rejects.toThrow(AppError);
     });
   });
@@ -79,9 +75,9 @@ describe('AuthService', () => {
     it('should throw error for non-existent user', async () => {
       User.findByEmail.mockResolvedValue(null);
 
-      await expect(
-        authService.loginUser('test@example.com', 'Test@1234'),
-      ).rejects.toThrow(AppError);
+      await expect(authService.loginUser('test@example.com', 'Test@1234')).rejects.toThrow(
+        AppError
+      );
     });
 
     it('should throw error for incorrect password', async () => {
@@ -94,9 +90,9 @@ describe('AuthService', () => {
 
       User.findByEmail.mockResolvedValue(mockUser);
 
-      await expect(
-        authService.loginUser('test@example.com', 'wrongpassword'),
-      ).rejects.toThrow(AppError);
+      await expect(authService.loginUser('test@example.com', 'wrongpassword')).rejects.toThrow(
+        AppError
+      );
     });
 
     it('should throw error for inactive user', async () => {
@@ -108,9 +104,9 @@ describe('AuthService', () => {
 
       User.findByEmail.mockResolvedValue(mockUser);
 
-      await expect(
-        authService.loginUser('test@example.com', 'Test@1234'),
-      ).rejects.toThrow(AppError);
+      await expect(authService.loginUser('test@example.com', 'Test@1234')).rejects.toThrow(
+        AppError
+      );
     });
   });
 });

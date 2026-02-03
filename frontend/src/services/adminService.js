@@ -1,6 +1,6 @@
 /**
  * Admin Service
- * 
+ *
  * Handles admin API calls.
  */
 

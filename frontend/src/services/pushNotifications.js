@@ -41,7 +41,7 @@ export async function subscribeToPush(vapidPublicKey) {
     const registration = await navigator.serviceWorker.ready;
     const subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)
+      applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
     });
     return subscription;
   } catch (error) {
@@ -56,7 +56,7 @@ export async function showNotification(title, options = {}) {
     icon: '/logo.png',
     badge: '/badge.png',
     tag: options.tag || 'notification',
-    ...options
+    ...options,
   });
 }
 
@@ -67,9 +67,9 @@ export async function sendSubscriptionToBackend(subscription) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
       },
-      body: JSON.stringify(subscription)
+      body: JSON.stringify(subscription),
     });
     return response.json();
   } catch (error) {
@@ -113,8 +113,8 @@ export async function disablePushNotifications() {
       await fetch('/api/notifications/unsubscribe', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-        }
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
       });
     }
   } catch (error) {
@@ -125,11 +125,9 @@ export async function disablePushNotifications() {
 // Utility: Convert VAPID key
 function urlBase64ToUint8Array(base64String) {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
-  const base64 = (base64String + padding)
-    .replace(/-/g, '+')
-    .replace(/_/g, '/');
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
   const rawData = window.atob(base64);
-  return new Uint8Array([...rawData].map(char => char.charCodeAt(0)));
+  return new Uint8Array([...rawData].map((char) => char.charCodeAt(0)));
 }
 
 // Notify about new game
@@ -142,8 +140,8 @@ export async function notifyNewGame(game) {
     requireInteraction: false,
     data: {
       url: `/games/${game.id}`,
-      gameId: game.id
-    }
+      gameId: game.id,
+    },
   });
 }
 
@@ -155,5 +153,5 @@ export default {
   sendSubscriptionToBackend,
   enablePushNotifications,
   disablePushNotifications,
-  notifyNewGame
+  notifyNewGame,
 };

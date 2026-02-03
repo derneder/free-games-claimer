@@ -7,14 +7,12 @@ describe('Games API', () => {
 
   beforeEach(async () => {
     // Создаем пользователя и логиниться
-    const registerResp = await request(app)
-      .post('/api/auth/register')
-      .send({
-        email: 'test@example.com',
-        username: 'testuser',
-        password: 'Password123!',
-        confirmPassword: 'Password123!',
-      });
+    const registerResp = await request(app).post('/api/auth/register').send({
+      email: 'test@example.com',
+      username: 'testuser',
+      password: 'Password123!',
+      confirmPassword: 'Password123!',
+    });
 
     token = registerResp.body.accessToken;
     userId = registerResp.body.user.id;
@@ -26,9 +24,7 @@ describe('Games API', () => {
 
   describe('GET /api/games', () => {
     test('Should return empty list for new user', async () => {
-      const response = await request(app)
-        .get('/api/games')
-        .set('Authorization', `Bearer ${token}`);
+      const response = await request(app).get('/api/games').set('Authorization', `Bearer ${token}`);
 
       expect(response.status).toBe(200);
       expect(response.body.games).toEqual([]);
@@ -84,8 +80,7 @@ describe('Games API', () => {
     });
 
     test('Should fail without authentication', async () => {
-      const response = await request(app)
-        .get('/api/games');
+      const response = await request(app).get('/api/games');
 
       expect(response.status).toBe(401);
     });
@@ -146,13 +141,10 @@ describe('Games API', () => {
 
     test('Should not add duplicate game', async () => {
       // Добавляем первый раз
-      await request(app)
-        .post('/api/games')
-        .set('Authorization', `Bearer ${token}`)
-        .send({
-          title: 'Test Game',
-          source: 'epic',
-        });
+      await request(app).post('/api/games').set('Authorization', `Bearer ${token}`).send({
+        title: 'Test Game',
+        source: 'epic',
+      });
 
       // Пытаемся добавить еще раз
       const response = await request(app)

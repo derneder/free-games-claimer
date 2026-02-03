@@ -74,8 +74,7 @@ export default function SystemStats({ stats }) {
               const percentage =
                 sourceData.length > 0
                   ? (
-                      (source.count /
-                        sourceData.reduce((sum, s) => sum + s.count, 0)) *
+                      (source.count / sourceData.reduce((sum, s) => sum + s.count, 0)) *
                       100
                     ).toFixed(1)
                   : 0;
@@ -132,8 +131,7 @@ export default function SystemStats({ stats }) {
                 <p className="text-white text-2xl font-bold">{platform.count}</p>
                 <p className="text-gray-500 text-xs mt-2">
                   {(
-                    (platform.count /
-                      platformData.reduce((sum, p) => sum + p.count, 0)) *
+                    (platform.count / platformData.reduce((sum, p) => sum + p.count, 0)) *
                     100
                   ).toFixed(1)}
                   %

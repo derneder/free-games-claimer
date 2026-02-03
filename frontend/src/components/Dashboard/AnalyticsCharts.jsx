@@ -58,14 +58,14 @@ export default function AnalyticsCharts() {
       ]);
 
       setActivityData(activityRes.data || []);
-      
-      const dist = (distRes.data?.distribution || []).map(item => ({
+
+      const dist = (distRes.data?.distribution || []).map((item) => ({
         name: item.source?.toUpperCase() || 'Unknown',
         value: item.count,
       }));
       setDistributionData(dist);
 
-      const platforms = (platformRes.data?.byPlatform || []).map(item => ({
+      const platforms = (platformRes.data?.byPlatform || []).map((item) => ({
         name: item.platform === 'windows' ? 'Windows' : item.platform === 'mac' ? 'macOS' : 'Linux',
         value: item.count,
       }));
@@ -103,7 +103,7 @@ export default function AnalyticsCharts() {
       <div className="bg-gray-700 bg-opacity-50 border border-gray-600 rounded-lg p-4">
         <h3 className="text-white font-semibold mb-3">📅 Select Period</h3>
         <div className="flex gap-2 flex-wrap">
-          {['week', 'month', 'year'].map(p => (
+          {['week', 'month', 'year'].map((p) => (
             <button
               key={p}
               onClick={() => setPeriod(p)}
@@ -126,11 +126,7 @@ export default function AnalyticsCharts() {
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={activityData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#4b5563" />
-              <XAxis 
-                dataKey="date" 
-                stroke="#9ca3af" 
-                style={{ fontSize: '12px' }}
-              />
+              <XAxis dataKey="date" stroke="#9ca3af" style={{ fontSize: '12px' }} />
               <YAxis stroke="#9ca3af" style={{ fontSize: '12px' }} />
               <Tooltip content={<CustomTooltip />} />
               <Legend wrapperStyle={{ color: '#d1d5db' }} />
@@ -163,7 +159,7 @@ export default function AnalyticsCharts() {
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={({ name, value, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  label={({ name, _value, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                   outerRadius={80}
                   fill="#8884d8"
                   dataKey="value"
@@ -172,7 +168,7 @@ export default function AnalyticsCharts() {
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip 
+                <Tooltip
                   contentStyle={{
                     backgroundColor: '#1f2937',
                     border: '1px solid #4b5563',
@@ -198,12 +194,7 @@ export default function AnalyticsCharts() {
                 <YAxis stroke="#9ca3af" style={{ fontSize: '12px' }} />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend wrapperStyle={{ color: '#d1d5db' }} />
-                <Bar
-                  dataKey="value"
-                  fill="#10b981"
-                  name="Games"
-                  radius={[8, 8, 0, 0]}
-                />
+                <Bar dataKey="value" fill="#10b981" name="Games" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           ) : (
@@ -236,9 +227,7 @@ export default function AnalyticsCharts() {
           </div>
           <div>
             <p className="text-gray-400 text-sm mb-1">Last Updated</p>
-            <p className="text-white text-lg font-bold">
-              {new Date().toLocaleTimeString()}
-            </p>
+            <p className="text-white text-lg font-bold">{new Date().toLocaleTimeString()}</p>
           </div>
         </div>
       </div>

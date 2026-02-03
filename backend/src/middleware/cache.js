@@ -35,14 +35,12 @@ export function cacheMiddleware(duration = 300) {
       const originalJson = res.json.bind(res);
 
       // Override json method to cache response
-      res.json = function(data) {
+      res.json = function (data) {
         try {
           // Cache the response
-          redis.setex(
-            cacheKey,
-            duration,
-            JSON.stringify(data),
-          ).catch(err => logger.error('Cache store error:', err));
+          redis
+            .setex(cacheKey, duration, JSON.stringify(data))
+            .catch((err) => logger.error('Cache store error:', err));
 
           logger.debug(`📞 Cache SET for ${req.originalUrl} (${duration}s)`);
         } catch (error) {
@@ -132,10 +130,10 @@ export function cacheGames(duration = 600) {
       }
 
       const originalJson = res.json.bind(res);
-      res.json = function(data) {
-        redis.setex(cacheKey, duration, JSON.stringify(data)).catch(err =>
-          logger.error('Cache error:', err),
-        );
+      res.json = function (data) {
+        redis
+          .setex(cacheKey, duration, JSON.stringify(data))
+          .catch((err) => logger.error('Cache error:', err));
         return originalJson(data);
       };
 
@@ -164,10 +162,10 @@ export function cacheAnalytics(duration = 1800) {
       }
 
       const originalJson = res.json.bind(res);
-      res.json = function(data) {
-        redis.setex(cacheKey, duration, JSON.stringify(data)).catch(err =>
-          logger.error('Analytics cache error:', err),
-        );
+      res.json = function (data) {
+        redis
+          .setex(cacheKey, duration, JSON.stringify(data))
+          .catch((err) => logger.error('Analytics cache error:', err));
         return originalJson(data);
       };
 

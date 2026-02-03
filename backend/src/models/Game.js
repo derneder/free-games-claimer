@@ -58,7 +58,7 @@ export class Game {
         game.claimedAt,
         game.expiresAt,
         game.url,
-      ],
+      ]
     );
 
     return game;
@@ -87,11 +87,9 @@ export class Game {
     const offset = (page - 1) * pageSize;
     const result = await query(
       'SELECT * FROM games WHERE userId = $1 ORDER BY claimedAt DESC LIMIT $2 OFFSET $3',
-      [userId, pageSize, offset],
+      [userId, pageSize, offset]
     );
-    const countResult = await query('SELECT COUNT(*) FROM games WHERE userId = $1', [
-      userId,
-    ]);
+    const countResult = await query('SELECT COUNT(*) FROM games WHERE userId = $1', [userId]);
     return {
       games: result.rows.map((row) => new Game(row)),
       total: parseInt(countResult.rows[0].count, 10),

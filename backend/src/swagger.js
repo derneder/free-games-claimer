@@ -174,14 +174,13 @@ const options = {
         },
       },
     },
-    security: [{
-      BearerAuth: [],
-    }],
+    security: [
+      {
+        BearerAuth: [],
+      },
+    ],
   },
-  apis: [
-    './src/routes/*.js',
-    './src/controllers/*.js',
-  ],
+  apis: ['./src/routes/*.js', './src/controllers/*.js'],
 };
 
 const specs = swaggerJsdoc(options);

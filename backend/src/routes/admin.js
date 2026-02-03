@@ -24,10 +24,7 @@ router.use(verifyToken, requireAdmin);
  * @desc Get system statistics
  * @access Admin
  */
-router.get(
-  '/stats',
-  asyncHandler(adminController.getSystemStats),
-);
+router.get('/stats', asyncHandler(adminController.getSystemStats));
 
 /**
  * @route GET /api/admin/users
@@ -45,7 +42,7 @@ router.get(
       isActive: Joi.boolean().optional(),
     }),
   }),
-  asyncHandler(adminController.listUsers),
+  asyncHandler(adminController.listUsers)
 );
 
 /**
@@ -60,7 +57,7 @@ router.get(
       userId: Joi.string().uuid().required(),
     }),
   }),
-  asyncHandler(adminController.getUser),
+  asyncHandler(adminController.getUser)
 );
 
 /**
@@ -75,7 +72,7 @@ router.post(
       userId: Joi.string().uuid().required(),
     }),
   }),
-  asyncHandler(adminController.deactivateUser),
+  asyncHandler(adminController.deactivateUser)
 );
 
 /**
@@ -90,7 +87,7 @@ router.post(
       userId: Joi.string().uuid().required(),
     }),
   }),
-  asyncHandler(adminController.activateUser),
+  asyncHandler(adminController.activateUser)
 );
 
 /**
@@ -109,7 +106,7 @@ router.get(
       sortOrder: Joi.string().valid('asc', 'desc').default('desc'),
     }),
   }),
-  asyncHandler(adminController.getActivityLogs),
+  asyncHandler(adminController.getActivityLogs)
 );
 
 /**
@@ -128,7 +125,7 @@ router.get(
       userId: Joi.string().uuid().required(),
     }),
   }),
-  asyncHandler(adminController.getUserActivityLogs),
+  asyncHandler(adminController.getUserActivityLogs)
 );
 
 export default router;

@@ -25,10 +25,14 @@ export async function fetchEpicGames() {
       }
     `;
 
-    const response = await axios.post(EPIC_API, { query }, {
-      headers: { 'Content-Type': 'application/json' },
-      timeout: 10000,
-    });
+    const response = await axios.post(
+      EPIC_API,
+      { query },
+      {
+        headers: { 'Content-Type': 'application/json' },
+        timeout: 10000,
+      }
+    );
 
     const games = response.data?.data?.Catalog?.searchStore?.elements || [];
     logger.info(`🌟 Found ${games.length} Epic Games`);

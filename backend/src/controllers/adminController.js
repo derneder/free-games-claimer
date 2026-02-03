@@ -33,8 +33,8 @@ export async function getSystemStats(req, res) {
           ...stats,
           timestamp: new Date().toISOString(),
         },
-        'System statistics retrieved',
-      ),
+        'System statistics retrieved'
+      )
     );
   } catch (error) {
     logger.error('Get system stats error:', error);
@@ -86,14 +86,7 @@ export async function listUsers(req, res) {
       updatedAt: user.updatedAt,
     }));
 
-    res.json(
-      formatPaginated(
-        users,
-        page,
-        pageSize,
-        parseInt(countResult.rows[0].count, 10),
-      ),
-    );
+    res.json(formatPaginated(users, page, pageSize, parseInt(countResult.rows[0].count, 10)));
   } catch (error) {
     logger.error('List users error:', error);
     res.status(500).json(formatError('INTERNAL_ERROR', 'Failed to list users'));
@@ -131,7 +124,7 @@ export async function getUser(req, res) {
         twoFaEnabled: user.twoFaEnabled,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
-      }),
+      })
     );
   } catch (error) {
     logger.error('Get user error:', error);
@@ -173,10 +166,7 @@ export async function deactivateUser(req, res) {
     });
 
     res.json(
-      formatSuccess(
-        { message: 'User account deactivated' },
-        'User deactivated successfully',
-      ),
+      formatSuccess({ message: 'User account deactivated' }, 'User deactivated successfully')
     );
   } catch (error) {
     logger.error('Deactivate user error:', error);
@@ -220,12 +210,7 @@ export async function activateUser(req, res) {
       resourceId: userId,
     });
 
-    res.json(
-      formatSuccess(
-        { message: 'User account activated' },
-        'User activated successfully',
-      ),
-    );
+    res.json(formatSuccess({ message: 'User account activated' }, 'User activated successfully'));
   } catch (error) {
     logger.error('Activate user error:', error);
     if (error instanceof AppError) {
@@ -277,14 +262,7 @@ export async function getActivityLogs(req, res) {
     const countParams = params.slice(0, params.length - 2);
     const countResult = await query(countSql, countParams);
 
-    res.json(
-      formatPaginated(
-        result.rows,
-        page,
-        pageSize,
-        parseInt(countResult.rows[0].count, 10),
-      ),
-    );
+    res.json(formatPaginated(result.rows, page, pageSize, parseInt(countResult.rows[0].count, 10)));
   } catch (error) {
     logger.error('Get activity logs error:', error);
     res.status(500).json(formatError('INTERNAL_ERROR', 'Failed to get activity logs'));
@@ -309,9 +287,7 @@ export async function getUserActivityLogs(req, res) {
 
     const result = await ActivityLog.getUserActivity(userId, page, pageSize);
 
-    res.json(
-      formatPaginated(result.logs, page, pageSize, result.total),
-    );
+    res.json(formatPaginated(result.logs, page, pageSize, result.total));
   } catch (error) {
     logger.error('Get user activity logs error:', error);
     res.status(500).json(formatError('INTERNAL_ERROR', 'Failed to get user activity logs'));

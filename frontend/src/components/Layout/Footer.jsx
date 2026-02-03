@@ -1,6 +1,6 @@
 /**
  * Footer Component
- * 
+ *
  * Application footer with links and information.
  */
 
@@ -15,7 +15,8 @@ function Footer() {
           <div>
             <h3 className="text-lg font-bold mb-4">Free Games Claimer</h3>
             <p className="text-gray-400 text-sm">
-              Track and manage all your claimed free games from Epic Games, GOG, Prime Gaming, and more.
+              Track and manage all your claimed free games from Epic Games, GOG, Prime Gaming, and
+              more.
             </p>
           </div>
 
@@ -23,9 +24,21 @@ function Footer() {
           <div>
             <h4 className="text-lg font-bold mb-4">Quick Links</h4>
             <ul className="space-y-2 text-sm text-gray-400">
-              <li><a href="#" className="hover:text-white">Documentation</a></li>
-              <li><a href="#" className="hover:text-white">API</a></li>
-              <li><a href="#" className="hover:text-white">Support</a></li>
+              <li>
+                <a href="#" className="hover:text-white">
+                  Documentation
+                </a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-white">
+                  API
+                </a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-white">
+                  Support
+                </a>
+              </li>
             </ul>
           </div>
 
@@ -33,9 +46,21 @@ function Footer() {
           <div>
             <h4 className="text-lg font-bold mb-4">Legal</h4>
             <ul className="space-y-2 text-sm text-gray-400">
-              <li><a href="#" className="hover:text-white">Privacy Policy</a></li>
-              <li><a href="#" className="hover:text-white">Terms of Service</a></li>
-              <li><a href="#" className="hover:text-white">Contact</a></li>
+              <li>
+                <a href="#" className="hover:text-white">
+                  Privacy Policy
+                </a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-white">
+                  Terms of Service
+                </a>
+              </li>
+              <li>
+                <a href="#" className="hover:text-white">
+                  Contact
+                </a>
+              </li>
             </ul>
           </div>
         </div>

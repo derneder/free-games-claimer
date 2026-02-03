@@ -40,7 +40,7 @@ export async function getProfile(req, res) {
         isActive: user.isActive,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
-      }),
+      })
     );
   } catch (error) {
     logger.error('Get profile error:', error);
@@ -106,8 +106,8 @@ export async function updateProfile(req, res) {
           username: user.username,
           updatedAt: user.updatedAt,
         },
-        'Profile updated successfully',
-      ),
+        'Profile updated successfully'
+      )
     );
   } catch (error) {
     logger.error('Update profile error:', error);
@@ -151,12 +151,7 @@ export async function changePassword(req, res) {
       description: 'User changed password',
     });
 
-    res.json(
-      formatSuccess(
-        { message: 'Password changed successfully' },
-        'Password updated',
-      ),
-    );
+    res.json(formatSuccess({ message: 'Password changed successfully' }, 'Password updated'));
   } catch (error) {
     logger.error('Change password error:', error);
     if (error instanceof AppError) {
@@ -199,12 +194,7 @@ export async function deleteAccount(req, res) {
       description: 'User deleted account',
     });
 
-    res.json(
-      formatSuccess(
-        { message: 'Account deleted successfully' },
-        'Account deactivated',
-      ),
-    );
+    res.json(formatSuccess({ message: 'Account deleted successfully' }, 'Account deactivated'));
   } catch (error) {
     logger.error('Delete account error:', error);
     if (error instanceof AppError) {

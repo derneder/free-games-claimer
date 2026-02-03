@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function UserManagementTable({ users, onAction }) {
   return (
     <div className="overflow-x-auto">
@@ -23,16 +21,20 @@ export default function UserManagementTable({ users, onAction }) {
               <td className="py-3 px-4">{user.email}</td>
               <td className="py-3 px-4">@{user.username}</td>
               <td className="py-3 px-4">
-                <span className={`px-2 py-1 rounded text-sm ${
-                  user.role === 'admin' ? 'bg-red-900 text-red-200' : 'bg-blue-900 text-blue-200'
-                }`}>
+                <span
+                  className={`px-2 py-1 rounded text-sm ${
+                    user.role === 'admin' ? 'bg-red-900 text-red-200' : 'bg-blue-900 text-blue-200'
+                  }`}
+                >
                   {user.role}
                 </span>
               </td>
               <td className="py-3 px-4">
-                <span className={`px-2 py-1 rounded text-sm ${
-                  user.is_active ? 'bg-green-900 text-green-200' : 'bg-red-900 text-red-200'
-                }`}>
+                <span
+                  className={`px-2 py-1 rounded text-sm ${
+                    user.is_active ? 'bg-green-900 text-green-200' : 'bg-red-900 text-red-200'
+                  }`}
+                >
                   {user.is_active ? '✅ Active' : '❌ Inactive'}
                 </span>
               </td>

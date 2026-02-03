@@ -61,27 +61,29 @@ export async function getCollaborativeFilteringRecommendations(userId, limit = 5
     }
 
     // Build user preference vector
-    const userVector = userGames.length > 0
-      ? userGames[0]
-        .map(g => buildGameVector(g))
-        .reduce((acc, v) => acc.map((a, i) => a + v[i]))
-      : [];
+    const userVector =
+      userGames.length > 0
+        ? userGames[0]
+            .map((g) => buildGameVector(g))
+            .reduce((acc, v) => acc.map((a, i) => a + v[i]))
+        : [];
 
     // Get all games
     const allGames = await db('games')
-      .whereNotIn('id', userGames.map(g => g.id))
+      .whereNotIn(
+        'id',
+        userGames.map((g) => g.id)
+      )
       .limit(100);
 
     // Calculate similarity for each game
-    const scored = allGames.map(game => ({
+    const scored = allGames.map((game) => ({
       ...game,
       score: cosineSimilarity(userVector, buildGameVector(game)),
     }));
 
     // Sort by score and return top N
-    return scored
-      .sort((a, b) => b.score - a.score)
-      .slice(0, limit);
+    return scored.sort((a, b) => b.score - a.score).slice(0, limit);
   } catch (error) {
     logger.error('Error getting collaborative filtering recommendations:', error);
     return [];
@@ -106,14 +108,12 @@ export async function getContentBasedRecommendations(gameId, limit = 5) {
       .where('source', game.source) // Same source often means similar catalog
       .limit(50);
 
-    const scored = similarGames.map(g => ({
+    const scored = similarGames.map((g) => ({
       ...g,
       score: cosineSimilarity(gameVector, buildGameVector(g)),
     }));
 
-    return scored
-      .sort((a, b) => b.score - a.score)
-      .slice(0, limit);
+    return scored.sort((a, b) => b.score - a.score).slice(0, limit);
   } catch (error) {
     logger.error('Error getting content-based recommendations:', error);
     return [];
@@ -178,9 +178,7 @@ export async function getPersonalizedRecommendations(userId, limit = 10) {
 
     // Merge and deduplicate
     const merged = [...collaborative, ...trending, ...popular];
-    const unique = Array.from(
-      new Map(merged.map(g => [g.id, g])).values(),
-    ).slice(0, limit);
+    const unique = Array.from(new Map(merged.map((g) => [g.id, g])).values()).slice(0, limit);
 
     // Cache for 6 hours
     await redis.setex(cacheKey, 6 * 60 * 60, JSON.stringify(unique));
@@ -215,8 +213,8 @@ export async function trainRecommendationModel() {
 
     // Calculate game statistics for better scoring
     const games = await db('games').select('*');
-    const maxPrice = Math.max(...games.map(g => g.steam_price_usd || 0), 1);
-    const maxClaims = Math.max(...games.map(g => g.claimed_count || 0), 1);
+    const maxPrice = Math.max(...games.map((g) => g.steam_price_usd || 0), 1);
+    const maxClaims = Math.max(...games.map((g) => g.claimed_count || 0), 1);
 
     // Update game vectors
     for (const game of games) {

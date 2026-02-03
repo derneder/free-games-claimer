@@ -28,14 +28,7 @@ export async function listGames(req, res) {
 
     const result = await gamesService.getUserGames(req.user.id, page, pageSize);
 
-    res.json(
-      formatPaginated(
-        result.games.map(formatGame),
-        page,
-        pageSize,
-        result.total,
-      ),
-    );
+    res.json(formatPaginated(result.games.map(formatGame), page, pageSize, result.total));
   } catch (error) {
     logger.error('List games error:', error);
     res.status(500).json(formatError('INTERNAL_ERROR', 'Failed to list games'));
@@ -90,9 +83,7 @@ export async function addGame(req, res) {
 
     const game = await gamesService.addGame(req.user.id, gameData);
 
-    res.status(201).json(
-      formatSuccess(formatGame(game), 'Game added successfully'),
-    );
+    res.status(201).json(formatSuccess(formatGame(game), 'Game added successfully'));
   } catch (error) {
     logger.error('Add game error:', error);
     if (error instanceof AppError) {
@@ -119,9 +110,7 @@ export async function deleteGame(req, res) {
 
     await gamesService.deleteGame(req.user.id, id);
 
-    res.json(
-      formatSuccess({ message: 'Game deleted successfully' }, 'Game removed'),
-    );
+    res.json(formatSuccess({ message: 'Game deleted successfully' }, 'Game removed'));
   } catch (error) {
     logger.error('Delete game error:', error);
     if (error instanceof AppError) {
@@ -145,7 +134,7 @@ export async function getStats(req, res) {
     // Get total games
     const gamesResult = await query(
       'SELECT COUNT(*) as total, SUM(price) as totalValue FROM games WHERE userId = $1',
-      [userId],
+      [userId]
     );
 
     const stats = gamesResult.rows[0];
@@ -158,7 +147,7 @@ export async function getStats(req, res) {
        FROM games 
        WHERE userId = $1 
        GROUP BY platform`,
-      [userId],
+      [userId]
     );
 
     // Get games by source
@@ -169,7 +158,7 @@ export async function getStats(req, res) {
        FROM games 
        WHERE userId = $1 
        GROUP BY source`,
-      [userId],
+      [userId]
     );
 
     res.json(
@@ -178,7 +167,7 @@ export async function getStats(req, res) {
         totalValue: parseFloat(stats.totalValue) || 0,
         platforms: platformsResult.rows,
         sources: sourcesResult.rows,
-      }),
+      })
     );
   } catch (error) {
     logger.error('Get stats error:', error);

@@ -51,7 +51,7 @@ export class ActivityLog {
         log.resourceId,
         log.ipAddress,
         log.userAgent,
-      ],
+      ]
     );
 
     return log;
@@ -69,12 +69,11 @@ export class ActivityLog {
     const offset = (page - 1) * pageSize;
     const result = await query(
       'SELECT * FROM activityLogs WHERE userId = $1 ORDER BY createdAt DESC LIMIT $2 OFFSET $3',
-      [userId, pageSize, offset],
+      [userId, pageSize, offset]
     );
-    const countResult = await query(
-      'SELECT COUNT(*) FROM activityLogs WHERE userId = $1',
-      [userId],
-    );
+    const countResult = await query('SELECT COUNT(*) FROM activityLogs WHERE userId = $1', [
+      userId,
+    ]);
     return {
       logs: result.rows.map((row) => new ActivityLog(row)),
       total: parseInt(countResult.rows[0].count, 10),
