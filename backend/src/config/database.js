@@ -28,13 +28,28 @@ let pool = null;
  */
 export async function initializeDatabase() {
   try {
-    pool = new Pool({
-      connectionString: config.database.url,
-      min: config.database.poolMin,
-      max: config.database.poolMax,
-      idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 5000,
-    });
+    // Support both connection string and individual PG environment variables
+    const poolConfig = config.database.url
+      ? {
+        connectionString: config.database.url,
+        min: config.database.poolMin,
+        max: config.database.poolMax,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 5000,
+      }
+      : {
+        host: process.env.PGHOST || 'localhost',
+        port: parseInt(process.env.PGPORT || '5432', 10),
+        user: process.env.PGUSER || 'postgres',
+        password: process.env.PGPASSWORD || 'postgres',
+        database: process.env.PGDATABASE || 'postgres',
+        min: config.database.poolMin,
+        max: config.database.poolMax,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 5000,
+      };
+
+    pool = new Pool(poolConfig);
 
     // Test connection
     const client = await pool.connect();
@@ -90,3 +105,10 @@ export async function closeDatabase() {
     logger.info('Database connection pool closed');
   }
 }
+
+/**
+ * Export pool as default to support both import styles
+ * Note: Pool is null until initializeDatabase() is called.
+ * Always call initializeDatabase() before using the pool.
+ */
+export default pool;

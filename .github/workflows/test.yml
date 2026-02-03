@@ -17,8 +17,9 @@ jobs:
       postgres:
         image: postgres:15
         env:
+          POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: free_games_test
+          POSTGRES_DB: postgres
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -50,21 +51,25 @@ jobs:
 
       - name: Install dependencies
         working-directory: ./backend
-        run: npm install
+        run: npm ci
 
       - name: Run tests
         working-directory: ./backend
         env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/free_games_test
+          PGHOST: localhost
+          PGPORT: 5432
+          PGUSER: postgres
+          PGPASSWORD: postgres
+          PGDATABASE: postgres
           REDIS_URL: redis://localhost:6379
           NODE_ENV: test
           JWT_SECRET: test-secret
-        run: npm test
+        run: npm run test:coverage
 
       - name: Upload coverage
         uses: codecov/codecov-action@v3
         with:
-          files: ./backend/coverage/coverage-final.json
+          files: ./backend/coverage/lcov.info
           flags: backend
           name: backend-coverage
 
@@ -83,7 +88,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: ./frontend
-        run: npm install
+        run: npm ci
 
       - name: Run lint
         working-directory: ./frontend
