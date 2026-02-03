@@ -80,6 +80,7 @@ jobs:
           PGUSER: postgres
           PGPASSWORD: postgres
           PGDATABASE: postgres
+          SESSION_SECRET: test-session-secret-for-ci-testing
 
       - name: Run tests
         working-directory: backend
@@ -93,6 +94,9 @@ jobs:
           PGDATABASE: postgres
           REDIS_URL: redis://localhost:6379
           JWT_SECRET: test-secret
+          SESSION_SECRET: test-session-secret-for-ci-testing
+          CREDENTIALS_ENC_KEY: qjGWi30DPY3kO6ur5VzT0fQ7Q6uB6OL1uwmvCTQQTvg=
+          CREDENTIALS_KEY_VERSION: '1'
 
       - name: Upload coverage
         uses: codecov/codecov-action@v3
