@@ -1,9 +1,16 @@
-import { Telegraf, session } from 'telegraf';
+import { Telegraf, session, Markup } from 'telegraf';
 import db from '../config/database.js';
 import logger from '../config/logger.js';
 import { addEpicGamesForUser } from '../workers/epicGamesWorker.js';
 import { addGOGGamesForUser } from '../workers/gogWorker.js';
 import { addSteamGamesForUser } from '../workers/steamWorker.js';
+import {
+  saveCredentials,
+  getAllCredentialStatuses,
+  deleteCredentials,
+} from '../services/credentialService.js';
+import { PROVIDER_NAMES } from '../validators/credentials.js';
+import { claimForUser } from '../workers/claimOrchestrator.js';
 
 const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
 
@@ -180,6 +187,255 @@ bot.hears('ℹ️ Help', async (ctx) => {
 // /help command
 bot.command('help', (ctx) => {
   ctx.hears('ℹ️ Help')(ctx);
+});
+
+// 🔐 Connect Account - Show provider selection
+bot.command('connect', async (ctx) => {
+  const keyboard = Markup.inlineKeyboard([
+    [
+      Markup.button.callback('🏴 Epic Games', 'connect_epic'),
+      Markup.button.callback('🕹️ GOG', 'connect_gog'),
+    ],
+    [Markup.button.callback('🚂 Steam', 'connect_steam')],
+  ]);
+
+  await ctx.reply(
+    '🔐 Connect Provider Account\n\n' +
+      'Choose which provider you want to connect:',
+    keyboard
+  );
+});
+
+// Handle provider connection callbacks
+bot.action(/connect_(.+)/, async (ctx) => {
+  const provider = ctx.match[1];
+  ctx.session = ctx.session || {};
+  ctx.session.connectingProvider = provider;
+
+  await ctx.answerCbQuery();
+  await ctx.reply(
+    `📝 Connecting ${PROVIDER_NAMES[provider]}\n\n` +
+      `Please send your credentials in JSON format:\n\n` +
+      `For email/password:\n` +
+      `{"email": "your@email.com", "password": "yourpassword"}\n\n` +
+      `Or use /cancel to abort.`
+  );
+});
+
+// 🗑️ Remove Account - Show provider selection
+bot.command('disconnect', async (ctx) => {
+  try {
+    const user = await db('users').where({ telegram_id: ctx.from.id.toString() }).first();
+    if (!user) return ctx.reply('❌ User not found');
+
+    const statuses = await getAllCredentialStatuses(user.id);
+    const connected = statuses.filter((s) => s.hasCredentials);
+
+    if (connected.length === 0) {
+      return ctx.reply('ℹ️ No connected accounts found.');
+    }
+
+    const buttons = connected.map((s) => [
+      Markup.button.callback(`Remove ${PROVIDER_NAMES[s.provider]}`, `disconnect_${s.provider}`),
+    ]);
+
+    const keyboard = Markup.inlineKeyboard(buttons);
+    await ctx.reply('🗑️ Select account to remove:', keyboard);
+  } catch (error) {
+    logger.error('Error in /disconnect:', error);
+    await ctx.reply('❌ Error fetching accounts');
+  }
+});
+
+// Handle provider disconnection callbacks
+bot.action(/disconnect_(.+)/, async (ctx) => {
+  const provider = ctx.match[1];
+
+  try {
+    const user = await db('users').where({ telegram_id: ctx.from.id.toString() }).first();
+    if (!user) return ctx.answerCbQuery('User not found');
+
+    const deleted = await deleteCredentials(user.id, provider);
+
+    if (deleted) {
+      await ctx.answerCbQuery('Credentials removed');
+      await ctx.editMessageText(
+        `✅ ${PROVIDER_NAMES[provider]} credentials have been removed.`
+      );
+    } else {
+      await ctx.answerCbQuery('Not found');
+      await ctx.editMessageText('❌ No credentials found to remove.');
+    }
+  } catch (error) {
+    logger.error('Error removing credentials:', error);
+    await ctx.answerCbQuery('Error occurred');
+    await ctx.reply('❌ Error removing credentials');
+  }
+});
+
+// 📋 Account Status
+bot.command('accounts', async (ctx) => {
+  try {
+    const user = await db('users').where({ telegram_id: ctx.from.id.toString() }).first();
+    if (!user) return ctx.reply('❌ User not found');
+
+    const statuses = await getAllCredentialStatuses(user.id);
+
+    let message = '📋 Connected Accounts:\n\n';
+
+    statuses.forEach((s) => {
+      const statusIcon = s.hasCredentials
+        ? s.status === 'active'
+          ? '✅'
+          : '⚠️'
+        : '❌';
+      const statusText = s.hasCredentials
+        ? s.status === 'active'
+          ? 'Connected'
+          : `${s.status}`
+        : 'Not connected';
+
+      message += `${statusIcon} ${PROVIDER_NAMES[s.provider]}: ${statusText}\n`;
+
+      if (s.lastVerifiedAt) {
+        const date = new Date(s.lastVerifiedAt).toLocaleDateString();
+        message += `   Last verified: ${date}\n`;
+      }
+      if (s.errorMessage) {
+        message += `   Error: ${s.errorMessage.substring(0, 50)}...\n`;
+      }
+      message += '\n';
+    });
+
+    message += 'Use /connect to add accounts\n';
+    message += 'Use /disconnect to remove accounts';
+
+    await ctx.reply(message);
+  } catch (error) {
+    logger.error('Error in /accounts:', error);
+    await ctx.reply('❌ Error fetching account status');
+  }
+});
+
+// 🚀 Claim Now - Trigger manual claim
+bot.command('claim', async (ctx) => {
+  try {
+    const user = await db('users').where({ telegram_id: ctx.from.id.toString() }).first();
+    if (!user) return ctx.reply('❌ User not found');
+
+    const statuses = await getAllCredentialStatuses(user.id);
+    const connected = statuses.filter((s) => s.hasCredentials && s.status === 'active');
+
+    if (connected.length === 0) {
+      return ctx.reply('ℹ️ No active accounts. Use /connect to add accounts first.');
+    }
+
+    const buttons = connected.map((s) => [
+      Markup.button.callback(`Claim from ${PROVIDER_NAMES[s.provider]}`, `claim_${s.provider}`),
+    ]);
+    buttons.push([Markup.button.callback('🚀 Claim All', 'claim_all')]);
+
+    const keyboard = Markup.inlineKeyboard(buttons);
+    await ctx.reply('🎮 Select provider to claim from:', keyboard);
+  } catch (error) {
+    logger.error('Error in /claim:', error);
+    await ctx.reply('❌ Error fetching accounts');
+  }
+});
+
+// Handle claim callbacks
+bot.action(/claim_(.+)/, async (ctx) => {
+  const provider = ctx.match[1];
+
+  try {
+    const user = await db('users').where({ telegram_id: ctx.from.id.toString() }).first();
+    if (!user) return ctx.answerCbQuery('User not found');
+
+    await ctx.answerCbQuery('Starting claim...');
+    await ctx.editMessageText(`⏳ Starting claim for ${PROVIDER_NAMES[provider]}...`);
+
+    if (provider === 'all') {
+      // Claim from all providers
+      const statuses = await getAllCredentialStatuses(user.id);
+      const connected = statuses.filter((s) => s.hasCredentials && s.status === 'active');
+
+      let totalClaimed = 0;
+      for (const status of connected) {
+        const result = await claimForUser(user.id, status.provider);
+        totalClaimed += result.claimed?.length || 0;
+      }
+
+      await ctx.reply(`✅ Claim complete! ${totalClaimed} games claimed.`);
+    } else {
+      // Claim from specific provider
+      const result = await claimForUser(user.id, provider);
+
+      let message = `📊 Claim Results for ${PROVIDER_NAMES[provider]}:\n\n`;
+      message += `✅ Claimed: ${result.claimed?.length || 0}\n`;
+      message += `📦 Already Owned: ${result.alreadyOwned?.length || 0}\n`;
+      message += `❌ Failed: ${result.failed?.length || 0}\n`;
+
+      if (result.errors?.length > 0) {
+        message += `\n⚠️ Errors:\n`;
+        result.errors.slice(0, 3).forEach((err) => {
+          message += `• ${err.error}\n`;
+        });
+      }
+
+      await ctx.reply(message);
+    }
+  } catch (error) {
+    logger.error('Error claiming games:', error);
+    await ctx.reply('❌ Error claiming games. Please try again later.');
+  }
+});
+
+// Handle credential input (when user sends JSON credentials)
+bot.on('text', async (ctx) => {
+  if (!ctx.session?.connectingProvider) return;
+
+  const provider = ctx.session.connectingProvider;
+
+  try {
+    // Parse credentials
+    const credentials = JSON.parse(ctx.message.text);
+
+    // Get user
+    const user = await db('users').where({ telegram_id: ctx.from.id.toString() }).first();
+    if (!user) {
+      delete ctx.session.connectingProvider;
+      return ctx.reply('❌ User not found');
+    }
+
+    // Save credentials
+    await saveCredentials(user.id, provider, credentials);
+
+    delete ctx.session.connectingProvider;
+    await ctx.reply(
+      `✅ ${PROVIDER_NAMES[provider]} credentials saved successfully!\n\n` +
+        `Use /claim to start claiming games.`
+    );
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      await ctx.reply(
+        '❌ Invalid JSON format. Please try again or use /cancel to abort.'
+      );
+    } else {
+      logger.error('Error saving credentials:', error);
+      delete ctx.session.connectingProvider;
+      await ctx.reply('❌ Error saving credentials: ' + error.message);
+    }
+  }
+});
+
+// /cancel - Cancel current operation
+bot.command('cancel', async (ctx) => {
+  if (ctx.session?.connectingProvider) {
+    delete ctx.session.connectingProvider;
+    await ctx.reply('❌ Operation cancelled.');
+  } else {
+    await ctx.reply('ℹ️ No operation to cancel.');
+  }
 });
 
 bot.launch();
