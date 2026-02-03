@@ -13,9 +13,15 @@ import rateLimit from 'express-rate-limit';
 import rateLimit from 'express-rate-limit';
 import rateLimit from 'express-rate-limit';
 import * as authController from '../controllers/authController.js';
+import rateLimit from 'express-rate-limit';
 import { validate } from '../middleware/validation.js';
 import { asyncHandler } from '../middleware/error.js';
 import { verifyToken } from '../middleware/auth.js';
+const logoutLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 logout requests per windowMs
+});
+
 
 // Rate limiter for authentication-related endpoints to mitigate abuse/DoS
 const authLimiter = rateLimit({
@@ -99,7 +105,7 @@ router.post('/2fa/setup', authLimiter, verifyToken, asyncHandler(authController.
 /**
  * @route POST /api/auth/refresh
  * @desc Refresh access token
- * @access Public
+router.post('/logout', logoutLimiter, verifyToken, asyncHandler(authController.logout));
  */
 router.post(
   '/refresh',
