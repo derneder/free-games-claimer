@@ -14,25 +14,20 @@ import * as authController from '../controllers/authController.js';
 import { validate } from '../middleware/validation.js';
 import { asyncHandler } from '../middleware/error.js';
 import { verifyToken } from '../middleware/auth.js';
-const logoutLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 logout requests per windowMs
-});
-
-
-// Rate limiter for authentication-related endpoints to mitigate abuse/DoS
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 50, // limit each IP to 50 requests per window for auth routes
-  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-});
 
 const router = Router();
+
 // Rate limiting for authentication routes
 const authRateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // limit each IP to 100 requests per windowMs for public auth endpoints
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const strictAuthLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20, // tighter limit for sensitive operations like login and 2FA
   standardHeaders: true,
   legacyHeaders: false,
 });
@@ -44,22 +39,18 @@ const twoFARateLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-
-// Rate limiters for authentication routes
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 auth requests per windowMs
-});
-
-  authRateLimiter,
-const strictAuthLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 20, // tighter limit for sensitive operations like login and 2FA
-});
-
 const profileLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 200, // allow more frequent profile access but still bounded
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const logoutLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 logout requests per windowMs
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
 /**
@@ -70,7 +61,6 @@ const profileLimiter = rateLimit({
 router.post(
   '/register',
   authRateLimiter,
-  authLimiter,
   validate({
     body: Joi.object({
       email: Joi.string().email().required(),
@@ -86,9 +76,8 @@ router.post(
  * @desc User login
  * @access Public
  */
-  authRateLimiter,
 router.post(
-router.post('/2fa/setup', authLimiter, verifyToken, asyncHandler(authController.setup2FA));
+  '/login',
   strictAuthLimiter,
   validate({
     body: Joi.object({
@@ -102,17 +91,12 @@ router.post('/2fa/setup', authLimiter, verifyToken, asyncHandler(authController.
 /**
  * @route POST /api/auth/refresh
  * @desc Refresh access token
-router.post('/logout', logoutLimiter, verifyToken, asyncHandler(authController.logout));
+ * @access Public
  */
 router.post(
   '/refresh',
-  authLimiter,
-router.post(
-  '/2fa/setup',
-  twoFARateLimiter,
-  verifyToken,
-  asyncHandler(authController.setup2FA),
-);
+  authRateLimiter,
+  validate({
     body: Joi.object({
       refreshToken: Joi.string().required(),
     }),
@@ -121,7 +105,6 @@ router.post(
 );
 
 /**
-  twoFARateLimiter,
  * @route GET /api/auth/profile
  * @desc Get current user profile
  * @access Private
@@ -140,19 +123,19 @@ router.get(
  */
 router.post(
   '/2fa/setup',
-  authLimiter,
+  twoFARateLimiter,
   verifyToken,
   asyncHandler(authController.setup2FA),
 );
 
 /**
-  strictAuthLimiter,
  * @route POST /api/auth/2fa/verify
  * @desc Verify 2FA token
  * @access Private
  */
 router.post(
   '/2fa/verify',
+  twoFARateLimiter,
   verifyToken,
   validate({
     body: Joi.object({
@@ -169,7 +152,7 @@ router.post(
  */
 router.post(
   '/logout',
-  authLimiter,
+  logoutLimiter,
   verifyToken,
   asyncHandler(authController.logout),
 );
