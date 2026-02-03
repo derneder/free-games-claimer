@@ -30,10 +30,10 @@ const gamesRateLimiter = rateLimit({
  * @desc Get user's games with pagination
  * @access Private
  */
-  gamesRateLimiter,
 router.get(
   '/',
   verifyToken,
+  gamesRateLimiter,
   validate({
     query: Joi.object({
       page: Joi.number().integer().min(1).default(1),
@@ -109,6 +109,11 @@ router.delete(
  * @desc Get games statistics
  * @access Private
  */
-router.get('/stats/summary', verifyToken, gamesRateLimiter, asyncHandler(gamesController.getStats));
+router.get(
+  '/stats/summary',
+  verifyToken,
+  gamesRateLimiter,
+  asyncHandler(gamesController.getStats),
+);
 
 export default router;
