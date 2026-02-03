@@ -42,7 +42,7 @@ router.get(
       sortOrder: Joi.string().valid('asc', 'desc').default('desc'),
     }),
   }),
-  asyncHandler(gamesController.listGames),
+  asyncHandler(gamesController.listGames)
 );
 
 /**
@@ -59,7 +59,7 @@ router.get(
       id: Joi.string().uuid().required(),
     }),
   }),
-  asyncHandler(gamesController.getGame),
+  asyncHandler(gamesController.getGame)
 );
 
 /**
@@ -84,7 +84,7 @@ router.post(
       expiresAt: Joi.date().optional(),
     }),
   }),
-  asyncHandler(gamesController.addGame),
+  asyncHandler(gamesController.addGame)
 );
 
 /**
@@ -101,7 +101,7 @@ router.delete(
       id: Joi.string().uuid().required(),
     }),
   }),
-  asyncHandler(gamesController.deleteGame),
+  asyncHandler(gamesController.deleteGame)
 );
 
 /**
@@ -109,11 +109,6 @@ router.delete(
  * @desc Get games statistics
  * @access Private
  */
-router.get(
-  '/stats/summary',
-  verifyToken,
-  gamesRateLimiter,
-  asyncHandler(gamesController.getStats),
-);
+router.get('/stats/summary', verifyToken, gamesRateLimiter, asyncHandler(gamesController.getStats));
 
 export default router;
