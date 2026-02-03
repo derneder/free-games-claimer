@@ -146,6 +146,14 @@ async function startServer() {
     await initializeRedis();
     logger.info('✓ Redis connected');
 
+    // Initialize Telegram Bot (if configured)
+    try {
+      const { initializeTelegramBot } = await import('./telegram/bot.js');
+      initializeTelegramBot();
+    } catch (error) {
+      logger.warn('Failed to initialize Telegram bot:', error.message);
+    }
+
     // Start listening
     const server = app.listen(config.port, config.host, () => {
       logger.info(`🚀 Server running at http://${config.host}:${config.port} [${config.nodeEnv}]`);
