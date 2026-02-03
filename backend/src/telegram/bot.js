@@ -200,8 +200,7 @@ bot.command('connect', async (ctx) => {
   ]);
 
   await ctx.reply(
-    '🔐 Connect Provider Account\n\n' +
-      'Choose which provider you want to connect:',
+    '🔐 Connect Provider Account\n\n' + 'Choose which provider you want to connect:',
     keyboard
   );
 });
@@ -259,9 +258,7 @@ bot.action(/disconnect_(.+)/, async (ctx) => {
 
     if (deleted) {
       await ctx.answerCbQuery('Credentials removed');
-      await ctx.editMessageText(
-        `✅ ${PROVIDER_NAMES[provider]} credentials have been removed.`
-      );
+      await ctx.editMessageText(`✅ ${PROVIDER_NAMES[provider]} credentials have been removed.`);
     } else {
       await ctx.answerCbQuery('Not found');
       await ctx.editMessageText('❌ No credentials found to remove.');
@@ -284,11 +281,7 @@ bot.command('accounts', async (ctx) => {
     let message = '📋 Connected Accounts:\n\n';
 
     statuses.forEach((s) => {
-      const statusIcon = s.hasCredentials
-        ? s.status === 'active'
-          ? '✅'
-          : '⚠️'
-        : '❌';
+      const statusIcon = s.hasCredentials ? (s.status === 'active' ? '✅' : '⚠️') : '❌';
       const statusText = s.hasCredentials
         ? s.status === 'active'
           ? 'Connected'
@@ -417,9 +410,7 @@ bot.on('text', async (ctx) => {
     );
   } catch (error) {
     if (error instanceof SyntaxError) {
-      await ctx.reply(
-        '❌ Invalid JSON format. Please try again or use /cancel to abort.'
-      );
+      await ctx.reply('❌ Invalid JSON format. Please try again or use /cancel to abort.');
     } else {
       logger.error('Error saving credentials:', error);
       delete ctx.session.connectingProvider;

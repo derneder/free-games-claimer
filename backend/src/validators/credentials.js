@@ -32,7 +32,10 @@ export const epicCredentialsSchema = Joi.object({
     )
     .optional(),
   sessionToken: Joi.string().optional(),
-  parentalPin: Joi.string().length(4).pattern(/^\d{4}$/).optional(),
+  parentalPin: Joi.string()
+    .length(4)
+    .pattern(/^\d{4}$/)
+    .optional(),
 }).or('email', 'cookies', 'sessionToken'); // At least one authentication method
 
 /**

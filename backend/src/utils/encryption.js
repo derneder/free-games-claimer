@@ -106,11 +106,7 @@ export function decryptCredentials(encryptedData) {
     }
 
     const key = getEncryptionKey(keyVersion);
-    const decipher = crypto.createDecipheriv(
-      ALGORITHM,
-      key,
-      Buffer.from(iv, 'base64')
-    );
+    const decipher = crypto.createDecipheriv(ALGORITHM, key, Buffer.from(iv, 'base64'));
 
     // Set authentication tag
     decipher.setAuthTag(Buffer.from(tag, 'base64'));

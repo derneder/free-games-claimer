@@ -46,9 +46,8 @@ const { doubleCsrfProtection, generateToken } = doubleCsrf({
     }
     return secret;
   },
-  cookieName: process.env.NODE_ENV === 'production'
-    ? '__Host-psifi.x-csrf-token'
-    : 'psifi.x-csrf-token',
+  cookieName:
+    process.env.NODE_ENV === 'production' ? '__Host-psifi.x-csrf-token' : 'psifi.x-csrf-token',
   cookieOptions: {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
