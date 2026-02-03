@@ -5,9 +5,7 @@
     "es2021": true,
     "jest": true
   },
-  "extends": [
-    "eslint:recommended"
-  ],
+  "extends": ["eslint:recommended"],
   "parserOptions": {
     "ecmaVersion": 2021,
     "sourceType": "module"
@@ -16,10 +14,7 @@
     "no-console": [
       "warn",
       {
-        "allow": [
-          "warn",
-          "error"
-        ]
+        "allow": ["warn", "error"]
       }
     ],
     "no-unused-vars": [
@@ -29,10 +24,7 @@
       }
     ],
     "no-trailing-spaces": "error",
-    "eol-last": [
-      "error",
-      "always"
-    ],
+    "eol-last": ["error", "always"],
     "quotes": [
       "error",
       "single",
@@ -40,18 +32,9 @@
         "avoidEscape": true
       }
     ],
-    "semi": [
-      "error",
-      "always"
-    ],
-    "comma-dangle": [
-      "error",
-      "always-multiline"
-    ],
-    "indent": [
-      "error",
-      2
-    ],
+    "semi": ["error", "always"],
+    "comma-dangle": ["error", "always-multiline"],
+    "indent": ["error", 2],
     "arrow-spacing": "error",
     "no-var": "error",
     "prefer-const": "error",

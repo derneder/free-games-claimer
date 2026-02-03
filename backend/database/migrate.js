@@ -1,8 +1,8 @@
 /**
  * Database Migration Runner
- * 
+ *
  * Executes SQL migration files in order.
- * 
+ *
  * Usage: node database/migrate.js
  */
 
@@ -38,9 +38,7 @@ async function runMigrations() {
     // Get migration files
     const migrationsDir = path.join(__dirname, 'migrations');
     const files = await readdir(migrationsDir);
-    const migrations = files
-      .filter((f) => f.endsWith('.sql'))
-      .sort();
+    const migrations = files.filter((f) => f.endsWith('.sql')).sort();
 
     if (migrations.length === 0) {
       logger.warn('No migration files found');

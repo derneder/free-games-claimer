@@ -7,7 +7,7 @@ const URLS_TO_CACHE = [
   '/css/main.css',
   '/js/main.js',
   '/manifest.json',
-  '/offline.html'
+  '/offline.html',
 ];
 
 // Install event
@@ -98,7 +98,7 @@ self.addEventListener('fetch', (event) => {
 // Handle push notifications
 self.addEventListener('push', (event) => {
   console.log('[SW] Push notification received');
-  
+
   const data = event.data?.json?.() || {};
   const title = data.title || 'Free Games Claimer';
   const options = {
@@ -106,12 +106,10 @@ self.addEventListener('push', (event) => {
     icon: '/icons/icon-192x192.png',
     badge: '/icons/badge-96x96.png',
     tag: data.tag || 'notification',
-    data: data.data || {}
+    data: data.data || {},
   };
 
-  event.waitUntil(
-    self.registration.showNotification(title, options)
-  );
+  event.waitUntil(self.registration.showNotification(title, options));
 });
 
 // Handle notification clicks
@@ -121,34 +119,36 @@ self.addEventListener('notificationclick', (event) => {
 
   const urlToOpen = event.notification.data?.url || '/';
   event.waitUntil(
-    clients.matchAll({
-      type: 'window',
-      includeUncontrolled: true
-    }).then((clientList) => {
-      // Check if app is already open
-      for (let i = 0; i < clientList.length; i++) {
-        const client = clientList[i];
-        if (client.url === urlToOpen && 'focus' in client) {
-          return client.focus();
+    clients
+      .matchAll({
+        type: 'window',
+        includeUncontrolled: true,
+      })
+      .then((clientList) => {
+        // Check if app is already open
+        for (let i = 0; i < clientList.length; i++) {
+          const client = clientList[i];
+          if (client.url === urlToOpen && 'focus' in client) {
+            return client.focus();
+          }
         }
-      }
-      // Open new window if not already open
-      if (clients.openWindow) {
-        return clients.openWindow(urlToOpen);
-      }
-    })
+        // Open new window if not already open
+        if (clients.openWindow) {
+          return clients.openWindow(urlToOpen);
+        }
+      })
   );
 });
 
 // Background sync for offline actions
 self.addEventListener('sync', (event) => {
   console.log('[SW] Background sync:', event.tag);
-  
+
   if (event.tag === 'sync-games') {
     event.waitUntil(
       fetch('/api/games/sync', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
       })
     );
   }

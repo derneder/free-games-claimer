@@ -7,7 +7,7 @@ module.exports = {
       exec_mode: 'cluster',
       env: {
         NODE_ENV: 'production',
-        PORT: 3000
+        PORT: 3000,
       },
       error_file: './logs/error.log',
       out_file: './logs/out.log',
@@ -22,15 +22,9 @@ module.exports = {
       kill_timeout: 5000,
       wait_ready: true,
       shutdown_with_message: true,
-      ignore_watch: [
-        'node_modules',
-        'logs',
-        'dist',
-        '.git',
-        '.env'
-      ],
+      ignore_watch: ['node_modules', 'logs', 'dist', '.git', '.env'],
       node_args: '--max-old-space-size=2048',
-      time_zone: 'UTC'
+      time_zone: 'UTC',
     },
     {
       name: 'telegram-bot',
@@ -38,13 +32,13 @@ module.exports = {
       instances: 1,
       exec_mode: 'fork',
       env: {
-        NODE_ENV: 'production'
+        NODE_ENV: 'production',
       },
       error_file: './logs/telegram-error.log',
       out_file: './logs/telegram-out.log',
       autorestart: true,
       max_memory_restart: '256M',
-      watch: false
+      watch: false,
     },
     {
       name: 'recommendations-engine',
@@ -52,13 +46,13 @@ module.exports = {
       instances: 1,
       exec_mode: 'fork',
       env: {
-        NODE_ENV: 'production'
+        NODE_ENV: 'production',
       },
       cron_restart: '0 2 * * *', // Train model at 2 AM daily
       error_file: './logs/recommendations-error.log',
       out_file: './logs/recommendations-out.log',
       autorestart: true,
-      max_memory_restart: '512M'
+      max_memory_restart: '512M',
     },
     {
       name: 'notification-worker',
@@ -66,13 +60,13 @@ module.exports = {
       instances: 1,
       exec_mode: 'fork',
       env: {
-        NODE_ENV: 'production'
+        NODE_ENV: 'production',
       },
       error_file: './logs/notification-error.log',
       out_file: './logs/notification-out.log',
       autorestart: true,
-      max_memory_restart: '256M'
-    }
+      max_memory_restart: '256M',
+    },
   ],
   deploy: {
     production: {
@@ -81,11 +75,11 @@ module.exports = {
       ref: 'origin/main',
       repo: 'https://github.com/derneder/free-games-claimer.git',
       path: '/var/www/free-games-claimer',
-      'post-deploy': 'npm install && npm run migrate && pm2 startOrRestart ecosystem.config.js'
-    }
+      'post-deploy': 'npm install && npm run migrate && pm2 startOrRestart ecosystem.config.js',
+    },
   },
   monit: {
     min_uptime: '10s',
-    max_restarts: 3
-  }
+    max_restarts: 3,
+  },
 };
