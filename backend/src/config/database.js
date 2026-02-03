@@ -78,6 +78,10 @@ export function getPool() {
 
 /**
  * Get database connection pool (alias for getPool)
+ * 
+ * Provides a more semantic alias for getPool() when the focus is on 
+ * database operations rather than connection pooling. Both functions
+ * return the same pool instance.
  *
  * @returns {pg.Pool} PostgreSQL connection pool
  * @throws {Error} If pool is not initialized
