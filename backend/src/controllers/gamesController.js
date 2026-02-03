@@ -11,7 +11,6 @@ import { Game } from '../models/Game.js';
 import { query } from '../config/database.js';
 import * as gamesService from '../services/games.js';
 import { AppError } from '../middleware/error.js';
-import { formatSuccess, formatError, formatPaginated, formatGame } from '../utils/formatters.js';
 import { logger } from '../config/logger.js';
 import { isValidUUID } from '../utils/validators.js';
 
@@ -24,14 +23,30 @@ import { isValidUUID } from '../utils/validators.js';
  */
 export async function listGames(req, res) {
   try {
-    const { page, pageSize } = req.query;
+    const { page = 1, limit = 20, source } = req.query;
+    const pageNum = parseInt(page, 10);
+    const limitNum = parseInt(limit, 10);
 
-    const result = await gamesService.getUserGames(req.user.id, page, pageSize);
+    const result = await gamesService.getUserGames(
+      req.user.id,
+      pageNum,
+      limitNum,
+      source ? { source } : {}
+    );
 
-    res.json(formatPaginated(result.games.map(formatGame), page, pageSize, result.total));
+    const totalPages = Math.ceil(result.total / limitNum);
+    res.json({
+      games: result.games,
+      pagination: {
+        page: pageNum,
+        limit: limitNum,
+        total: result.total,
+        pages: totalPages,
+      },
+    });
   } catch (error) {
     logger.error('List games error:', error);
-    res.status(500).json(formatError('INTERNAL_ERROR', 'Failed to list games'));
+    res.status(500).json({ error: 'Failed to list games' });
   }
 }
 
@@ -47,26 +62,23 @@ export async function getGame(req, res) {
     const { id } = req.params;
 
     if (!isValidUUID(id)) {
-      return res.status(400).json(formatError('INVALID_ID', 'Invalid game ID format'));
+      return res.status(404).json({ error: 'Game not found' });
     }
 
     const game = await Game.findById(id);
 
     if (!game) {
-      throw new AppError('Game not found', 404, 'GAME_NOT_FOUND');
+      return res.status(404).json({ error: 'Game not found' });
     }
 
     if (game.userId !== req.user.id) {
-      throw new AppError('Unauthorized to access this game', 403, 'FORBIDDEN');
+      return res.status(403).json({ error: 'Unauthorized to access this game' });
     }
 
-    res.json(formatSuccess(formatGame(game)));
+    res.json({ game });
   } catch (error) {
     logger.error('Get game error:', error);
-    if (error instanceof AppError) {
-      return res.status(error.statusCode).json(formatError(error.code, error.message));
-    }
-    res.status(500).json(formatError('INTERNAL_ERROR', 'Failed to get game'));
+    res.status(500).json({ error: 'Failed to get game' });
   }
 }
 
@@ -83,13 +95,13 @@ export async function addGame(req, res) {
 
     const game = await gamesService.addGame(req.user.id, gameData);
 
-    res.status(201).json(formatSuccess(formatGame(game), 'Game added successfully'));
+    res.status(201).json({ game });
   } catch (error) {
     logger.error('Add game error:', error);
     if (error instanceof AppError) {
-      return res.status(error.statusCode).json(formatError(error.code, error.message));
+      return res.status(error.statusCode).json({ error: error.message });
     }
-    res.status(500).json(formatError('INTERNAL_ERROR', 'Failed to add game'));
+    res.status(500).json({ error: 'Failed to add game' });
   }
 }
 
@@ -105,18 +117,18 @@ export async function deleteGame(req, res) {
     const { id } = req.params;
 
     if (!isValidUUID(id)) {
-      return res.status(400).json(formatError('INVALID_ID', 'Invalid game ID format'));
+      return res.status(400).json({ error: 'Invalid game ID format' });
     }
 
     await gamesService.deleteGame(req.user.id, id);
 
-    res.json(formatSuccess({ message: 'Game deleted successfully' }, 'Game removed'));
+    res.json({ message: 'Game deleted successfully' });
   } catch (error) {
     logger.error('Delete game error:', error);
     if (error instanceof AppError) {
-      return res.status(error.statusCode).json(formatError(error.code, error.message));
+      return res.status(error.statusCode).json({ error: error.message });
     }
-    res.status(500).json(formatError('INTERNAL_ERROR', 'Failed to delete game'));
+    res.status(500).json({ error: 'Failed to delete game' });
   }
 }
 
@@ -161,16 +173,37 @@ export async function getStats(req, res) {
       [userId]
     );
 
-    res.json(
-      formatSuccess({
-        totalGames: parseInt(stats.total, 10),
-        totalValue: parseFloat(stats.totalValue) || 0,
-        platforms: platformsResult.rows,
-        sources: sourcesResult.rows,
-      })
-    );
+    res.json({
+      totalGames: parseInt(stats.total, 10),
+      totalValue: parseFloat(stats.totalValue) || 0,
+      platforms: platformsResult.rows,
+      sources: sourcesResult.rows,
+    });
   } catch (error) {
     logger.error('Get stats error:', error);
-    res.status(500).json(formatError('INTERNAL_ERROR', 'Failed to get statistics'));
+    res.status(500).json({ error: 'Failed to get statistics' });
+  }
+}
+
+/**
+ * Bulk import games
+ *
+ * @param {Object} req - Express request (with user attached)
+ * @param {Object} res - Express response
+ * @returns {Promise<void>}
+ */
+export async function bulkImport(req, res) {
+  try {
+    const { games } = req.body;
+
+    const result = await gamesService.bulkImportGames(req.user.id, games);
+
+    res.status(201).json(result);
+  } catch (error) {
+    logger.error('Bulk import error:', error);
+    if (error instanceof AppError) {
+      return res.status(error.statusCode).json({ error: error.message });
+    }
+    res.status(500).json({ error: 'Failed to import games' });
   }
 }

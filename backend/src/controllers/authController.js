@@ -10,9 +10,8 @@
 import { User } from '../models/User.js';
 import { ActivityLog } from '../models/ActivityLog.js';
 import * as authService from '../services/auth.js';
-import { generateToken, generateRefreshToken } from '../middleware/auth.js';
+import { generateToken } from '../middleware/auth.js';
 import { AppError } from '../middleware/error.js';
-import { formatSuccess, formatError } from '../utils/formatters.js';
 import { logger } from '../config/logger.js';
 import { config } from '../config/env.js';
 import jwt from 'jsonwebtoken';
@@ -45,7 +44,7 @@ export async function register(req, res) {
     });
   } catch (error) {
     logger.error('Registration error:', error);
-    
+
     // Handle Postgres unique constraint violations
     if (error.code === '23505') {
       let message = 'User already exists';
@@ -56,7 +55,7 @@ export async function register(req, res) {
       }
       return res.status(400).json({ error: message });
     }
-    
+
     if (error instanceof AppError) {
       // Return 400 for all user-facing errors during registration
       const statusCode = error.statusCode === 409 ? 400 : error.statusCode;
@@ -270,13 +269,13 @@ export async function verify2FA(req, res) {
       description: 'Two-factor authentication enabled',
     });
 
-    res.json(formatSuccess({ message: '2FA enabled successfully' }, '2FA is now active'));
+    res.json({ message: '2FA enabled successfully' });
   } catch (error) {
     logger.error('2FA verification error:', error);
     if (error instanceof AppError) {
-      return res.status(error.statusCode).json(formatError(error.code, error.message));
+      return res.status(error.statusCode).json({ error: error.message });
     }
-    res.status(500).json(formatError('INTERNAL_ERROR', '2FA verification failed'));
+    res.status(500).json({ error: '2FA verification failed' });
   }
 }
 
@@ -296,9 +295,9 @@ export async function logout(req, res) {
       description: 'User logged out',
     });
 
-    res.json(formatSuccess({ message: 'Logged out successfully' }, 'Logout successful'));
+    res.json({ message: 'Logged out successfully' });
   } catch (error) {
     logger.error('Logout error:', error);
-    res.status(500).json(formatError('INTERNAL_ERROR', 'Logout failed'));
+    res.status(500).json({ error: 'Logout failed' });
   }
 }

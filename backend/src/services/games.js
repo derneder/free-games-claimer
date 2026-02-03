@@ -24,9 +24,16 @@ export async function addGame(userId, gameData) {
     throw new AppError('Game title is required', 400, 'INVALID_GAME');
   }
 
+  // Check if game already exists in user's library
+  const existingGame = await Game.findByUserAndTitle(userId, gameData.title, gameData.source);
+  if (existingGame) {
+    throw new AppError('Game already in library', 400, 'GAME_EXISTS');
+  }
+
   const game = await Game.create({
     ...gameData,
     userId,
+    user_id: userId, // Also set user_id for database compatibility
   });
 
   // Log activity
@@ -47,10 +54,11 @@ export async function addGame(userId, gameData) {
  * @param {string} userId - User ID
  * @param {number} page - Page number
  * @param {number} pageSize - Items per page
+ * @param {Object} filters - Filter options (e.g., { source: 'epic' })
  * @returns {Promise<Object>} Games and pagination info
  */
-export async function getUserGames(userId, page = 1, pageSize = 20) {
-  return Game.listByUser(userId, page, pageSize);
+export async function getUserGames(userId, page = 1, pageSize = 20, filters = {}) {
+  return Game.listByUser(userId, page, pageSize, filters);
 }
 
 /**
@@ -81,4 +89,50 @@ export async function deleteGame(userId, gameId) {
     resourceType: 'game',
     resourceId: gameId,
   });
+}
+
+/**
+ * Bulk import games
+ *
+ * @param {string} userId - User ID
+ * @param {Array} gamesData - Array of game data
+ * @returns {Promise<Object>} Imported games and count
+ * @throws {AppError} If validation fails
+ */
+export async function bulkImportGames(userId, gamesData) {
+  if (!Array.isArray(gamesData) || gamesData.length === 0) {
+    throw new AppError('Games array is required and must not be empty', 400, 'INVALID_INPUT');
+  }
+
+  const importedGames = [];
+
+  for (const gameData of gamesData) {
+    if (!gameData.title) {
+      continue; // Skip games without title
+    }
+
+    try {
+      const game = await Game.create({
+        ...gameData,
+        userId,
+        user_id: userId,
+      });
+      importedGames.push(game);
+    } catch (error) {
+      // Log but continue with other games
+      console.error(`Failed to import game ${gameData.title}:`, error);
+    }
+  }
+
+  // Log activity
+  await ActivityLog.log({
+    userId,
+    action: 'GAMES_BULK_IMPORTED',
+    description: `Bulk import: ${importedGames.length} games`,
+  });
+
+  return {
+    games: importedGames,
+    count: importedGames.length,
+  };
 }
