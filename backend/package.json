@@ -11,9 +11,9 @@
   "scripts": {
     "dev": "NODE_ENV=development nodemon src/index.js",
     "start": "NODE_ENV=production node src/index.js",
-    "test": "NODE_ENV=test jest --passWithNoTests",
+    "test": "NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest --passWithNoTests",
     "test:watch": "NODE_ENV=test jest --watch",
-    "test:coverage": "NODE_ENV=test jest --coverage",
+    "test:coverage": "NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest --coverage",
     "lint": "eslint src tests --fix",
     "format": "prettier --write src tests",
     "type-check": "tsc --noEmit",

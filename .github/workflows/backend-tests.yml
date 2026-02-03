@@ -23,9 +23,9 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_DB: test_db
-          POSTGRES_USER: testuser
-          POSTGRES_PASSWORD: testpass
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -69,10 +69,14 @@ jobs:
 
       - name: Run tests
         working-directory: backend
-        run: npm run test -- --coverage
+        run: npm run test:coverage
         env:
           NODE_ENV: test
-          DATABASE_URL: 'postgresql://testuser:testpass@localhost:5432/test_db'
+          PGHOST: localhost
+          PGPORT: 5432
+          PGUSER: postgres
+          PGPASSWORD: postgres
+          PGDATABASE: postgres
           REDIS_URL: 'redis://localhost:6379'
 
       - name: Upload coverage reports

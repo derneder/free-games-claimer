@@ -16,16 +16,16 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_USER: test
-          POSTGRES_PASSWORD: test
-          POSTGRES_DB: free_games_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
         ports:
-          - 5433:5432
+          - 5432:5432
 
       redis:
         image: redis:7
@@ -35,7 +35,7 @@ jobs:
           --health-timeout 5s
           --health-retries 5
         ports:
-          - 6380:6379
+          - 6379:6379
 
     steps:
       - uses: actions/checkout@v4
@@ -49,7 +49,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: backend
-        run: npm install
+        run: npm ci
 
       - name: Lint code
         working-directory: backend
@@ -61,10 +61,14 @@ jobs:
 
       - name: Run tests
         working-directory: backend
-        run: npm test
+        run: npm run test:coverage
         env:
-          DATABASE_URL: postgresql://test:test@localhost:5433/free_games_test
-          REDIS_URL: redis://localhost:6380
+          PGHOST: localhost
+          PGPORT: 5432
+          PGUSER: postgres
+          PGPASSWORD: postgres
+          PGDATABASE: postgres
+          REDIS_URL: redis://localhost:6379
           NODE_ENV: test
 
       - name: Upload coverage
@@ -91,7 +95,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: frontend
-        run: npm install
+        run: npm ci
 
       - name: Lint code
         working-directory: frontend

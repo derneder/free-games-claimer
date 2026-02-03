@@ -52,7 +52,7 @@ export const config = {
 
   // Database
   database: {
-    url: requireEnv('DATABASE_URL'),
+    url: process.env.DATABASE_URL || null,
     poolMin: parseInt(process.env.DATABASE_POOL_MIN || '2', 10),
     poolMax: parseInt(process.env.DATABASE_POOL_MAX || '20', 10),
   },

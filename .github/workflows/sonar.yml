@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - implementation
   pull_request:
       types: [opened, synchronize, reopened]
 
@@ -27,17 +28,19 @@ jobs:
         cache: 'npm'
         cache-dependency-path: 'backend/package-lock.json'
     -
-      name: Install dev dependencies which include ESLint + plugins
+      name: Install backend dependencies
       working-directory: backend
-      run: npm install --only=dev
+      run: npm ci
     -
-      name: Run ESLint
+      name: Run ESLint on backend
       working-directory: backend
-      continue-on-error: true
-      run: npx eslint . -f json -o ../eslint_report.json
+      run: npx eslint . --ext .js,.ts -f json -o ../eslint_report.json || true
     -
       name: Fix ESLint paths
-      run: sed -i 's+/home/runner/work/free-games-claimer/free-games-claimer+/github/workspace+g' eslint_report.json
+      run: |
+        if [ -f eslint_report.json ]; then
+          sed -i 's+/home/runner/work/free-games-claimer/free-games-claimer+/github/workspace+g' eslint_report.json
+        fi
     -
       name: SonarCloud Scan
       uses: sonarsource/sonarcloud-github-action@master
