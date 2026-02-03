@@ -78,8 +78,8 @@ export function getPool() {
 
 /**
  * Get database connection pool (alias for getPool)
- * 
- * Provides a more semantic alias for getPool() when the focus is on 
+ *
+ * Provides a more semantic alias for getPool() when the focus is on
  * database operations rather than connection pooling. Both functions
  * return the same pool instance.
  *
