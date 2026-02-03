@@ -120,3 +120,9 @@ export function generateRefreshToken(payload) {
     expiresIn: config.jwt.refreshExpiration,
   });
 }
+
+/**
+ * Authenticate middleware (alias for verifyToken)
+ * Exported for backward compatibility
+ */
+export const authenticate = verifyToken;
