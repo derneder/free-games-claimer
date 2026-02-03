@@ -17,15 +17,10 @@
 ### Операционная
 - [DEPLOYMENT.md](./DEPLOYMENT.md) - Развертывание
 - [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) - Решение проблем
-- [CONTRIBUTING.md](./CONTRIBUTING.md) - Рекомендации по вкладу
 
 ### Справочная
 - [API_ERRORS.md](./API_ERRORS.md) - Справочник ошибок API
-
-### История и Статус
-- [PHASE_1_SUMMARY.md](./PHASE_1_SUMMARY.md) - Итоги фазы 1
-- [IMPLEMENTATION_SUMMARY.md](./IMPLEMENTATION_SUMMARY.md) - Итоги реализации
-- [FINAL.md](./FINAL.md) - Финальная информация
+- [../CONTRIBUTING.md](../CONTRIBUTING.md) - Рекомендации по вкладу
 
 ---
 
@@ -60,7 +55,7 @@ npm run test:coverage # С отчетом о покрытии
 | Я разрабатываю API | [API.md](./API.md) → [API_ERRORS.md](./API_ERRORS.md) |
 | У меня проблема | [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) |
 | Я хочу задеплоить | [DEPLOYMENT.md](./DEPLOYMENT.md) |
-| Я вношу вклад | [CONTRIBUTING.md](./CONTRIBUTING.md) |
+| Я вношу вклад | [../CONTRIBUTING.md](../CONTRIBUTING.md) |
 
 ---
 
