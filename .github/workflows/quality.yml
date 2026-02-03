@@ -20,28 +20,65 @@ jobs:
         with:
           fetch-depth: 0  # Full history for better analysis
 
-      - name: Setup Node.js
+      - name: Setup Node.js for Backend
         uses: actions/setup-node@v4
         with:
           node-version: '18.18.2'
           cache: 'npm'
+          cache-dependency-path: 'backend/package-lock.json'
 
-      - name: Install dependencies
+      - name: Install backend dependencies
+        working-directory: backend
         run: npm ci
 
-      - name: Format check (Prettier)
+      - name: Format check backend (Prettier)
+        working-directory: backend
         run: npm run format:check
         continue-on-error: true
 
-      - name: Lint code (ESLint)
+      - name: Lint backend (ESLint)
+        working-directory: backend
         run: npm run lint
         continue-on-error: true
 
-      - name: Type check (TypeScript)
+      - name: Type check backend (TypeScript)
+        working-directory: backend
         run: npm run type-check
         continue-on-error: true
 
-      - name: Security audit
+      - name: Security audit backend
+        working-directory: backend
+        run: npm audit --audit-level=moderate
+        continue-on-error: true
+
+      - name: Setup Node.js for Frontend
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.18.2'
+          cache: 'npm'
+          cache-dependency-path: 'frontend/package-lock.json'
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Format check frontend (Prettier)
+        working-directory: frontend
+        run: npm run format:check
+        continue-on-error: true
+
+      - name: Lint frontend (ESLint)
+        working-directory: frontend
+        run: npm run lint
+        continue-on-error: true
+
+      - name: Type check frontend (TypeScript)
+        working-directory: frontend
+        run: npm run type-check
+        continue-on-error: true
+
+      - name: Security audit frontend
+        working-directory: frontend
         run: npm audit --audit-level=moderate
         continue-on-error: true
 
@@ -57,21 +94,36 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js for Backend
         uses: actions/setup-node@v4
         with:
           node-version: '18.18.2'
           cache: 'npm'
+          cache-dependency-path: 'backend/package-lock.json'
 
-      - name: Install dependencies
+      - name: Install backend dependencies
+        working-directory: backend
         run: npm ci
 
       - name: Build backend
+        working-directory: backend
         run: npm run build
         continue-on-error: true
 
+      - name: Setup Node.js for Frontend
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.18.2'
+          cache: 'npm'
+          cache-dependency-path: 'frontend/package-lock.json'
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
       - name: Build frontend
-        run: npm run build --prefix frontend
+        working-directory: frontend
+        run: npm run build
         env:
           VITE_API_URL: 'https://api.example.com'
         continue-on-error: true
