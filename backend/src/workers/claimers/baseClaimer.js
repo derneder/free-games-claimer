@@ -116,17 +116,17 @@ export class BaseClaimer {
     /* eslint-disable no-undef */
     await this.page.addInitScript(() => {
       // Override webdriver property
-      Object.defineProperty(Object.getPrototypeOf(navigator), 'webdriver', {
+      Object.defineProperty(navigator, 'webdriver', {
         get: () => undefined,
       });
 
       // Override plugins
-      Object.defineProperty(Object.getPrototypeOf(navigator), 'plugins', {
+      Object.defineProperty(navigator, 'plugins', {
         get: () => [1, 2, 3, 4, 5],
       });
 
       // Override languages
-      Object.defineProperty(Object.getPrototypeOf(navigator), 'languages', {
+      Object.defineProperty(navigator, 'languages', {
         get: () => ['en-US', 'en'],
       });
     });
