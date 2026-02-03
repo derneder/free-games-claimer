@@ -26,7 +26,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18.18.2'
+          node-version: '20.x'
           cache: 'npm'
           cache-dependency-path: 'frontend/package-lock.json'
 
@@ -36,11 +36,12 @@ jobs:
 
       - name: Run linter
         run: npm run lint --prefix frontend
-        continue-on-error: true
+
+      - name: Run format check
+        run: npm run format --prefix frontend
 
       - name: Run type check
         run: npm run type-check --prefix frontend
-        continue-on-error: true
 
       - name: Run tests
         run: npm run test --prefix frontend -- --coverage
