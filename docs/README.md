@@ -1,109 +1,75 @@
-# 📚 Documentation Hub
+# 📚 Документация Free Games Claimer
 
-All documentation is organized in this folder.
+Эта папка содержит полную документацию проекта.
 
----
+## 📖 Основные Документы
 
-## 📖 Main Guides
+### Для Новых Разработчиков
+- [QUICKSTART.md](./QUICKSTART.md) - Быстрый старт
+- [INSTALL.md](./INSTALL.md) - Инструкции по установке
+- [DEVELOPMENT_GUIDE.md](./DEVELOPMENT_GUIDE.md) - Гайд разработки
 
-### 👉 Start Here:
+### Архитектура и Дизайн
+- [ARCHITECTURE.md](./ARCHITECTURE.md) - Архитектура системы
+- [STRUCTURE.md](./STRUCTURE.md) - Структура проекта
+- [API.md](./API.md) - API документация
 
-1. **[PHASE_1_SUMMARY.md](./PHASE_1_SUMMARY.md)** - Overview of Phase 1
-   - What features are implemented
-   - What files were added
-   - How to get started
+### Операционная
+- [DEPLOYMENT.md](./DEPLOYMENT.md) - Развертывание
+- [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) - Решение проблем
+- [CONTRIBUTING.md](./CONTRIBUTING.md) - Рекомендации по вкладу
 
-2. **[INTEGRATION_GUIDE.md](./INTEGRATION_GUIDE.md)** - Step-by-step integration
-   - Backend setup
-   - Frontend setup
-   - Verification
+### Справочная
+- [API_ERRORS.md](./API_ERRORS.md) - Справочник ошибок API
 
----
-
-## 📊 For Deployment
-
-### 🔧 Production (Deployment)
-- **[DEPLOYMENT_CHECKLIST.md](./DEPLOYMENT_CHECKLIST.md)** - Complete checklist
-  - Infrastructure setup
-  - Docker deployment
-  - Security verification
-  - Monitoring
-
-### 🔗 Git & Development
-- **[GIT_COMMIT_INSTRUCTIONS.md](./GIT_COMMIT_INSTRUCTIONS.md)** - Git workflow
-  - How to create PR
-  - How to merge code
-  - Commit conventions
-
-### 🤝 Open Source
-- **[CONTRIBUTING.md](./CONTRIBUTING.md)** - How to contribute
-  - Development setup
-  - Code style
-  - PR process
+### История и Статус
+- [PHASE_1_SUMMARY.md](./PHASE_1_SUMMARY.md) - Итоги фазы 1
+- [IMPLEMENTATION_SUMMARY.md](./IMPLEMENTATION_SUMMARY.md) - Итоги реализации
+- [FINAL.md](./FINAL.md) - Финальная информация
 
 ---
 
-## 📋 Documentation Structure
+## 🚀 Быстрые Ссылки
 
-```
-docs/
-├── README.md                         (this file)
-├── PHASE_1_SUMMARY.md               Phase 1 overview
-├── INTEGRATION_GUIDE.md              Setup steps
-├── DEPLOYMENT_CHECKLIST.md          Deployment guide
-├── GIT_COMMIT_INSTRUCTIONS.md       Git workflow
-└── CONTRIBUTING.md                  Contributing guide
-```
-
----
-
-## 🏃 Quick Start
-
-### Step 1: Read overview
+**Для локальной разработки:**
 ```bash
-cat PHASE_1_SUMMARY.md
+nvm use              # Использовать Node.js из .nvmrc
+npm install          # Установить зависимости
+npm run dev          # Запустить в режиме разработки
 ```
 
-### Step 2: Integrate code
+**Для деплоя:**
 ```bash
-cat INTEGRATION_GUIDE.md
+./scripts/deploy.sh v1.0.0
 ```
 
-### Step 3: Setup & test
+**Для тестирования:**
 ```bash
-cd backend && npm install && npm test
-cd ../frontend && npm install
-npm run dev
-```
-
-### Step 4: Git workflow
-```bash
-cat GIT_COMMIT_INSTRUCTIONS.md
+npm run test         # Запустить тесты
+npm run test:coverage # С отчетом о покрытии
 ```
 
 ---
 
-## 🔗 Important Links
+## 📊 Навигация по Документации
 
-- 🎮 [GitHub Repository](https://github.com/derneder/free-games-claimer)
-- 📝 [Root README](../README.md) - Project overview
-- 🐛 [Issues](https://github.com/derneder/free-games-claimer/issues) - Report problems
-- 💬 [Discussions](https://github.com/derneder/free-games-claimer/discussions) - Ask questions
-
----
-
-## 🧭 Navigation
-
-| I want to... | Open |
-|---|---|
-| See what was done | [PHASE_1_SUMMARY.md](./PHASE_1_SUMMARY.md) |
-| Setup on my machine | [INTEGRATION_GUIDE.md](./INTEGRATION_GUIDE.md) |
-| Deploy to production | [DEPLOYMENT_CHECKLIST.md](./DEPLOYMENT_CHECKLIST.md) |
-| Submit code | [GIT_COMMIT_INSTRUCTIONS.md](./GIT_COMMIT_INSTRUCTIONS.md) |
-| Contribute code | [CONTRIBUTING.md](./CONTRIBUTING.md) |
+| Цель | Документ |
+|------|----------|
+| Я новый разработчик | [QUICKSTART.md](./QUICKSTART.md) → [DEVELOPMENT_GUIDE.md](./DEVELOPMENT_GUIDE.md) |
+| Я хочу понять архитектуру | [ARCHITECTURE.md](./ARCHITECTURE.md) → [STRUCTURE.md](./STRUCTURE.md) |
+| Я разрабатываю API | [API.md](./API.md) → [API_ERRORS.md](./API_ERRORS.md) |
+| У меня проблема | [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) |
+| Я хочу задеплоить | [DEPLOYMENT.md](./DEPLOYMENT.md) |
+| Я вношу вклад | [CONTRIBUTING.md](./CONTRIBUTING.md) |
 
 ---
 
-**👉 Start with [PHASE_1_SUMMARY.md](./PHASE_1_SUMMARY.md)**
+## 🔍 Версионирование
 
-**Then: [INTEGRATION_GUIDE.md](./INTEGRATION_GUIDE.md)**
+**Текущая версия:** 1.0.0  
+**Статус:** Production Ready (95%)  
+**Последнее обновление:** 3 февраля 2026
+
+---
+
+Если вы не нашли ответ на свой вопрос, см. [TROUBLESHOOTING.md](./TROUBLESHOOTING.md).
