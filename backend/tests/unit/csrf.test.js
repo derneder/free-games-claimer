@@ -3,7 +3,7 @@
  * Tests for the csrf-csrf double CSRF protection implementation
  */
 
-import { describe, it, expect, beforeAll } from '@jest/globals';
+import { describe, it, expect, beforeAll, jest } from '@jest/globals';
 
 describe('CSRF Middleware', () => {
   let csrfModule;
