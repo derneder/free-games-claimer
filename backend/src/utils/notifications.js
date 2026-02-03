@@ -1,5 +1,5 @@
-import db from '../config/database.js';
-import bot from '../telegram/bot.js';
+import { query } from '../config/database.js';
+import { getTelegramBot } from '../telegram/bot.js';
 import logger from '../config/logger.js';
 
 // ============ NOTIFICATION TYPES ============
@@ -28,9 +28,10 @@ export async function notifyAdmins(notification) {
     } = notification;
 
     // Get all admin users
-    const admins = await db('users')
-      .where({ role: 'admin', is_active: true })
-      .select('id', 'email', 'telegram_id');
+    const adminsResult = await query(
+      "SELECT id, email, telegram_id FROM users WHERE role = 'admin' AND is_active = true"
+    );
+    const admins = adminsResult.rows;
 
     if (admins.length === 0) {
       logger.warn('No active admins found for notification');
@@ -39,16 +40,11 @@ export async function notifyAdmins(notification) {
 
     // Save to database
     for (const admin of admins) {
-      await db('notifications').insert({
-        user_id: admin.id,
-        type,
-        title,
-        message,
-        severity,
-        metadata: JSON.stringify(metadata),
-        is_read: false,
-        created_at: new Date(),
-      });
+      await query(
+        `INSERT INTO notifications (user_id, type, title, message, severity, metadata, is_read, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+        [admin.id, type, title, message, severity, JSON.stringify(metadata), false, new Date()]
+      );
 
       // Send Telegram notification
       if (admin.telegram_id) {
@@ -87,9 +83,14 @@ async function sendTelegramNotification(chatId, notification) {
     const emoji = severityEmoji[severity] || 'ℹ️';
     const text = `${emoji} *${title}*\n\n${message}`;
 
-    await bot.telegram.sendMessage(chatId, text, {
-      parse_mode: 'Markdown',
-    });
+    const bot = getTelegramBot();
+    if (bot) {
+      await bot.telegram.sendMessage(chatId, text, {
+        parse_mode: 'Markdown',
+      });
+    } else {
+      logger.warn('Telegram bot not initialized, skipping notification');
+    }
   } catch (error) {
     logger.error('Error sending Telegram notification:', error);
   }
