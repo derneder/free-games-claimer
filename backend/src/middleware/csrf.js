@@ -1,7 +1,7 @@
 import helmet from 'helmet';
 import { doubleCsrf } from 'csrf-csrf';
 import cookieParser from 'cookie-parser';
-import logger from '../config/logger.js';
+import { logger } from '../config/logger.js';
 
 /**
  * Helmet middleware для безопасности headers
