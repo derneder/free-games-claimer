@@ -13,7 +13,7 @@ import Layout from './components/Layout/Layout';
 
 function App() {
   return (
-    <Router>
+    <Router basename="/free-games-claimer">
       <Layout>
         <Routes>
           <Route path="/" element={<HomePage />} />
