@@ -13,6 +13,28 @@ import { PROVIDER_NAMES } from '../validators/credentials.js';
 import { claimForUser } from '../workers/claimOrchestrator.js';
 
 let bot = null;
+let signalHandlersRegistered = false;
+
+/**
+ * Setup signal handlers for graceful shutdown
+ */
+function setupSignalHandlers() {
+  if (signalHandlersRegistered) return;
+
+  const stopBot = (signal) => {
+    if (bot) {
+      logger.info(`Received ${signal}, stopping Telegram bot...`);
+      bot.stop(signal);
+      bot = null;
+      signalHandlersRegistered = false;
+    }
+  };
+
+  process.once('SIGINT', () => stopBot('SIGINT'));
+  process.once('SIGTERM', () => stopBot('SIGTERM'));
+
+  signalHandlersRegistered = true;
+}
 
 /**
  * Initialize and start the Telegram bot
@@ -28,10 +50,10 @@ export function initializeTelegramBot() {
 
   bot = new Telegraf(token);
 
-    bot.use(session());
-  
-    // /start - Инициализация
-    bot.command('start', async (ctx) => {
+  bot.use(session());
+
+  // /start - Инициализация
+  bot.command('start', async (ctx) => {
     const telegramId = ctx.from.id.toString();
     const username = ctx.from.username || 'Unknown';
   
@@ -199,8 +221,16 @@ export function initializeTelegramBot() {
   });
   
   // /help command
-  bot.command('help', (ctx) => {
-    ctx.hears('ℹ️ Help')(ctx);
+  bot.command('help', async (ctx) => {
+    const message =
+      'ℹ️ Help\n\n' +
+      '📊 Stats - View your game collection statistics\n' +
+      '🎮 Recent - See your latest added games\n' +
+      '🔄 Run - Start automatic game collection\n' +
+      '⚙️ Settings - Configure preferences\n\n' +
+      'Questions? Visit https://github.com/derneder/free-games-claimer';
+
+    await ctx.reply(message);
   });
   
   // 🔐 Connect Account - Show provider selection
@@ -447,14 +477,8 @@ export function initializeTelegramBot() {
   bot.launch();
   logger.info('🤖 Telegram bot started successfully');
 
-  // Graceful shutdown handlers
-  const stopBot = (signal) => {
-    logger.info(`Received ${signal}, stopping Telegram bot...`);
-    bot.stop(signal);
-  };
-
-  process.once('SIGINT', () => stopBot('SIGINT'));
-  process.once('SIGTERM', () => stopBot('SIGTERM'));
+  // Setup graceful shutdown handlers
+  setupSignalHandlers();
 
   return bot;
 }
