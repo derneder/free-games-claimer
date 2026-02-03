@@ -96,7 +96,7 @@ export function setupSwagger(app) {
         filter: true,
         showExtensions: true,
       },
-    })
+    }),
   );
 
   logger.info('📚 Swagger API docs available at http://localhost:3000/api-docs');
