@@ -15,14 +15,22 @@ import { logger } from '../src/config/logger.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const client = new pg.Client({
-  connectionString: config.database.url,
-});
+// Create client configuration supporting both connection string and individual env vars
+const clientConfig = config.database.url
+  ? { connectionString: config.database.url }
+  : {
+      host: process.env.PGHOST || 'localhost',
+      port: parseInt(process.env.PGPORT || '5432', 10),
+      user: process.env.PGUSER || 'postgres',
+      password: process.env.PGPASSWORD || 'postgres',
+      database: process.env.PGDATABASE || 'postgres',
+    };
 
 /**
  * Run migrations
  */
 async function runMigrations() {
+  const client = new pg.Client(clientConfig);
   try {
     await client.connect();
     logger.info('Connected to database');
@@ -62,6 +70,7 @@ async function runMigrations() {
  * Run seeds
  */
 async function runSeeds() {
+  const client = new pg.Client(clientConfig);
   try {
     await client.connect();
     logger.info('Connected to database for seeding');
