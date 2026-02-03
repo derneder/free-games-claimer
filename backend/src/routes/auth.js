@@ -10,10 +10,7 @@
 import { Router } from 'express';
 import Joi from 'joi';
 import rateLimit from 'express-rate-limit';
-import rateLimit from 'express-rate-limit';
-import rateLimit from 'express-rate-limit';
 import * as authController from '../controllers/authController.js';
-import rateLimit from 'express-rate-limit';
 import { validate } from '../middleware/validation.js';
 import { asyncHandler } from '../middleware/error.js';
 import { verifyToken } from '../middleware/auth.js';
