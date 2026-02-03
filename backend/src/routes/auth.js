@@ -10,12 +10,28 @@
 import { Router } from 'express';
 import Joi from 'joi';
 import rateLimit from 'express-rate-limit';
+import rateLimit from 'express-rate-limit';
 import * as authController from '../controllers/authController.js';
 import { validate } from '../middleware/validation.js';
 import { asyncHandler } from '../middleware/error.js';
 import { verifyToken } from '../middleware/auth.js';
 
 const router = Router();
+// Rate limiting for authentication routes
+const authRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs for public auth endpoints
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const twoFARateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 30, // stricter limit for 2FA-related operations
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 
 // Rate limiters for authentication routes
 const authLimiter = rateLimit({
@@ -23,6 +39,7 @@ const authLimiter = rateLimit({
   max: 100, // limit each IP to 100 auth requests per windowMs
 });
 
+  authRateLimiter,
 const strictAuthLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 20, // tighter limit for sensitive operations like login and 2FA
@@ -40,6 +57,7 @@ const profileLimiter = rateLimit({
  */
 router.post(
   '/register',
+  authRateLimiter,
   authLimiter,
   validate({
     body: Joi.object({
@@ -56,6 +74,7 @@ router.post(
  * @desc User login
  * @access Public
  */
+  authRateLimiter,
 router.post(
   '/login',
   strictAuthLimiter,
@@ -76,7 +95,12 @@ router.post(
 router.post(
   '/refresh',
   authLimiter,
-  validate({
+router.post(
+  '/2fa/setup',
+  twoFARateLimiter,
+  verifyToken,
+  asyncHandler(authController.setup2FA),
+);
     body: Joi.object({
       refreshToken: Joi.string().required(),
     }),
@@ -85,6 +109,7 @@ router.post(
 );
 
 /**
+  twoFARateLimiter,
  * @route GET /api/auth/profile
  * @desc Get current user profile
  * @access Private
