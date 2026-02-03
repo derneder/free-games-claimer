@@ -75,7 +75,7 @@ describe('Encryption Utilities', () => {
 
       expect(masked.email).toBe('test@example.com');
       expect(masked.password).not.toBe('verylongpassword123');
-      expect(masked.password).toContain('...');
+      expect(masked.password).toBe('***');
     });
 
     it('should mask multiple sensitive fields', () => {

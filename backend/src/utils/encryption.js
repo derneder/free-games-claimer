@@ -164,7 +164,7 @@ export function maskSensitiveData(
     if (masked[field]) {
       if (typeof masked[field] === 'string') {
         const value = masked[field];
-        // Always mask passwords completely for security
+        // Always fully mask passwords for security
         if (field === 'password') {
           masked[field] = '***';
         } else if (value.length > 8) {
