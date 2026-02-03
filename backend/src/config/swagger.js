@@ -87,14 +87,17 @@ const specs = swaggerJsdoc(options);
 
 export function setupSwagger(app) {
   app.use('/api-docs', swaggerUi.serve);
-  app.get('/api-docs', swaggerUi.setup(specs, {
-    swaggerOptions: {
-      persistAuthorization: true,
-      displayRequestDuration: true,
-      filter: true,
-      showExtensions: true,
-    },
-  }));
+  app.get(
+    '/api-docs',
+    swaggerUi.setup(specs, {
+      swaggerOptions: {
+        persistAuthorization: true,
+        displayRequestDuration: true,
+        filter: true,
+        showExtensions: true,
+      },
+    }),
+  );
 
   logger.info('📚 Swagger API docs available at http://localhost:3000/api-docs');
 }

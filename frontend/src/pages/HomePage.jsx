@@ -1,6 +1,6 @@
 /**
  * Home Page
- * 
+ *
  * Landing page with project information.
  */
 
@@ -11,11 +11,10 @@ function HomePage() {
     <div className="py-12">
       {/* Hero Section */}
       <section className="text-center mb-16">
-        <h1 className="text-5xl font-bold text-gray-900 mb-4">
-          Free Games Claimer
-        </h1>
+        <h1 className="text-5xl font-bold text-gray-900 mb-4">Free Games Claimer</h1>
         <p className="text-xl text-gray-600 mb-8">
-          Never miss a free game again. Track all your claimed games from Epic Games, GOG, Prime Gaming, and more.
+          Never miss a free game again. Track all your claimed games from Epic Games, GOG, Prime
+          Gaming, and more.
         </p>
         <div className="flex gap-4 justify-center">
           <Link

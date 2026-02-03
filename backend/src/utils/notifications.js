@@ -220,7 +220,7 @@ export async function getUnreadNotifications(adminId) {
       .orderBy('created_at', 'desc')
       .limit(50);
 
-    return notifications.map(n => ({
+    return notifications.map((n) => ({
       ...n,
       metadata: JSON.parse(n.metadata || '{}'),
     }));
@@ -236,12 +236,10 @@ export async function getUnreadNotifications(adminId) {
  */
 export async function markAsRead(notificationId) {
   try {
-    await db('notifications')
-      .where({ id: notificationId })
-      .update({
-        is_read: true,
-        read_at: new Date(),
-      });
+    await db('notifications').where({ id: notificationId }).update({
+      is_read: true,
+      read_at: new Date(),
+    });
   } catch (error) {
     logger.error('Error marking notification as read:', error);
   }
@@ -254,9 +252,7 @@ export async function cleanupOldNotifications() {
   try {
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
-    const deleted = await db('notifications')
-      .where('created_at', '<', thirtyDaysAgo)
-      .delete();
+    const deleted = await db('notifications').where('created_at', '<', thirtyDaysAgo).delete();
 
     logger.info(`🧹 Cleaned up ${deleted} old notifications`);
   } catch (error) {

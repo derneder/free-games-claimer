@@ -24,10 +24,7 @@ router.use(verifyToken);
  * @desc Get current user profile
  * @access Private
  */
-router.get(
-  '/profile',
-  asyncHandler(usersController.getProfile),
-);
+router.get('/profile', asyncHandler(usersController.getProfile));
 
 /**
  * @route PUT /api/users/profile

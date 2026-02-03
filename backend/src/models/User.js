@@ -117,10 +117,10 @@ export class User {
    */
   static async list(page = 1, pageSize = 20) {
     const offset = (page - 1) * pageSize;
-    const result = await query(
-      'SELECT * FROM users ORDER BY createdAt DESC LIMIT $1 OFFSET $2',
-      [pageSize, offset],
-    );
+    const result = await query('SELECT * FROM users ORDER BY createdAt DESC LIMIT $1 OFFSET $2', [
+      pageSize,
+      offset,
+    ]);
     const countResult = await query('SELECT COUNT(*) FROM users');
     return {
       users: result.rows.map((row) => new User(row)),

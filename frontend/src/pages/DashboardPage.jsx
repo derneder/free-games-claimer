@@ -1,6 +1,6 @@
 /**
  * Dashboard Page
- * 
+ *
  * User dashboard showing games and statistics.
  */
 

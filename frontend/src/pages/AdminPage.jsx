@@ -1,6 +1,6 @@
 /**
  * Admin Page
- * 
+ *
  * Admin dashboard with system stats and user management.
  */
 
@@ -73,7 +73,9 @@ function AdminPage() {
             <thead className="bg-gray-50 border-b">
               <tr>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Email</th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Username</th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
+                  Username
+                </th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Role</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Status</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Created</th>
@@ -93,9 +95,7 @@ function AdminPage() {
                     <td className="px-6 py-4 text-sm">
                       <span
                         className={`px-2 py-1 rounded text-xs font-semibold ${
-                          user.isActive
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-red-100 text-red-800'
+                          user.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                         }`}
                       >
                         {user.isActive ? 'Active' : 'Inactive'}

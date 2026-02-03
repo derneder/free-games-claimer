@@ -39,15 +39,15 @@ export default function ActivityLogs() {
 
   const getActionIcon = (action) => {
     const icons = {
-      'user_login': '🔓',
-      'user_logout': '🔐',
-      'user_register': '✅',
-      'game_add': '➕',
-      'game_delete': '🗑️',
-      'game_import': '📦',
-      'admin_action': '🔧',
-      'settings_change': '⚙️',
-      'error': '❌',
+      user_login: '🔓',
+      user_logout: '🔐',
+      user_register: '✅',
+      game_add: '➕',
+      game_delete: '🗑️',
+      game_import: '📦',
+      admin_action: '🔧',
+      settings_change: '⚙️',
+      error: '❌',
     };
     return icons[action] || '📋';
   };
@@ -130,9 +130,7 @@ export default function ActivityLogs() {
                       {getActionIcon(log.action)} {log.action.replace(/_/g, ' ').toUpperCase()}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-white">
-                    {log.user_email || 'System'}
-                  </td>
+                  <td className="px-4 py-3 text-white">{log.user_email || 'System'}</td>
                   <td className="px-4 py-3 text-gray-400">
                     <span title={log.details}>{log.details}</span>
                   </td>

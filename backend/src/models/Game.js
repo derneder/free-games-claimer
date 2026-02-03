@@ -89,9 +89,7 @@ export class Game {
       'SELECT * FROM games WHERE userId = $1 ORDER BY claimedAt DESC LIMIT $2 OFFSET $3',
       [userId, pageSize, offset],
     );
-    const countResult = await query('SELECT COUNT(*) FROM games WHERE userId = $1', [
-      userId,
-    ]);
+    const countResult = await query('SELECT COUNT(*) FROM games WHERE userId = $1', [userId]);
     return {
       games: result.rows.map((row) => new Game(row)),
       total: parseInt(countResult.rows[0].count, 10),

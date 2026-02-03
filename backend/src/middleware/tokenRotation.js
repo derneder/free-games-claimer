@@ -50,11 +50,7 @@ export async function storeUsedRefreshToken(refreshToken, userId) {
     if (decoded && decoded.exp) {
       const ttl = decoded.exp - Math.floor(Date.now() / 1000);
       if (ttl > 0) {
-        await redis.setex(
-          `used_refresh:${userId}:${refreshToken}`,
-          ttl,
-          'true',
-        );
+        await redis.setex(`used_refresh:${userId}:${refreshToken}`, ttl, 'true');
       }
     }
   } catch (error) {
@@ -87,7 +83,7 @@ export async function getUserRefreshTokens(userId) {
   try {
     const pattern = `user_refresh:${userId}:*`;
     const keys = await redis.keys(pattern);
-    return keys.map(key => key.replace(`user_refresh:${userId}:`, ''));
+    return keys.map((key) => key.replace(`user_refresh:${userId}:`, ''));
   } catch (error) {
     logger.error('Error getting user refresh tokens:', error);
     return [];
@@ -134,11 +130,7 @@ export async function storeRefreshToken(userId, refreshToken, metadata = {}) {
           device_name: metadata.deviceName || 'Unknown Device',
         };
 
-        await redis.setex(
-          `user_refresh:${userId}:${tokenId}`,
-          ttl,
-          JSON.stringify(data),
-        );
+        await redis.setex(`user_refresh:${userId}:${tokenId}`, ttl, JSON.stringify(data));
 
         logger.info(`💾 Refresh token stored for user ${userId}`);
       }

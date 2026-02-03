@@ -49,11 +49,7 @@ export default function UserManagement() {
 
     try {
       await api.patch(`/admin/users/${userId}/deactivate`);
-      setUsers(
-        users.map((u) =>
-          u.id === userId ? { ...u, is_active: false } : u
-        )
-      );
+      setUsers(users.map((u) => (u.id === userId ? { ...u, is_active: false } : u)));
     } catch (err) {
       console.error('Error deactivating user:', err);
       alert('Failed to deactivate user');
@@ -67,11 +63,7 @@ export default function UserManagement() {
 
     try {
       await api.patch(`/admin/users/${userId}/activate`);
-      setUsers(
-        users.map((u) =>
-          u.id === userId ? { ...u, is_active: true } : u
-        )
-      );
+      setUsers(users.map((u) => (u.id === userId ? { ...u, is_active: true } : u)));
     } catch (err) {
       console.error('Error activating user:', err);
       alert('Failed to activate user');
@@ -146,9 +138,7 @@ export default function UserManagement() {
           </div>
 
           <div>
-            <label className="block text-gray-300 text-sm font-semibold mb-2">
-              Filter by role
-            </label>
+            <label className="block text-gray-300 text-sm font-semibold mb-2">Filter by role</label>
             <select
               value={filterRole}
               onChange={(e) => {
@@ -201,12 +191,8 @@ export default function UserManagement() {
                   <td className="px-4 py-3 text-white">{user.email}</td>
                   <td className="px-4 py-3 text-white">{user.username}</td>
                   <td className="px-4 py-3">{getRoleBadge(user.role)}</td>
-                  <td className="px-4 py-3 text-center text-white">
-                    {user.games_count || 0}
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    {getStatusBadge(user.is_active)}
-                  </td>
+                  <td className="px-4 py-3 text-center text-white">{user.games_count || 0}</td>
+                  <td className="px-4 py-3 text-center">{getStatusBadge(user.is_active)}</td>
                   <td className="px-4 py-3">
                     <div className="flex gap-2 flex-wrap">
                       {user.is_active ? (

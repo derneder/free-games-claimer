@@ -24,10 +24,7 @@ router.use(verifyToken, requireAdmin);
  * @desc Get system statistics
  * @access Admin
  */
-router.get(
-  '/stats',
-  asyncHandler(adminController.getSystemStats),
-);
+router.get('/stats', asyncHandler(adminController.getSystemStats));
 
 /**
  * @route GET /api/admin/users

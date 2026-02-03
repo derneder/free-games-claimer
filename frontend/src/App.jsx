@@ -1,6 +1,6 @@
 /**
  * Root Application Component
- * 
+ *
  * Sets up routing and main layout.
  */
 

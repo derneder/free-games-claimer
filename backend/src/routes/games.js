@@ -13,8 +13,17 @@ import * as gamesController from '../controllers/gamesController.js';
 import { validate } from '../middleware/validation.js';
 import { asyncHandler } from '../middleware/error.js';
 import { verifyToken } from '../middleware/auth.js';
+import rateLimit from 'express-rate-limit';
 
 const router = Router();
+
+// Rate limiter for games routes: limit to 100 requests per 15 minutes per IP
+const gamesRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 /**
  * @route GET /api/games
@@ -24,6 +33,7 @@ const router = Router();
 router.get(
   '/',
   verifyToken,
+  gamesRateLimiter,
   validate({
     query: Joi.object({
       page: Joi.number().integer().min(1).default(1),
@@ -40,6 +50,7 @@ router.get(
  * @desc Get game by ID
  * @access Private
  */
+  gamesRateLimiter,
 router.get(
   '/:id',
   verifyToken,
@@ -56,6 +67,7 @@ router.get(
  * @desc Add new claimed game
  * @access Private
  */
+  gamesRateLimiter,
 router.post(
   '/',
   verifyToken,
@@ -80,6 +92,7 @@ router.post(
  * @desc Delete game
  * @access Private
  */
+  gamesRateLimiter,
 router.delete(
   '/:id',
   verifyToken,
@@ -99,6 +112,7 @@ router.delete(
 router.get(
   '/stats/summary',
   verifyToken,
+  gamesRateLimiter,
   asyncHandler(gamesController.getStats),
 );
 

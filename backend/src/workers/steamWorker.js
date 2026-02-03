@@ -10,10 +10,7 @@ export async function fetchSteamFreeGames() {
   try {
     logger.info('🔄 Fetching Steam free games...');
 
-    const response = await axios.get(
-      `${STEAM_API}/ISteamApps/GetAppList/v2/`,
-      { timeout: 10000 },
-    );
+    const response = await axios.get(`${STEAM_API}/ISteamApps/GetAppList/v2/`, { timeout: 10000 });
 
     const games = response.data?.applist?.apps || [];
     logger.info(`🌟 Found ${games.length} Steam games`);

@@ -158,7 +158,7 @@ async function sendEmailVerification(email, code) {
  */
 async function sendDailyDigest(email, digest) {
   const gamesList = digest.games
-    .map(g => `<li>${g.title} - ${g.sources.join(', ')}</li>`)
+    .map((g) => `<li>${g.title} - ${g.sources.join(', ')}</li>`)
     .join('');
 
   const mailOptions = {

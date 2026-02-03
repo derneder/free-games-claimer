@@ -1,6 +1,6 @@
 /**
  * API Client
- * 
+ *
  * Configured axios instance for API requests.
  */
 

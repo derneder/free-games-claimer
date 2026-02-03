@@ -78,19 +78,13 @@ export const csrfTokenMiddleware = (req, res, next) => {
 /**
  * Исключения для CSRF protection
  */
-const csrfExcludedRoutes = [
-  '/api/health',
-  '/api/telegram',
-  '/webhook',
-];
+const csrfExcludedRoutes = ['/api/health', '/api/telegram', '/webhook'];
 
 /**
  * Conditional CSRF protection
  */
 export const conditionalCsrf = (req, res, next) => {
-  const isExcluded = csrfExcludedRoutes.some(route =>
-    req.path.startsWith(route),
-  );
+  const isExcluded = csrfExcludedRoutes.some((route) => req.path.startsWith(route));
 
   if (isExcluded) {
     return next();

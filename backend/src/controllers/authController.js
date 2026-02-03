@@ -271,12 +271,7 @@ export async function verify2FA(req, res) {
       description: 'Two-factor authentication enabled',
     });
 
-    res.json(
-      formatSuccess(
-        { message: '2FA enabled successfully' },
-        '2FA is now active',
-      ),
-    );
+    res.json(formatSuccess({ message: '2FA enabled successfully' }, '2FA is now active'));
   } catch (error) {
     logger.error('2FA verification error:', error);
     if (error instanceof AppError) {
@@ -302,12 +297,7 @@ export async function logout(req, res) {
       description: 'User logged out',
     });
 
-    res.json(
-      formatSuccess(
-        { message: 'Logged out successfully' },
-        'Logout successful',
-      ),
-    );
+    res.json(formatSuccess({ message: 'Logged out successfully' }, 'Logout successful'));
   } catch (error) {
     logger.error('Logout error:', error);
     res.status(500).json(formatError('INTERNAL_ERROR', 'Logout failed'));

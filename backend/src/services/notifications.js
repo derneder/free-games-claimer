@@ -133,10 +133,7 @@ async function markAsRead(notificationId) {
  */
 async function markAllAsRead(userId) {
   try {
-    await Notification.update(
-      { read: true },
-      { where: { userId, read: false } },
-    );
+    await Notification.update({ read: true }, { where: { userId, read: false } });
   } catch (error) {
     logger.error(`Failed to mark all notifications as read: ${error.message}`);
     throw error;

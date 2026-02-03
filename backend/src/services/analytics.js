@@ -41,9 +41,8 @@ async function getSystemStats() {
     stats.gamesThisMonth = parseInt(monthResult.rows[0].count);
 
     // Average games per user
-    stats.avgGamesPerUser = stats.totalUsers > 0
-      ? (stats.totalGames / stats.totalUsers).toFixed(2)
-      : 0;
+    stats.avgGamesPerUser =
+      stats.totalUsers > 0 ? (stats.totalGames / stats.totalUsers).toFixed(2) : 0;
 
     logger.info('System statistics calculated');
     return stats;
@@ -63,53 +62,63 @@ async function getUserAnalytics(userId) {
     const analytics = {};
 
     // Total games claimed
-    const gamesResult = await db.query(
-      'SELECT COUNT(*) as count FROM games WHERE user_id = $1',
-      [userId],
-    );
+    const gamesResult = await db.query('SELECT COUNT(*) as count FROM games WHERE user_id = $1', [
+      userId,
+    ]);
     analytics.totalGames = parseInt(gamesResult.rows[0].count);
 
     // Total value
-    const valueResult = await db.query(
-      'SELECT SUM(price) as total FROM games WHERE user_id = $1',
-      [userId],
-    );
+    const valueResult = await db.query('SELECT SUM(price) as total FROM games WHERE user_id = $1', [
+      userId,
+    ]);
     analytics.totalValue = parseFloat(valueResult.rows[0].total) || 0;
 
     // Games claimed this month
-    const monthResult = await db.query(`
+    const monthResult = await db.query(
+      `
       SELECT COUNT(*) as count FROM games
       WHERE user_id = $1 AND created_at > NOW() - INTERVAL '30 days'
-    `, [userId]);
+    `,
+      [userId],
+    );
     analytics.gamesThisMonth = parseInt(monthResult.rows[0].count);
 
     // Most used platform
-    const platformResult = await db.query(`
+    const platformResult = await db.query(
+      `
       SELECT jsonb_array_elements(platforms) as platform,
              COUNT(*) as count
       FROM games WHERE user_id = $1
       GROUP BY platform
       ORDER BY count DESC LIMIT 1
-    `, [userId]);
+    `,
+      [userId],
+    );
     analytics.mostUsedPlatform = platformResult.rows[0]?.platform || 'N/A';
 
     // Most used source
-    const sourceResult = await db.query(`
+    const sourceResult = await db.query(
+      `
       SELECT jsonb_array_elements(sources) as source,
              COUNT(*) as count
       FROM games WHERE user_id = $1
       GROUP BY source
       ORDER BY count DESC LIMIT 1
-    `, [userId]);
+    `,
+      [userId],
+    );
     analytics.mostUsedSource = sourceResult.rows[0]?.source || 'N/A';
 
     // Activity streak
-    const streakResult = await db.query(`
+    const streakResult = await db.query(
+      `
       SELECT COUNT(DISTINCT DATE(created_at)) as days
       FROM activity_logs
       WHERE user_id = $1
       AND created_at > NOW() - INTERVAL '30 days'
-    `, [userId]);
+    `,
+      [userId],
+    );
     analytics.activityDays = parseInt(streakResult.rows[0].days);
 
     logger.info(`User analytics calculated for ${userId}`);
@@ -155,9 +164,9 @@ async function getPerformanceMetrics() {
     `);
 
     if (errorResult.rows[0].total > 0) {
-      metrics.errorRate = (
-        (errorResult.rows[0].errors / errorResult.rows[0].total) * 100
-      ).toFixed(2);
+      metrics.errorRate = ((errorResult.rows[0].errors / errorResult.rows[0].total) * 100).toFixed(
+        2,
+      );
     }
 
     logger.info('Performance metrics calculated');

@@ -1,7 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
-  LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
 } from 'recharts';
 import api from '../../services/api';
 
@@ -40,7 +51,7 @@ export default function GameAnalytics() {
     <div className="w-full bg-gray-900 text-white p-6 rounded-lg">
       <div className="mb-6">
         <h1 className="text-3xl font-bold mb-4">📊 Game Analytics</h1>
-        
+
         {/* Period Selector */}
         <div className="flex gap-2">
           {['7d', '30d', '90d', '1y'].map((p) => (
@@ -48,15 +59,16 @@ export default function GameAnalytics() {
               key={p}
               onClick={() => setPeriod(p)}
               className={`px-4 py-2 rounded ${
-                period === p
-                  ? 'bg-blue-600'
-                  : 'bg-gray-700 hover:bg-gray-600'
+                period === p ? 'bg-blue-600' : 'bg-gray-700 hover:bg-gray-600'
               }`}
             >
-              {p === '7d' ? 'Last 7 Days'
-                : p === '30d' ? 'Last 30 Days'
-                : p === '90d' ? 'Last 90 Days'
-                : 'Last Year'}
+              {p === '7d'
+                ? 'Last 7 Days'
+                : p === '30d'
+                  ? 'Last 30 Days'
+                  : p === '90d'
+                    ? 'Last 90 Days'
+                    : 'Last Year'}
             </button>
           ))}
         </div>
@@ -127,7 +139,10 @@ export default function GameAnalytics() {
           <h2 className="text-xl font-bold mb-4">⭐ Most Popular Games</h2>
           <div className="space-y-2">
             {(data.topGames || []).map((game, i) => (
-              <div key={i} className="flex justify-between items-center p-2 hover:bg-gray-700 rounded">
+              <div
+                key={i}
+                className="flex justify-between items-center p-2 hover:bg-gray-700 rounded"
+              >
                 <div>
                   <p className="font-semibold">{game.title}</p>
                   <p className="text-sm text-gray-400">{game.source.toUpperCase()}</p>

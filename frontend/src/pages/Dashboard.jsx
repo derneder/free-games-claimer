@@ -131,24 +131,38 @@ export default function Dashboard() {
               <table className="w-full">
                 <thead className="bg-gray-50 border-t">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900">Title</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900">Source</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900">Platform</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900">Price</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900">Date</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900">
+                      Title
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900">
+                      Source
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900">
+                      Platform
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900">
+                      Price
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900">
+                      Date
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y">
                   {games.map((game) => (
                     <tr key={game.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-3 text-sm text-gray-900 font-semibold">{game.title}</td>
+                      <td className="px-6 py-3 text-sm text-gray-900 font-semibold">
+                        {game.title}
+                      </td>
                       <td className="px-6 py-3 text-sm">
                         <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-semibold">
                           {game.source.toUpperCase()}
                         </span>
                       </td>
                       <td className="px-6 py-3 text-sm text-gray-600">{game.platform}</td>
-                      <td className="px-6 py-3 text-sm text-gray-900 font-semibold">${game.steam_price_usd || 0}</td>
+                      <td className="px-6 py-3 text-sm text-gray-900 font-semibold">
+                        ${game.steam_price_usd || 0}
+                      </td>
                       <td className="px-6 py-3 text-sm text-gray-600">
                         {new Date(game.obtained_at).toLocaleDateString()}
                       </td>

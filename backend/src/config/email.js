@@ -226,7 +226,7 @@ export async function sendActivityAlert(email, activity) {
 export async function sendWeeklyDigest(email, digestData) {
   try {
     const gamesHtml = digestData.games
-      .map(g => `<li>${g.title} (${g.source.toUpperCase()}) - $${g.price}</li>`)
+      .map((g) => `<li>${g.title} (${g.source.toUpperCase()}) - $${g.price}</li>`)
       .join('');
 
     const html = `
