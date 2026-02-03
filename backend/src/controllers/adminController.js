@@ -257,7 +257,7 @@ export async function getActivityLogs(req, res) {
     // Get total count
     let countSql = 'SELECT COUNT(*) FROM activityLogs';
     if (conditions.length > 0) {
-      countSql += ` WHERE ${conditions.slice(0, conditions.length).join(' AND ')}`;
+      countSql += ` WHERE ${conditions.join(' AND ')}`;
     }
     const countParams = params.slice(0, params.length - 2);
     const countResult = await query(countSql, countParams);

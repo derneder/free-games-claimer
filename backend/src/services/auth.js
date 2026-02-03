@@ -22,7 +22,7 @@ import { validatePassword, isValidEmail } from '../utils/validators.js';
  * @returns {Promise<Object>} Tokens and user data
  * @throws {AppError} If validation fails
  */
-export async function registerUser(email, username, password) {
+export async function registerUser(email, username, password, confirmPassword) {
   // Validate input
   if (!isValidEmail(email)) {
     throw new AppError('Invalid email format', 400, 'INVALID_EMAIL');
@@ -32,15 +32,33 @@ export async function registerUser(email, username, password) {
     throw new AppError('Username must be at least 3 characters', 400, 'INVALID_USERNAME');
   }
 
-  const pwValidation = validatePassword(password);
-  if (!pwValidation.isValid) {
-    throw new AppError('Password does not meet requirements', 400, 'WEAK_PASSWORD');
+  // Check password confirmation
+  if (password !== confirmPassword) {
+    throw new AppError('Passwords do not match', 400, 'PASSWORD_MISMATCH');
   }
 
-  // Check if email exists
-  const existingEmail = await User.findByEmail(email);
-  if (existingEmail) {
-    throw new AppError('User with this email already exists', 409, 'USER_EXISTS');
+  const pwValidation = validatePassword(password);
+  if (!pwValidation.isValid) {
+    const unmetRequirements = Object.values(pwValidation.requirements)
+      .filter((req) => !req.met)
+      .map((req) => req.message);
+    throw new AppError(
+      `Password must meet the following requirements: ${unmetRequirements.join(', ')}`,
+      400,
+      'WEAK_PASSWORD'
+    );
+  }
+
+  // Check if user exists by email
+  const existingUserByEmail = await User.findByEmail(email);
+  if (existingUserByEmail) {
+    throw new AppError('User with this email already exists', 400, 'USER_EXISTS');
+  }
+
+  // Check if user exists by username
+  const existingUserByUsername = await User.findByUsername(username);
+  if (existingUserByUsername) {
+    throw new AppError('User with this username already exists', 400, 'USER_EXISTS');
   }
 
   // Check if username exists

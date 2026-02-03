@@ -16,7 +16,6 @@ import { logger } from '../config/logger.js';
 import { config } from '../config/env.js';
 import jwt from 'jsonwebtoken';
 import speakeasy from 'speakeasy';
-import crypto from 'crypto';
 import { getRedisClient } from '../config/redis.js';
 
 /**
@@ -30,12 +29,7 @@ export async function register(req, res) {
   try {
     const { email, username, password, confirmPassword } = req.body;
 
-    // Check password confirmation
-    if (password !== confirmPassword) {
-      return res.status(400).json({ error: 'Passwords do not match' });
-    }
-
-    const result = await authService.registerUser(email, username, password);
+    const result = await authService.registerUser(email, username, password, confirmPassword);
 
     res.status(201).json({
       user: result.user,
@@ -57,9 +51,7 @@ export async function register(req, res) {
     }
 
     if (error instanceof AppError) {
-      // Return 400 for all user-facing errors during registration
-      const statusCode = error.statusCode === 409 ? 400 : error.statusCode;
-      return res.status(statusCode).json({ error: error.message });
+      return res.status(error.statusCode).json({ error: error.message });
     }
     res.status(500).json({ error: 'Registration failed' });
   }
@@ -119,9 +111,9 @@ export async function refreshToken(req, res) {
 
     // Generate new tokens
     const accessToken = generateToken({ id: user.id, email: user.email, role: user.role });
-
     res.json({
       accessToken,
+      refreshToken, // возвращаем входной токен без лишней переменной
     });
   } catch (error) {
     logger.error('Token refresh error:', error);
@@ -189,12 +181,10 @@ export async function setup2FA(req, res) {
     });
 
     // Generate 10 backup codes
-    const backupCodes = [];
-    for (let i = 0; i < 10; i++) {
-      backupCodes.push(crypto.randomBytes(4).toString('hex').toUpperCase());
-    }
+    const { generateRandomCode } = await import('../utils/crypto.js');
+    const backupCodes = Array.from({ length: 10 }, () => generateRandomCode(8));
 
-    // Store temporary secret in Redis
+    // Store temporary secret and backup codes in Redis
     const redis = getRedisClient();
     await redis.setEx(
       `2fa_temp:${user.id}`,
@@ -234,13 +224,13 @@ export async function verify2FA(req, res) {
 
     // Get temporary secret from Redis
     const redis = getRedisClient();
-    const tempSecret = await redis.get(`2fa_temp:${user.id}`);
+    const tempData = await redis.get(`2fa_temp:${user.id}`);
 
-    if (!tempSecret) {
+    if (!tempData) {
       throw new AppError('2FA setup expired. Please try again.', 400, 'SETUP_EXPIRED');
     }
 
-    const secret = JSON.parse(tempSecret);
+    const { secret } = JSON.parse(tempData);
 
     // Verify token
     const verified = speakeasy.totp.verify({

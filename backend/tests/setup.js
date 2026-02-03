@@ -14,14 +14,16 @@ dotenv.config({ path: '.env.test' });
 // Set test environment
 process.env.NODE_ENV = 'test';
 
-// Initialize database and redis before all tests
+// Initialize database and Redis before all tests
 beforeAll(async () => {
   await initializeDatabase();
   await initializeRedis();
+  await initializeRedis();
 });
 
-// Close database and redis after all tests
+// Close database and Redis after all tests
 afterAll(async () => {
+  await closeRedis();
   await closeRedis();
   await closeDatabase();
 });

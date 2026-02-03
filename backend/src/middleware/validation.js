@@ -23,9 +23,9 @@ export function validate(schemas) {
           stripUnknown: true,
         });
         if (error) {
-          const message = error.details.map((d) => d.message).join(', ');
+          const errorMessage = error.details.map((d) => d.message).join(', ');
           return res.status(400).json({
-            error: message,
+            error: errorMessage,
           });
         }
         req.body = value;
@@ -35,9 +35,9 @@ export function validate(schemas) {
       if (schemas.params) {
         const { error, value } = schemas.params.validate(req.params);
         if (error) {
-          const message = error.details.map((d) => d.message).join(', ');
+          const errorMessage = error.details.map((d) => d.message).join(', ');
           return res.status(400).json({
-            error: message,
+            error: errorMessage,
           });
         }
         req.params = value;
@@ -47,9 +47,9 @@ export function validate(schemas) {
       if (schemas.query) {
         const { error, value } = schemas.query.validate(req.query);
         if (error) {
-          const message = error.details.map((d) => d.message).join(', ');
+          const errorMessage = error.details.map((d) => d.message).join(', ');
           return res.status(400).json({
-            error: message,
+            error: errorMessage,
           });
         }
         req.query = value;
