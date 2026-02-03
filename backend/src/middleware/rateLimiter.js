@@ -14,8 +14,9 @@ export const apiLimiter = rateLimit({
     // Skip rate limiting for GET requests
     return req.method === 'GET';
   },
-  onLimitReached: (req) => {
+  handler: (req, res, next, options) => {
     logger.warn(`Rate limit reached for IP: ${req.ip}`);
+    res.status(options.statusCode).send(options.message);
   },
 });
 
