@@ -1,138 +1,92 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../hooks/useAuth';
-import api from '../../services/api';
-import UserManagementTable from './UserManagementTable';
+import { useState, useEffect } from 'react';
+import api from '../../services/api.js';
+import UserManagement from './UserManagement';
 import SystemStats from './SystemStats';
-import AuditLogs from './AuditLogs';
+import ActivityLogs from './ActivityLogs';
 
 export default function AdminDashboard() {
-  const { user, isLoading } = useAuth();
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState('stats');
   const [stats, setStats] = useState(null);
-  const [users, setUsers] = useState([]);
-  const [logs, setLogs] = useState([]);
-  const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  // Проверка админа
   useEffect(() => {
-    if (!isLoading && user?.role !== 'admin') {
-      window.location.href = '/dashboard';
-    }
-  }, [user, isLoading]);
-
-  // Загрузи данные
-  useEffect(() => {
-    fetchData();
+    fetchAdminStats();
   }, []);
 
-  const fetchData = async () => {
+  const fetchAdminStats = async () => {
     try {
-      setRefreshing(true);
-      const [statsRes, usersRes, logsRes] = await Promise.all([
-        api.get('/admin/stats'),
-        api.get('/admin/users?limit=50'),
-        api.get('/admin/logs?limit=50')
-      ]);
-      
-      setStats(statsRes.data);
-      setUsers(usersRes.data.users);
-      setLogs(logsRes.data.logs);
-    } catch (error) {
-      console.error('Error fetching admin data:', error);
+      setLoading(true);
+      const response = await api.get('/admin/stats');
+      setStats(response.data);
+      setError('');
+    } catch (err) {
+      console.error('Error fetching admin stats:', err);
+      setError('Failed to load admin statistics');
     } finally {
-      setRefreshing(false);
+      setLoading(false);
     }
   };
 
-  const handleUserAction = async (userId, action) => {
-    try {
-      if (action === 'deactivate') {
-        await api.patch(`/admin/users/${userId}/deactivate`);
-      } else if (action === 'activate') {
-        await api.patch(`/admin/users/${userId}/activate`);
-      } else if (action === 'delete') {
-        await api.delete(`/admin/users/${userId}`);
-      }
-      await fetchData();
-    } catch (error) {
-      console.error('Error performing user action:', error);
-    }
-  };
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
-
-  if (user?.role !== 'admin') {
-    return (
-      <div className="p-6 text-center">
-        <h1 className="text-2xl font-bold text-red-600">Access Denied</h1>
-        <p className="mt-2">You don't have permission to access this page.</p>
-      </div>
-    );
-  }
+  const tabs = [
+    { id: 'stats', label: '📋 Statistics', icon: '📋' },
+    { id: 'users', label: '👥 Users', icon: '👥' },
+    { id: 'logs', label: '📋 Logs', icon: '📋' },
+  ];
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-6">
+    <div className="min-h-screen bg-gray-900 p-6 md:p-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-2">🔧 Admin Dashboard</h1>
-        <p className="text-gray-400">Manage users, view system stats, and monitor activities</p>
+        <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">🔧 Admin Panel</h1>
+        <p className="text-gray-400">Manage users, view statistics, and monitor system activity</p>
       </div>
 
-      {/* Refresh Button */}
-      <div className="mb-6">
-        <button
-          onClick={fetchData}
-          disabled={refreshing}
-          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-50"
-        >
-          {refreshing ? 'Refreshing...' : '🔄 Refresh Data'}
-        </button>
-      </div>
+      {/* Error message */}
+      {error && (
+        <div className="bg-red-900 border border-red-700 text-red-200 px-4 py-3 rounded mb-6">
+          ❌ {error}
+        </div>
+      )}
 
-      {/* Tabs */}
-      <div className="flex gap-4 mb-6 border-b border-gray-700">
-        <button
-          onClick={() => setActiveTab('overview')}
-          className={`px-4 py-2 ${activeTab === 'overview' ? 'border-b-2 border-blue-600' : ''}`}
-        >
-          📊 Overview
-        </button>
-        <button
-          onClick={() => setActiveTab('users')}
-          className={`px-4 py-2 ${activeTab === 'users' ? 'border-b-2 border-blue-600' : ''}`}
-        >
-          👥 Users ({users.length})
-        </button>
-        <button
-          onClick={() => setActiveTab('logs')}
-          className={`px-4 py-2 ${activeTab === 'logs' ? 'border-b-2 border-blue-600' : ''}`}
-        >
-          📝 Audit Logs
-        </button>
+      {/* Tab Navigation */}
+      <div className="flex flex-wrap gap-2 mb-6 border-b border-gray-700">
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`px-4 py-3 font-semibold border-b-2 transition-colors ${
+              activeTab === tab.id
+                ? 'border-blue-600 text-blue-400'
+                : 'border-transparent text-gray-400 hover:text-gray-300'
+            }`}
+          >
+            {tab.icon} {tab.label}
+          </button>
+        ))}
       </div>
 
       {/* Content */}
-      <div className="bg-gray-800 rounded-lg p-6">
-        {activeTab === 'overview' && stats && (
-          <SystemStats stats={stats} />
+      <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
+        {loading && activeTab === 'stats' ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="text-gray-400">
+              <div className="animate-spin text-2xl mb-2">⏳</div>
+              <p>Loading statistics...</p>
+            </div>
+          </div>
+        ) : (
+          <>
+            {activeTab === 'stats' && stats && <SystemStats stats={stats} />}
+            {activeTab === 'users' && <UserManagement />}
+            {activeTab === 'logs' && <ActivityLogs />}
+          </>
         )}
-        
-        {activeTab === 'users' && (
-          <UserManagementTable 
-            users={users} 
-            onAction={handleUserAction}
-          />
-        )}
-        
-        {activeTab === 'logs' && (
-          <AuditLogs logs={logs} />
-        )}
+      </div>
+
+      {/* Footer */}
+      <div className="mt-8 text-center text-gray-500 text-sm">
+        <p>Last updated: {new Date().toLocaleTimeString()}</p>
       </div>
     </div>
   );
