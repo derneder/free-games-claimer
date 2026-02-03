@@ -18,12 +18,10 @@ process.env.NODE_ENV = 'test';
 beforeAll(async () => {
   await initializeDatabase();
   await initializeRedis();
-  await initializeRedis();
 });
 
 // Close database and Redis after all tests
 afterAll(async () => {
-  await closeRedis();
   await closeRedis();
   await closeDatabase();
 });

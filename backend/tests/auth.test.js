@@ -3,6 +3,11 @@ import app from '../src/index.js';
 import { query } from '../src/config/database.js';
 
 describe('Auth API', () => {
+  beforeAll(async () => {
+    // Ensure clean database state before running tests
+    await query('TRUNCATE TABLE "users" RESTART IDENTITY CASCADE');
+  });
+
   afterEach(async () => {
     // Очистка БД после каждого теста
     await query('TRUNCATE TABLE "users" RESTART IDENTITY CASCADE');

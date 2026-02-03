@@ -68,6 +68,12 @@ async function runMigrations() {
  * Run seeds
  */
 async function runSeeds() {
+  // Skip seeding in test environment
+  if (process.env.NODE_ENV === 'test') {
+    logger.info('Skipping seed data in test environment');
+    return;
+  }
+
   const client = new pg.Client(clientConfig);
   try {
     await client.connect();
