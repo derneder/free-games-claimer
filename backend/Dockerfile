@@ -1,7 +1,7 @@
 # Multi-stage build for backend
 
 # Stage 1: Builder
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
@@ -14,7 +14,7 @@ COPY src ./src
 COPY database ./database
 
 # Stage 2: Runtime
-FROM node:18-alpine
+FROM node:20-alpine
 
 WORKDIR /app
 
