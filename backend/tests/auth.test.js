@@ -1,13 +1,7 @@
 import request from 'supertest';
 import app from '../src/index.js';
-import { query } from '../src/config/database.js';
 
 describe('Auth API', () => {
-  afterEach(async () => {
-    // Очистка БД после каждого теста
-    await query('TRUNCATE TABLE "users" RESTART IDENTITY CASCADE');
-  });
-
   describe('POST /api/auth/register', () => {
     test('Should register new user', async () => {
       const response = await request(app).post('/api/auth/register').send({

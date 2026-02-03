@@ -5,8 +5,8 @@
  */
 
 import dotenv from 'dotenv';
-import { initializeDatabase, closeDatabase } from '../src/config/database.js';
-import { initializeRedis, closeRedis } from '../src/config/redis.js';
+import { initializeDatabase, closeDatabase, query } from '../src/config/database.js';
+import { initializeRedis, closeRedis, getRedisClient } from '../src/config/redis.js';
 
 // Load test environment
 dotenv.config({ path: '.env.test' });
@@ -18,12 +18,27 @@ process.env.NODE_ENV = 'test';
 beforeAll(async () => {
   await initializeDatabase();
   await initializeRedis();
-  await initializeRedis();
+});
+
+// Reset database before each test to prevent data pollution
+beforeEach(async () => {
+  // Truncate all tables in the correct order (respecting foreign key constraints)
+  // Note: PostgreSQL converts unquoted identifiers to lowercase
+  await query('TRUNCATE TABLE notifications RESTART IDENTITY CASCADE');
+  await query('TRUNCATE TABLE refreshtokens RESTART IDENTITY CASCADE');
+  await query('TRUNCATE TABLE activitylogs RESTART IDENTITY CASCADE');
+  await query('TRUNCATE TABLE games RESTART IDENTITY CASCADE');
+  await query('TRUNCATE TABLE users RESTART IDENTITY CASCADE');
+
+  // Clear Redis cache
+  const redis = getRedisClient();
+  if (redis && redis.isOpen) {
+    await redis.flushDb();
+  }
 });
 
 // Close database and Redis after all tests
 afterAll(async () => {
-  await closeRedis();
   await closeRedis();
   await closeDatabase();
 });
