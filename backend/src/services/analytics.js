@@ -79,7 +79,7 @@ async function getUserAnalytics(userId) {
       SELECT COUNT(*) as count FROM games
       WHERE user_id = $1 AND created_at > NOW() - INTERVAL '30 days'
     `,
-      [userId],
+      [userId]
     );
     analytics.gamesThisMonth = parseInt(monthResult.rows[0].count);
 
@@ -92,7 +92,7 @@ async function getUserAnalytics(userId) {
       GROUP BY platform
       ORDER BY count DESC LIMIT 1
     `,
-      [userId],
+      [userId]
     );
     analytics.mostUsedPlatform = platformResult.rows[0]?.platform || 'N/A';
 
@@ -105,7 +105,7 @@ async function getUserAnalytics(userId) {
       GROUP BY source
       ORDER BY count DESC LIMIT 1
     `,
-      [userId],
+      [userId]
     );
     analytics.mostUsedSource = sourceResult.rows[0]?.source || 'N/A';
 
@@ -117,7 +117,7 @@ async function getUserAnalytics(userId) {
       WHERE user_id = $1
       AND created_at > NOW() - INTERVAL '30 days'
     `,
-      [userId],
+      [userId]
     );
     analytics.activityDays = parseInt(streakResult.rows[0].days);
 
@@ -165,7 +165,7 @@ async function getPerformanceMetrics() {
 
     if (errorResult.rows[0].total > 0) {
       metrics.errorRate = ((errorResult.rows[0].errors / errorResult.rows[0].total) * 100).toFixed(
-        2,
+        2
       );
     }
 

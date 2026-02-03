@@ -40,7 +40,7 @@ export async function getProfile(req, res) {
         isActive: user.isActive,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
-      }),
+      })
     );
   } catch (error) {
     logger.error('Get profile error:', error);
@@ -106,8 +106,8 @@ export async function updateProfile(req, res) {
           username: user.username,
           updatedAt: user.updatedAt,
         },
-        'Profile updated successfully',
-      ),
+        'Profile updated successfully'
+      )
     );
   } catch (error) {
     logger.error('Update profile error:', error);

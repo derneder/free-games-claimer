@@ -55,7 +55,7 @@ class JobQueue {
       job.successCount++;
 
       logger.info(
-        `✅ Job completed: ${job.name} (${duration}ms) - Result: ${JSON.stringify(result)}`,
+        `✅ Job completed: ${job.name} (${duration}ms) - Result: ${JSON.stringify(result)}`
       );
     } catch (error) {
       job.errorCount++;

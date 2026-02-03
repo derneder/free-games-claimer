@@ -39,8 +39,8 @@ export async function register(req, res) {
             refreshToken: result.refreshToken,
           },
         },
-        'User registered successfully',
-      ),
+        'User registered successfully'
+      )
     );
   } catch (error) {
     logger.error('Registration error:', error);
@@ -73,8 +73,8 @@ export async function login(req, res) {
             refreshToken: result.refreshToken,
           },
         },
-        'Login successful',
-      ),
+        'Login successful'
+      )
     );
   } catch (error) {
     logger.error('Login error:', error);
@@ -124,8 +124,8 @@ export async function refreshToken(req, res) {
             refreshToken: newRefreshToken,
           },
         },
-        'Tokens refreshed',
-      ),
+        'Tokens refreshed'
+      )
     );
   } catch (error) {
     logger.error('Token refresh error:', error);
@@ -160,7 +160,7 @@ export async function getProfile(req, res) {
         twoFaEnabled: user.twoFaEnabled,
         isActive: user.isActive,
         createdAt: user.createdAt,
-      }),
+      })
     );
   } catch (error) {
     logger.error('Get profile error:', error);
@@ -197,7 +197,7 @@ export async function setup2FA(req, res) {
     await redis.setEx(
       `2fa_temp:${user.id}`,
       300, // 5 minutes
-      JSON.stringify(secret),
+      JSON.stringify(secret)
     );
 
     res.json(
@@ -206,8 +206,8 @@ export async function setup2FA(req, res) {
           secret: secret.base32,
           qrCode: secret.otpauth_url,
         },
-        '2FA setup initiated',
-      ),
+        '2FA setup initiated'
+      )
     );
   } catch (error) {
     logger.error('2FA setup error:', error);

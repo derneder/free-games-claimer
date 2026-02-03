@@ -52,7 +52,7 @@ bot.command('start', async (ctx) => {
           keyboard,
           resize_keyboard: true,
         },
-      },
+      }
     );
   } catch (error) {
     logger.error('Error in /start:', error);
