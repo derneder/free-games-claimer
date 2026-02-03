@@ -73,3 +73,9 @@ export function requestLogger(req, res, next) {
   });
   next();
 }
+
+/**
+ * Default export for backward compatibility
+ * Allows both `import logger from './logger.js'` and `import { logger } from './logger.js'`
+ */
+export default logger;
