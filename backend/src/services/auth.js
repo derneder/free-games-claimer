@@ -61,6 +61,12 @@ export async function registerUser(email, username, password, confirmPassword) {
     throw new AppError('User with this username already exists', 400, 'USER_EXISTS');
   }
 
+  // Check if username exists
+  const existingUsername = await User.findByUsername(username);
+  if (existingUsername) {
+    throw new AppError('User with this username already exists', 409, 'USERNAME_EXISTS');
+  }
+
   // Create user
   const user = await User.create({ email, username, password });
 
