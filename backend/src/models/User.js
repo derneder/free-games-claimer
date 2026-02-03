@@ -70,7 +70,7 @@ export class User {
 
     await query(
       'INSERT INTO users (id, email, username, password, role, isActive) VALUES ($1, $2, $3, $4, $5, $6)',
-      [user.id, user.email, user.username, user.password, user.role, user.isActive],
+      [user.id, user.email, user.username, user.password, user.role, user.isActive]
     );
 
     return user;
@@ -94,7 +94,7 @@ export class User {
         this.isActive,
         this.updatedAt,
         this.id,
-      ],
+      ]
     );
   }
 

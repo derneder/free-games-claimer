@@ -22,7 +22,7 @@ router.get(
     const result = await notificationsService.getUserNotifications(
       req.user.id,
       parseInt(page),
-      parseInt(pageSize),
+      parseInt(pageSize)
     );
 
     res.json({
@@ -30,7 +30,7 @@ router.get(
       data: result.notifications,
       pagination: result.pagination,
     });
-  }),
+  })
 );
 
 /**
@@ -54,7 +54,7 @@ router.get(
       success: true,
       unreadCount: count,
     });
-  }),
+  })
 );
 
 /**
@@ -71,7 +71,7 @@ router.patch(
       success: true,
       data: notification,
     });
-  }),
+  })
 );
 
 /**
@@ -88,7 +88,7 @@ router.patch(
       success: true,
       message: 'All notifications marked as read',
     });
-  }),
+  })
 );
 
 /**
@@ -105,7 +105,7 @@ router.delete(
       success: true,
       message: 'Notification deleted',
     });
-  }),
+  })
 );
 
 module.exports = router;
