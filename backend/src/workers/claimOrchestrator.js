@@ -150,9 +150,7 @@ export async function claimForAllUsers(provider, options = {}) {
       }
     }
 
-    logger.info(
-      `Batch claim completed for ${provider}: ${results.length} users processed`
-    );
+    logger.info(`Batch claim completed for ${provider}: ${results.length} users processed`);
     return results;
   } catch (error) {
     logger.error(`Batch claim failed for provider ${provider}:`, error);

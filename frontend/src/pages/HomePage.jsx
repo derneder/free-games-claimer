@@ -40,7 +40,7 @@ function HomePage() {
           </div>
           <h3 className="text-lg font-bold text-gray-900 mb-2">Track Games</h3>
           <p className="text-gray-600">
-            Keep track of all free games you've claimed across multiple platforms.
+            Keep track of all free games you&apos;ve claimed across multiple platforms.
           </p>
         </div>
 

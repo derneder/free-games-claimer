@@ -106,11 +106,7 @@ export function decryptCredentials(encryptedData) {
     }
 
     const key = getEncryptionKey(keyVersion);
-    const decipher = crypto.createDecipheriv(
-      ALGORITHM,
-      key,
-      Buffer.from(iv, 'base64')
-    );
+    const decipher = crypto.createDecipheriv(ALGORITHM, key, Buffer.from(iv, 'base64'));
 
     // Set authentication tag
     decipher.setAuthTag(Buffer.from(tag, 'base64'));
@@ -167,9 +163,12 @@ export function maskSensitiveData(
   for (const field of sensitiveFields) {
     if (masked[field]) {
       if (typeof masked[field] === 'string') {
-        // Show first 2 and last 2 characters
         const value = masked[field];
-        if (value.length > 8) {
+        // Always fully mask passwords for security
+        if (field === 'password') {
+          masked[field] = '***';
+        } else if (value.length > 8) {
+          // Show first 2 and last 2 characters for other sensitive fields
           masked[field] = `${value.substring(0, 2)}...${value.substring(value.length - 2)}`;
         } else {
           masked[field] = '***';
@@ -200,7 +199,7 @@ export function generateEncryptionKey() {
  * @returns {boolean} True if valid
  */
 export function isValidEncryptedData(data) {
-  return (
+  return !!(
     data &&
     typeof data === 'object' &&
     typeof data.ciphertext === 'string' &&

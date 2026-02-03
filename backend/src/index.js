@@ -17,7 +17,12 @@ import { logger } from './config/logger.js';
 import { initializeDatabase } from './config/database.js';
 import { initializeRedis } from './config/redis.js';
 import { globalErrorHandler } from './middleware/error.js';
-import { cookieParserMiddleware, conditionalCsrf, csrfErrorHandler, generateToken } from './middleware/csrf.js';
+import {
+  cookieParserMiddleware,
+  conditionalCsrf,
+  csrfErrorHandler,
+  generateToken,
+} from './middleware/csrf.js';
 import { rateLimiter } from './middleware/rateLimiter.js';
 
 // Import routes

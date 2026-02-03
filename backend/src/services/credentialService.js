@@ -57,13 +57,7 @@ export async function saveCredentials(userId, provider, credentials, metadata = 
          SET enc_data = $1, key_version = $2, status = $3, error_message = NULL, updated_at = NOW()
          WHERE user_id = $4 AND provider = $5
          RETURNING id, user_id, provider, status, key_version, created_at, updated_at`,
-        [
-          JSON.stringify(encryptedData),
-          encryptedData.keyVersion,
-          'active',
-          userId,
-          provider,
-        ]
+        [JSON.stringify(encryptedData), encryptedData.keyVersion, 'active', userId, provider]
       );
 
       // Log audit event
@@ -74,13 +68,7 @@ export async function saveCredentials(userId, provider, credentials, metadata = 
         `INSERT INTO user_credentials (user_id, provider, enc_data, key_version, status)
          VALUES ($1, $2, $3, $4, $5)
          RETURNING id, user_id, provider, status, key_version, created_at, updated_at`,
-        [
-          userId,
-          provider,
-          JSON.stringify(encryptedData),
-          encryptedData.keyVersion,
-          'active',
-        ]
+        [userId, provider, JSON.stringify(encryptedData), encryptedData.keyVersion, 'active']
       );
 
       // Log audit event
@@ -119,9 +107,7 @@ export async function getCredentials(userId, provider) {
 
     // Check if credentials are active
     if (record.status !== 'active') {
-      logger.warn(
-        `Attempted to get inactive credentials for user ${userId}, provider ${provider}`
-      );
+      logger.warn(`Attempted to get inactive credentials for user ${userId}, provider ${provider}`);
       return null;
     }
 
@@ -288,7 +274,10 @@ export async function markCredentialsVerified(userId, provider) {
     await logCredentialAudit(userId, provider, 'verified');
     logger.info(`Credentials verified for user ${userId}, provider ${provider}`);
   } catch (error) {
-    logger.error(`Failed to mark credentials as verified for user ${userId}, provider ${provider}:`, error);
+    logger.error(
+      `Failed to mark credentials as verified for user ${userId}, provider ${provider}:`,
+      error
+    );
     throw new Error('Failed to mark credentials as verified');
   }
 }

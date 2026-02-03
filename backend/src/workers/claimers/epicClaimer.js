@@ -124,7 +124,9 @@ export class EpicClaimer extends BaseClaimer {
 
       // Handle parental PIN if needed
       if (process.env.EPIC_PARENTAL_PIN || credentials.parentalPin) {
-        const needsPin = await this.page.$('input[type="password"][maxlength="4"]').catch(() => null);
+        const needsPin = await this.page
+          .$('input[type="password"][maxlength="4"]')
+          .catch(() => null);
         if (needsPin) {
           const pin = credentials.parentalPin || process.env.EPIC_PARENTAL_PIN;
           await this.page.fill('input[type="password"][maxlength="4"]', pin);
@@ -183,9 +185,13 @@ export class EpicClaimer extends BaseClaimer {
 
       for (const card of gameCards) {
         try {
-          const title = await card.$eval('[data-testid="offer-title"]', el => el.textContent).catch(() => 'Unknown');
-          const price = await card.$eval('[data-testid="offer-price"]', el => el.textContent).catch(() => '');
-          const url = await card.$eval('a', el => el.href).catch(() => '');
+          const title = await card
+            .$eval('[data-testid="offer-title"]', (el) => el.textContent)
+            .catch(() => 'Unknown');
+          const price = await card
+            .$eval('[data-testid="offer-price"]', (el) => el.textContent)
+            .catch(() => '');
+          const url = await card.$eval('a', (el) => el.href).catch(() => '');
 
           // Only include if it's free
           if (price.includes('Free') || price.includes('$0')) {
@@ -234,7 +240,9 @@ export class EpicClaimer extends BaseClaimer {
       await this.page.waitForTimeout(1000);
 
       // Handle purchase flow
-      const placeOrderButton = await this.page.$('button:has-text("Place Order")').catch(() => null);
+      const placeOrderButton = await this.page
+        .$('button:has-text("Place Order")')
+        .catch(() => null);
       if (placeOrderButton) {
         await placeOrderButton.click();
         await this.page.waitForTimeout(2000);

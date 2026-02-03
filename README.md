@@ -183,16 +183,40 @@ For full CI/CD functionality, configure these secrets in repository Settings →
 nvm use
 
 # Install dependencies
-npm install  # Activates Husky pre-commit hooks
+cd backend && npm install
+cd ../frontend && npm install
 
 # Run tests
-npm run test
-npm run test:coverage
+cd backend && npm run test
+cd ../frontend && npm run test
 
 # Lint & format
-npm run lint
-npm run format
+cd backend && npm run lint && npm run format:check
+cd ../frontend && npm run lint && npm run format
+
+# Type checking
+cd backend && npm run type-check
+cd ../frontend && npm run type-check
+
+# Security audit
+cd backend && npm audit
+cd ../frontend && npm audit
 ```
+
+### Code Quality Standards
+
+This project maintains high code quality standards:
+
+- ✅ **Test Coverage Target:** 60%+ (Backend & Frontend)
+- ✅ **Zero Security Vulnerabilities:** Regular `npm audit` checks
+- ✅ **Linting:** ESLint enforced on all code
+- ✅ **Formatting:** Prettier with consistent style
+- ✅ **Type Safety:** TypeScript type checking enabled
+- ✅ **Code Duplication:** <5% (currently 1.6-1.7%)
+- ✅ **No var usage:** Only `const` and `let`
+- ✅ **Semantic Versioning:** All dependencies follow semver
+
+For detailed quality metrics and audit results, see [docs/CODE_QUALITY.md](./docs/CODE_QUALITY.md).
 
 ### Code Standards
 - [EditorConfig](./docs/CONTRIBUTING.md) - Automatic IDE configuration
