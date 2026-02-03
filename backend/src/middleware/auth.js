@@ -122,7 +122,7 @@ export function generateRefreshToken(payload) {
 }
 
 /**
- * Authenticate middleware (alias for verifyToken)
- * Exported for backward compatibility
+ * Authenticate - Alias for verifyToken middleware
+ * Exported for backward compatibility with routes that use 'authenticate'
  */
 export const authenticate = verifyToken;
