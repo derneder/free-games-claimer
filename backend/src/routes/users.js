@@ -39,7 +39,7 @@ router.put(
       email: Joi.string().email().optional(),
     }).min(1),
   }),
-  asyncHandler(usersController.updateProfile)
+  asyncHandler(usersController.updateProfile),
 );
 
 /**
@@ -56,7 +56,7 @@ router.post(
       confirmPassword: Joi.string().valid(Joi.ref('newPassword')).required(),
     }),
   }),
-  asyncHandler(usersController.changePassword)
+  asyncHandler(usersController.changePassword),
 );
 
 /**
@@ -71,7 +71,7 @@ router.delete(
       password: Joi.string().required(),
     }),
   }),
-  asyncHandler(usersController.deleteAccount)
+  asyncHandler(usersController.deleteAccount),
 );
 
 export default router;
