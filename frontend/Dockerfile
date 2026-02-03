@@ -1,3 +1,6 @@
+# Multi-stage build for frontend
+
+# Stage 1: Builder
 FROM node:18-alpine AS builder
 
 WORKDIR /app
@@ -8,14 +11,19 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
-FROM node:18-alpine
+# Stage 2: Runtime (Nginx)
+FROM nginx:alpine
 
-WORKDIR /app
+# Copy nginx config
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-RUN npm install -g serve
+# Copy built app from builder
+COPY --from=builder /app/dist /usr/share/nginx/html
 
-COPY --from=builder /app/dist ./dist
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget --quiet --tries=1 --spider http://localhost:80/health || exit 1
 
-EXPOSE 5173
+EXPOSE 80
 
-CMD ["serve", "-s", "dist", "-l", "5173"]
+CMD ["nginx", "-g", "daemon off;"]
