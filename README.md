@@ -1,160 +1,165 @@
-# Free Games Claimer PRO
+# 🎮 Free Games Claimer
 
-🎮 Автоматический сборщик бесплатных игр с Epic Games, GOG, Steam и Prime Gaming.
+Automated tool to claim free games from Epic Games, GOG, Steam, and Prime Gaming.
 
-## 🎯 Возможности
+## 📋 Overview
 
-- ✅ **Автоматическая сборка** - Собирает бесплатные игры с 4 источников
-- ✅ **Веб-интерфейс** - React приложение с красивым UI
-- ✅ **Telegram бот** - Управление через Telegram
-- ✅ **Аналитика** - Статистика по играм и источникам
-- ✅ **2FA** - Двухфакторная аутентификация
-- ✅ **Docker** - Готовые контейнеры для быстрого старта
+This project automatically monitors and claims free games from multiple platforms, keeping your game library up to date.
 
-## 🚀 Быстрый старт
+**Main Features:**
+- 🤖 Automated game claiming
+- 🎮 Support for Epic Games, GOG, Steam, Prime Gaming
+- 📊 Admin dashboard with analytics
+- 👥 User management
+- 🔐 Secure authentication with 2FA
+- 📧 Email notifications
+- 📈 Real-time analytics and reporting
 
-### 1. Требования
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
 - Node.js 18+
-- Docker & Docker Compose
-- PostgreSQL 16 (или используй Docker)
-- Redis (или используй Docker)
+- PostgreSQL 14+
+- Redis 7+
 
-### 2. Установка
+### Installation
 
 ```bash
-# Клонируй проект
+# Clone repository
 git clone https://github.com/derneder/free-games-claimer.git
 cd free-games-claimer
 
-# Создай .env файл
-cp .env.example .env
-
-# Отредактируй .env если нужно
-
-# Запусти Docker
-docker-compose up -d
-
-# Дождись инициализации (2-3 минуты)
-```
-
-### 3. Доступ
-
-- **Frontend**: http://localhost:5173
-- **API**: http://localhost:3000/api
-- **API Docs**: http://localhost:3000/api/docs
-
-## 📋 Структура проекта
-
-```
-free-games-claimer/
-├── backend/              # Express.js + PostgreSQL + Redis
-│   ├── src/
-│   │   ├── api/         # API routes
-│   │   ├── workers/     # Game scrapers
-│   │   ├── telegram/    # Telegram bot
-│   │   ├── config/      # Configuration
-│   │   ├── middleware/  # Express middleware
-│   │   └── utils/       # Utilities
-│   ├── migrations/      # Database migrations
-│   └── package.json
-│
-├── frontend/             # React + Vite + Tailwind
-│   ├── src/
-│   │   ├── components/  # React components
-│   │   ├── hooks/       # Custom hooks
-│   │   ├── store/       # Zustand store
-│   │   ├── services/    # API services
-│   │   └── App.jsx
-│   └── package.json
-│
-├── docker-compose.yml   # Docker setup
-├── .env.example         # Environment template
-└── README.md
-```
-
-## 🔐 Безопасность
-
-- JWT аутентификация (15 минут)
-- TOTP 2FA (Google Authenticator)
-- bcrypt password hashing
-- Rate limiting (100 req/15min)
-- CORS настройки
-- AES-256 encryption
-
-## 🎮 Поддерживаемые источники
-
-1. **Epic Games Store** - GraphQL API
-2. **GOG.com** - HTML parsing
-3. **Steam** - REST API
-4. **Amazon Prime Gaming** - Web scraping
-
-## 🤖 Telegram Bot
-
-- `/start` - Инициализация
-- `/stats` - Статистика
-- `/recent` - Последние 5 игр
-- `/run` - Запустить сборку
-- `/settings` - Настройки
-- `/help` - Справка
-
-## 📚 API Endpoints
-
-### Authentication
-- `POST /api/auth/register` - Регистрация
-- `POST /api/auth/login` - Вход
-- `POST /api/auth/2fa/setup` - Настройка 2FA
-- `POST /api/auth/2fa/verify` - Верификация 2FA
-
-### Games
-- `GET /api/games` - Список игр
-- `GET /api/games/:id` - Одна игра
-- `GET /api/games/search/:query` - Поиск
-- `POST /api/games` - Добавить игру
-- `DELETE /api/games/:id` - Удалить игру
-
-### Analytics
-- `GET /api/analytics/stats` - Статистика
-- `GET /api/analytics/distribution` - Распределение
-- `GET /api/analytics/activity` - Активность
-- `GET /api/analytics/export/:format` - Экспорт (csv/json)
-
-## 🐛 Troubleshooting
-
-### "Cannot find module"
-```bash
+# Backend setup
 cd backend && npm install
+
+# Frontend setup
 cd ../frontend && npm install
 ```
 
-### "Database connection failed"
+### Running
+
 ```bash
-docker-compose down
+# Backend (Terminal 1)
+cd backend && npm run dev
+
+# Frontend (Terminal 2)
+cd frontend && npm run dev
+```
+
+Visit `http://localhost:5173`
+
+---
+
+## 📁 Project Structure
+
+```
+free-games-claimer/
+├── backend/                    # Express API + Jest tests
+├── frontend/                   # React + Tailwind UI
+├── docs/                       # 📚 Documentation
+├── Dockerfile
+├── docker-compose.yml
+└── *.js                        # Scrapers
+```
+
+---
+
+## 📚 Documentation
+
+**👉 All documentation is in the `/docs` folder:**
+
+1. **[docs/README.md](./docs/README.md)** - START HERE
+2. **[docs/PHASE_1_SUMMARY.md](./docs/PHASE_1_SUMMARY.md)** - Features & status
+3. **[docs/INTEGRATION_GUIDE.md](./docs/INTEGRATION_GUIDE.md)** - Setup instructions
+4. **[docs/DEPLOYMENT_CHECKLIST.md](./docs/DEPLOYMENT_CHECKLIST.md)** - Deployment
+5. **[docs/GIT_COMMIT_INSTRUCTIONS.md](./docs/GIT_COMMIT_INSTRUCTIONS.md)** - Git workflow
+6. **[docs/CONTRIBUTING.md](./docs/CONTRIBUTING.md)** - Contributing
+
+---
+
+## ✅ Features
+
+### Phase 1 (Complete) ✅
+- Jest Testing Framework (75+ test cases)
+- Swagger/OpenAPI Documentation
+- CSRF Protection & Security Headers
+- Email Notifications
+- Admin Dashboard
+- Analytics Charts
+
+---
+
+## 🔐 Security
+
+✅ CSRF Protection  
+✅ Helmet Headers  
+✅ JWT Authentication  
+✅ 2FA Support  
+✅ Password Hashing  
+✅ XSS Protection  
+✅ Secure Cookies  
+
+---
+
+## 🧪 Testing
+
+```bash
+# Run tests
+npm test
+
+# Coverage
+npm run test:coverage
+```
+
+**Coverage:** 70%+ | **Tests:** 75+
+
+---
+
+## 📊 API Docs
+
+Swagger available at `http://localhost:3000/docs`
+
+---
+
+## 🛠️ Tech Stack
+
+**Backend:** Node.js, Express, PostgreSQL, Redis, Jest  
+**Frontend:** React 18, Vite, Tailwind CSS, Recharts  
+**Docs:** Swagger/OpenAPI  
+**Security:** Helmet, CSRF, JWT, 2FA  
+
+---
+
+## 🐳 Docker
+
+```bash
 docker-compose up -d
 ```
 
-### "Telegram bot not responding"
-- Проверь TELEGRAM_BOT_TOKEN в .env
-- Получи новый токен: @BotFather в Telegram
-
-## 📈 Статистика проекта
-
-| Метрика | Кол-во |
-|---------|--------|
-| API endpoints | 20+ |
-| React components | 10+ |
-| Database tables | 9 |
-| Game sources | 4 |
-| Telegram commands | 6 |
-| Lines of code | ~3000 |
-
-## 📝 License
-
-MIT
+---
 
 ## 🤝 Contributing
 
-Приветствуются pull requests! 🎉
+See [docs/CONTRIBUTING.md](./docs/CONTRIBUTING.md)
 
-## 📞 Support
+---
 
-Открой issue на GitHub для любых вопросов.
+## 📄 License
+
+MIT - See [LICENSE](./LICENSE)
+
+---
+
+## 🆘 Support
+
+- [Docs](./docs/README.md)
+- [Issues](https://github.com/derneder/free-games-claimer/issues)
+- [Discussions](https://github.com/derneder/free-games-claimer/discussions)
+
+---
+
+**Status:** Phase 1 ✅ | **Ready:** Production ✓ | **Read:** [docs/README.md](./docs/README.md)
+
+**Made with ❤️**
