@@ -38,8 +38,8 @@ export default [
       },
     },
   },
+  // TypeScript files are ignored as the project doesn't have TypeScript parser configured
   {
     ignores: ['**/*.ts', '**/*.tsx', '**/*.d.ts'],
   },
 ];
-
