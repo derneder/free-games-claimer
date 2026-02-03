@@ -55,10 +55,14 @@ describe('CSRF Middleware', () => {
       };
 
       const token = csrfModule.generateToken(mockReq, mockRes);
-      
+
       expect(token).toBeDefined();
       expect(typeof token).toBe('string');
       expect(token.length).toBeGreaterThan(0);
+
+      // Verify that a cookie was set
+      expect(mockRes.cookie).toHaveBeenCalled();
+      expect(mockRes.cookie.mock.calls[0][0]).toMatch(/csrf-token/);
     });
   });
 
@@ -71,7 +75,7 @@ describe('CSRF Middleware', () => {
       const mockNext = jest.fn();
 
       csrfModule.conditionalCsrf(mockReq, mockRes, mockNext);
-      
+
       expect(mockNext).toHaveBeenCalledWith();
     });
 
@@ -83,7 +87,7 @@ describe('CSRF Middleware', () => {
       const mockNext = jest.fn();
 
       csrfModule.conditionalCsrf(mockReq, mockRes, mockNext);
-      
+
       expect(mockNext).toHaveBeenCalledWith();
     });
 
@@ -95,7 +99,7 @@ describe('CSRF Middleware', () => {
       const mockNext = jest.fn();
 
       csrfModule.conditionalCsrf(mockReq, mockRes, mockNext);
-      
+
       expect(mockNext).toHaveBeenCalledWith();
     });
   });
@@ -118,7 +122,7 @@ describe('CSRF Middleware', () => {
       const mockNext = jest.fn();
 
       csrfModule.csrfErrorHandler(mockErr, mockReq, mockRes, mockNext);
-      
+
       expect(mockRes.status).toHaveBeenCalledWith(403);
       expect(mockRes.json).toHaveBeenCalledWith({
         error: 'Invalid CSRF token',
@@ -144,7 +148,7 @@ describe('CSRF Middleware', () => {
       const mockNext = jest.fn();
 
       csrfModule.csrfErrorHandler(mockErr, mockReq, mockRes, mockNext);
-      
+
       expect(mockRes.status).toHaveBeenCalledWith(403);
       expect(mockRes.json).toHaveBeenCalledWith({
         error: 'Invalid CSRF token',
@@ -162,7 +166,7 @@ describe('CSRF Middleware', () => {
       const mockNext = jest.fn();
 
       csrfModule.csrfErrorHandler(mockErr, mockReq, mockRes, mockNext);
-      
+
       expect(mockNext).toHaveBeenCalledWith(mockErr);
     });
   });

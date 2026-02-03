@@ -39,8 +39,16 @@ export const cookieParserMiddleware = cookieParser();
  * CSRF protection using csrf-csrf double CSRF implementation
  */
 const { doubleCsrfProtection, generateToken } = doubleCsrf({
-  getSecret: () => process.env.SESSION_SECRET || 'default-secret-change-in-production',
-  cookieName: '__Host-psifi.x-csrf-token',
+  getSecret: () => {
+    const secret = process.env.SESSION_SECRET;
+    if (!secret) {
+      throw new Error('SESSION_SECRET environment variable is required for CSRF protection');
+    }
+    return secret;
+  },
+  cookieName: process.env.NODE_ENV === 'production'
+    ? '__Host-psifi.x-csrf-token'
+    : 'psifi.x-csrf-token',
   cookieOptions: {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
