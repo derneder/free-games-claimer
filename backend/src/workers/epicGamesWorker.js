@@ -31,7 +31,7 @@ export async function fetchEpicGames() {
       {
         headers: { 'Content-Type': 'application/json' },
         timeout: 10000,
-      }
+      },
     );
 
     const games = response.data?.data?.Catalog?.searchStore?.elements || [];

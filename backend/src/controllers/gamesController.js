@@ -134,7 +134,7 @@ export async function getStats(req, res) {
     // Get total games
     const gamesResult = await query(
       'SELECT COUNT(*) as total, SUM(price) as totalValue FROM games WHERE userId = $1',
-      [userId]
+      [userId],
     );
 
     const stats = gamesResult.rows[0];
@@ -147,7 +147,7 @@ export async function getStats(req, res) {
        FROM games 
        WHERE userId = $1 
        GROUP BY platform`,
-      [userId]
+      [userId],
     );
 
     // Get games by source
@@ -158,7 +158,7 @@ export async function getStats(req, res) {
        FROM games 
        WHERE userId = $1 
        GROUP BY source`,
-      [userId]
+      [userId],
     );
 
     res.json(
@@ -167,7 +167,7 @@ export async function getStats(req, res) {
         totalValue: parseFloat(stats.totalValue) || 0,
         platforms: platformsResult.rows,
         sources: sourcesResult.rows,
-      })
+      }),
     );
   } catch (error) {
     logger.error('Get stats error:', error);

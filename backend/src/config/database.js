@@ -31,23 +31,23 @@ export async function initializeDatabase() {
     // Support both connection string and individual PG environment variables
     const poolConfig = config.database.url
       ? {
-          connectionString: config.database.url,
-          min: config.database.poolMin,
-          max: config.database.poolMax,
-          idleTimeoutMillis: 30000,
-          connectionTimeoutMillis: 5000,
-        }
+        connectionString: config.database.url,
+        min: config.database.poolMin,
+        max: config.database.poolMax,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 5000,
+      }
       : {
-          host: process.env.PGHOST || 'localhost',
-          port: parseInt(process.env.PGPORT || '5432', 10),
-          user: process.env.PGUSER || 'postgres',
-          password: process.env.PGPASSWORD || 'postgres',
-          database: process.env.PGDATABASE || 'postgres',
-          min: config.database.poolMin,
-          max: config.database.poolMax,
-          idleTimeoutMillis: 30000,
-          connectionTimeoutMillis: 5000,
-        };
+        host: process.env.PGHOST || 'localhost',
+        port: parseInt(process.env.PGPORT || '5432', 10),
+        user: process.env.PGUSER || 'postgres',
+        password: process.env.PGPASSWORD || 'postgres',
+        database: process.env.PGDATABASE || 'postgres',
+        min: config.database.poolMin,
+        max: config.database.poolMax,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 5000,
+      };
 
     pool = new Pool(poolConfig);
 
