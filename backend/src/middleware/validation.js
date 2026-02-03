@@ -23,12 +23,9 @@ export function validate(schemas) {
           stripUnknown: true,
         });
         if (error) {
+          const errorMessage = error.details.map((d) => d.message).join(', ');
           return res.status(400).json({
-            error: 'VALIDATION_ERROR',
-            details: error.details.map((d) => ({
-              field: d.path.join('.'),
-              message: d.message,
-            })),
+            error: errorMessage,
           });
         }
         req.body = value;
@@ -38,12 +35,9 @@ export function validate(schemas) {
       if (schemas.params) {
         const { error, value } = schemas.params.validate(req.params);
         if (error) {
+          const errorMessage = error.details.map((d) => d.message).join(', ');
           return res.status(400).json({
-            error: 'VALIDATION_ERROR',
-            details: error.details.map((d) => ({
-              field: d.path.join('.'),
-              message: d.message,
-            })),
+            error: errorMessage,
           });
         }
         req.params = value;
@@ -53,12 +47,9 @@ export function validate(schemas) {
       if (schemas.query) {
         const { error, value } = schemas.query.validate(req.query);
         if (error) {
+          const errorMessage = error.details.map((d) => d.message).join(', ');
           return res.status(400).json({
-            error: 'VALIDATION_ERROR',
-            details: error.details.map((d) => ({
-              field: d.path.join('.'),
-              message: d.message,
-            })),
+            error: errorMessage,
           });
         }
         req.query = value;
@@ -67,8 +58,7 @@ export function validate(schemas) {
       next();
     } catch (err) {
       res.status(500).json({
-        error: 'VALIDATION_ERROR',
-        message: 'Failed to validate input',
+        error: 'Failed to validate input',
       });
     }
   };

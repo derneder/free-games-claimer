@@ -6,6 +6,7 @@
 
 import dotenv from 'dotenv';
 import { initializeDatabase, closeDatabase } from '../src/config/database.js';
+import { initializeRedis, closeRedis } from '../src/config/redis.js';
 
 // Load test environment
 dotenv.config({ path: '.env.test' });
@@ -13,13 +14,15 @@ dotenv.config({ path: '.env.test' });
 // Set test environment
 process.env.NODE_ENV = 'test';
 
-// Initialize database before all tests
+// Initialize database and Redis before all tests
 beforeAll(async () => {
   await initializeDatabase();
+  await initializeRedis();
 });
 
-// Close database after all tests
+// Close database and Redis after all tests
 afterAll(async () => {
+  await closeRedis();
   await closeDatabase();
 });
 
