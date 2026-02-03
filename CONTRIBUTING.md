@@ -245,14 +245,46 @@ git commit -m "your message"
 ### Рунить тесты
 
 ```bash
-# Все тесты
-npm run test
+# Backend
+cd backend
+npm run test              # All tests
+npm run test:watch        # Watch mode
+npm run test:coverage     # With coverage
 
-# С откладкой
-npm run test:watch
+# Frontend
+cd frontend
+npm run test              # All tests
+npm run test:watch        # Watch mode
+npm run test:coverage     # With coverage
+```
 
-# О покрытии
-npm run test:coverage
+### Код качества и аудит
+
+```bash
+# Backend
+cd backend
+npm run lint              # ESLint check
+npm run format            # Format code with Prettier
+npm run format:check      # Check formatting
+npm run type-check        # TypeScript type checking
+npm audit                 # Security vulnerability check
+npx depcheck              # Find unused dependencies
+
+# Frontend
+cd frontend
+npm run lint              # ESLint check
+npm run format            # Check formatting with Prettier
+npm run format:write      # Format code
+npm run type-check        # TypeScript type checking
+npm audit                 # Security vulnerability check
+npx depcheck              # Find unused dependencies
+
+# Shell scripts
+shellcheck scripts/*.sh   # Validate shell scripts
+
+# Code duplication
+npx jscpd backend/src --min-lines 10
+npx jscpd frontend/src --min-lines 10
 ```
 
 ### Как написать тесты

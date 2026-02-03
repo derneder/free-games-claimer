@@ -28,7 +28,8 @@ LOG_FILE="${LOG_DIR}/deploy.log"
 # Log message with timestamp
 log() {
   local message="$1"
-  local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+  local timestamp
+  timestamp=$(date '+%Y-%m-%d %H:%M:%S')
   echo -e "${BLUE}[${timestamp}]${NC} ${message}" | tee -a "${LOG_FILE}"
 }
 
@@ -36,7 +37,8 @@ log() {
 error() {
   local message="$1"
   local exit_code="${2:-1}"
-  local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+  local timestamp
+  timestamp=$(date '+%Y-%m-%d %H:%M:%S')
   echo -e "${RED}[ERROR ${timestamp}] ${message}${NC}" | tee -a "${LOG_FILE}" >&2
   exit "${exit_code}"
 }
@@ -44,14 +46,16 @@ error() {
 # Log success
 success() {
   local message="$1"
-  local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+  local timestamp
+  timestamp=$(date '+%Y-%m-%d %H:%M:%S')
   echo -e "${GREEN}[${timestamp}] ✓ ${message}${NC}" | tee -a "${LOG_FILE}"
 }
 
 # Log warning
 warn() {
   local message="$1"
-  local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+  local timestamp
+  timestamp=$(date '+%Y-%m-%d %H:%M:%S')
   echo -e "${YELLOW}[WARNING ${timestamp}] ${message}${NC}" | tee -a "${LOG_FILE}"
 }
 
@@ -84,7 +88,8 @@ check_tag_exists() {
 
 # Create backup of current deployment
 backup_current() {
-  local backup_file="${BACKUP_DIR}/backup-$(date +%Y-%m-%d-%H-%M-%S).tar.gz"
+  local backup_file
+  backup_file="${BACKUP_DIR}/backup-$(date +%Y-%m-%d-%H-%M-%S).tar.gz"
   
   log "Creating backup: ${backup_file}"
   
@@ -93,7 +98,7 @@ backup_current() {
     --exclude=node_modules \
     --exclude=.git \
     --exclude=logs \
-    . 2>>${LOG_FILE}; then
+    . 2>>"${LOG_FILE}"; then
     success "Backup created: ${backup_file}"
     
     # Create symlink to latest backup
@@ -114,11 +119,11 @@ deploy_version() {
   log "Pulling latest code from repository"
   cd "${DEPLOY_DIR}" || error "Failed to change directory"
   
-  if ! git fetch origin "${version}" 2>>${LOG_FILE}; then
+  if ! git fetch origin "${version}" 2>>"${LOG_FILE}"; then
     error "Failed to fetch version ${version}"
   fi
   
-  if ! git checkout "${version}" 2>>${LOG_FILE}; then
+  if ! git checkout "${version}" 2>>"${LOG_FILE}"; then
     error "Failed to checkout version ${version}"
   fi
   
@@ -127,7 +132,7 @@ deploy_version() {
   # Install dependencies
   log "Installing dependencies"
   
-  if ! npm ci 2>>${LOG_FILE}; then
+  if ! npm ci 2>>"${LOG_FILE}"; then
     error "Failed to install dependencies"
   fi
   
@@ -137,7 +142,7 @@ deploy_version() {
   log "Running database migrations"
   
   if [[ -f "${DEPLOY_DIR}/backend/knexfile.js" ]]; then
-    if ! npm run db:migrate 2>>${LOG_FILE}; then
+    if ! npm run db:migrate 2>>"${LOG_FILE}"; then
       warn "Database migration may have skipped (could be normal)"
     fi
     success "Migrations completed"
@@ -149,12 +154,12 @@ restart_services() {
   log "Restarting services"
   
   if command -v docker-compose &> /dev/null; then
-    if ! docker-compose -f "${DEPLOY_DIR}/docker-compose.prod.yml" restart 2>>${LOG_FILE}; then
+    if ! docker-compose -f "${DEPLOY_DIR}/docker-compose.prod.yml" restart 2>>"${LOG_FILE}"; then
       error "Failed to restart Docker services"
     fi
     success "Docker services restarted"
   elif command -v systemctl &> /dev/null; then
-    if ! systemctl restart free-games-claimer 2>>${LOG_FILE}; then
+    if ! systemctl restart free-games-claimer 2>>"${LOG_FILE}"; then
       error "Failed to restart systemd service"
     fi
     success "Service restarted"

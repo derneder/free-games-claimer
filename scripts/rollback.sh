@@ -27,27 +27,31 @@ LOG_FILE="${LOG_DIR}/rollback.log"
 
 log() {
   local message="$1"
-  local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+  local timestamp
+  timestamp=$(date '+%Y-%m-%d %H:%M:%S')
   echo -e "${BLUE}[${timestamp}]${NC} ${message}" | tee -a "${LOG_FILE}"
 }
 
 error() {
   local message="$1"
   local exit_code="${2:-1}"
-  local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+  local timestamp
+  timestamp=$(date '+%Y-%m-%d %H:%M:%S')
   echo -e "${RED}[ERROR ${timestamp}] ${message}${NC}" | tee -a "${LOG_FILE}" >&2
   exit "${exit_code}"
 }
 
 success() {
   local message="$1"
-  local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+  local timestamp
+  timestamp=$(date '+%Y-%m-%d %H:%M:%S')
   echo -e "${GREEN}[${timestamp}] ✓ ${message}${NC}" | tee -a "${LOG_FILE}"
 }
 
 warn() {
   local message="$1"
-  local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+  local timestamp
+  timestamp=$(date '+%Y-%m-%d %H:%M:%S')
   echo -e "${YELLOW}[WARNING ${timestamp}] ${message}${NC}" | tee -a "${LOG_FILE}"
 }
 
@@ -87,7 +91,7 @@ restore_backup() {
   # Stop services first
   log "Stopping services before restore"
   if command -v docker-compose &> /dev/null; then
-    if docker-compose -f "${DEPLOY_DIR}/docker-compose.prod.yml" stop 2>>${LOG_FILE}; then
+    if docker-compose -f "${DEPLOY_DIR}/docker-compose.prod.yml" stop 2>>"${LOG_FILE}"; then
       success "Docker services stopped"
     else
       warn "Failed to stop Docker services"
@@ -103,7 +107,7 @@ restore_backup() {
   
   # Extract backup
   log "Extracting backup"
-  if tar -xzf "${backup_file}" -C "${DEPLOY_DIR}" 2>>${LOG_FILE}; then
+  if tar -xzf "${backup_file}" -C "${DEPLOY_DIR}" 2>>"${LOG_FILE}"; then
     success "Backup restored"
   else
     error "Failed to extract backup"
@@ -115,13 +119,13 @@ restart_services() {
   log "Restarting services"
   
   if command -v docker-compose &> /dev/null; then
-    if docker-compose -f "${DEPLOY_DIR}/docker-compose.prod.yml" up -d 2>>${LOG_FILE}; then
+    if docker-compose -f "${DEPLOY_DIR}/docker-compose.prod.yml" up -d 2>>"${LOG_FILE}"; then
       success "Docker services started"
     else
       error "Failed to start Docker services"
     fi
   elif command -v systemctl &> /dev/null; then
-    if systemctl start free-games-claimer 2>>${LOG_FILE}; then
+    if systemctl start free-games-claimer 2>>"${LOG_FILE}"; then
       success "Service started"
     else
       error "Failed to start systemd service"
