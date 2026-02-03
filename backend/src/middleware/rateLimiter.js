@@ -146,4 +146,10 @@ export function createLimiter(options = {}) {
   });
 }
 
+/**
+ * rateLimiter - Alias for createLimiter function
+ * Exported for backward compatibility with routes that use 'rateLimiter'
+ */
+export const rateLimiter = createLimiter;
+
 export default apiLimiter;
