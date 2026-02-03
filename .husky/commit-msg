@@ -1,0 +1,14 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "📐 Validating commit message format..."
+
+# Validate commit message with commitlint
+if ! npx --no -- commitlint --edit "$1"; then
+  echo "❌ Commit message format is invalid!"
+  echo "📗 Please use the format: <type>(<scope>): <description>"
+  echo "   Example: feat(auth): add JWT authentication"
+  exit 1
+fi
+
+echo "✅ Commit message format is valid!"
