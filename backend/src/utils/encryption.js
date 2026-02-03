@@ -196,7 +196,7 @@ export function generateEncryptionKey() {
  * @returns {boolean} True if valid
  */
 export function isValidEncryptedData(data) {
-  return (
+  return !!(
     data &&
     typeof data === 'object' &&
     typeof data.ciphertext === 'string' &&
