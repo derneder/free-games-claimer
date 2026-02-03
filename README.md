@@ -104,9 +104,35 @@ For detailed structure, see [docs/STRUCTURE.md](./docs/STRUCTURE.md).
 - ✅ Redis caching
 - ✅ Docker containerization
 - ✅ GitHub Actions CI/CD
+- ✅ **GitHub Pages deployment** for frontend
 - ✅ Comprehensive testing (Jest)
 - ✅ API documentation (Swagger)
 - ✅ Security hardening
+
+---
+
+## 🌐 GitHub Pages Deployment
+
+The frontend is automatically deployed to GitHub Pages on every push to the `main` branch.
+
+**Live Demo:** `https://<username>.github.io/free-games-claimer/`
+
+### Setup GitHub Pages
+
+1. Go to repository Settings → Pages
+2. Under "Build and deployment", select:
+   - **Source:** GitHub Actions
+3. The Pages workflow will automatically deploy on push to main
+
+### Required Secrets
+
+For full CI/CD functionality, configure these secrets in repository Settings → Secrets and variables → Actions:
+
+- **`SONAR_TOKEN`**: SonarCloud authentication token (for code quality analysis)
+  - Get from: https://sonarcloud.io/account/security
+  - Required for: Sonar workflow
+- **`GITHUB_TOKEN`**: Automatically provided by GitHub Actions
+  - No configuration needed
 
 ---
 

@@ -23,14 +23,18 @@ jobs:
     -
       uses: actions/setup-node@v4
       with:
+        node-version: '18'
         cache: 'npm'
+        cache-dependency-path: 'backend/package-lock.json'
     -
-      name: Install dev dependencies which includde ESLint + plugins
+      name: Install dev dependencies which include ESLint + plugins
+      working-directory: backend
       run: npm install --only=dev
     -
       name: Run ESLint
+      working-directory: backend
       continue-on-error: true
-      run: npx eslint . -f json -o eslint_report.json
+      run: npx eslint . -f json -o ../eslint_report.json
     -
       name: Fix ESLint paths
       run: sed -i 's+/home/runner/work/free-games-claimer/free-games-claimer+/github/workspace+g' eslint_report.json
