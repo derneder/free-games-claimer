@@ -7,7 +7,7 @@ const express = require('express');
 const router = express.Router();
 const authenticate = require('../middleware/auth');
 const notificationsService = require('../services/notifications');
-const { AppError, catchAsync } = require('../middleware/error');
+const { catchAsync } = require('../middleware/error');
 
 /**
  * GET /api/notifications

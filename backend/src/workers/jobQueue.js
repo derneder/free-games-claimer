@@ -2,4 +2,142 @@ import logger from '../config/logger.js';
 import epicGamesWorker from './epicGamesWorker.js';
 import gogWorker from './gogWorker.js';
 import steamWorker from './steamWorker.js';
-import primeGamingWorker from './primeGamingWorker.js';\n\nclass JobQueue {\n  constructor() {\n    this.jobs = [];\n    this.isRunning = false;\n    this.checkInterval = null;\n  }\n\n  /**\n   * Register a scheduled job\n   * @param {string} name - Job name\n   * @param {Function} handler - Job handler function\n   * @param {number} intervalMs - Interval in milliseconds\n   */\n  registerJob(name, handler, intervalMs = 60000) {\n    this.jobs.push({\n      name,\n      handler,\n      intervalMs,\n      lastRun: 0,\n      nextRun: Date.now() + intervalMs,\n      isRunning: false,\n      successCount: 0,\n      errorCount: 0,\n    });\n\n    logger.info(`📋 Job registered: ${name} (${intervalMs / 1000 / 60}min interval)`);\n  }\n\n  /**\n   * Execute a job\n   */\n  async executeJob(job) {\n    if (job.isRunning) {\n      logger.warn(`⏳ Job already running: ${job.name}`);\n      return;\n    }\n\n    job.isRunning = true;\n\n    try {\n      const startTime = Date.now();\n      logger.info(`🚀 Running job: ${job.name}`);\n\n      const result = await job.handler();\n\n      const duration = Date.now() - startTime;\n      job.lastRun = Date.now();\n      job.nextRun = Date.now() + job.intervalMs;\n      job.successCount++;\n\n      logger.info(\n        `✅ Job completed: ${job.name} (${duration}ms) - Result: ${JSON.stringify(result)}`\n      );\n    } catch (error) {\n      job.errorCount++;\n      logger.error(`❌ Job error: ${job.name}`, error.message);\n    } finally {\n      job.isRunning = false;\n    }\n  }\n\n  /**\n   * Start the job queue\n   */\n  run() {\n    if (this.isRunning) {\n      logger.warn('Job queue already running');\n      return;\n    }\n\n    this.isRunning = true;\n    logger.info('\\uD83D\\uDEB2 Job queue started');\n\n    // Run all jobs immediately on startup\n    this.jobs.forEach((job) => {\n      this.executeJob(job);\n    });\n\n    // Check every minute which jobs need to run\n    this.checkInterval = setInterval(() => {\n      const now = Date.now();\n\n      this.jobs.forEach((job) => {\n        if (now >= job.nextRun && !job.isRunning) {\n          this.executeJob(job);\n        }\n      });\n    }, 60 * 1000); // Check every minute\n  }\n\n  /**\n   * Stop the job queue\n   */\n  stop() {\n    if (this.checkInterval) {\n      clearInterval(this.checkInterval);\n      this.isRunning = false;\n      logger.info('⛔ Job queue stopped');\n    }\n  }\n\n  /**\n   * Get job status\n   */\n  getStatus() {\n    return {\n      isRunning: this.isRunning,\n      jobs: this.jobs.map((j) => ({\n        name: j.name,\n        isRunning: j.isRunning,\n        lastRun: new Date(j.lastRun).toISOString(),\n        nextRun: new Date(j.nextRun).toISOString(),\n        successCount: j.successCount,\n        errorCount: j.errorCount,\n      })),\n    };\n  }\n}\n\n// Create singleton instance\nconst jobQueue = new JobQueue();\n\n// Register workers\n// Epic Games: Every 2 hours\njobQueue.registerJob('epic-games', () => epicGamesWorker.getFreeGames(), 2 * 60 * 60 * 1000);\n\n// GOG: Every 3 hours\njobQueue.registerJob('gog-games', () => gogWorker.getFreeGames(), 3 * 60 * 60 * 1000);\n\n// Steam: Every 4 hours\njobQueue.registerJob('steam-games', () => steamWorker.getFreeGames(), 4 * 60 * 60 * 1000);\n\n// Prime Gaming: Every 1 day\njobQueue.registerJob('prime-gaming', () => primeGamingWorker.getFreeGames(), 24 * 60 * 60 * 1000);\n\nexport { jobQueue, JobQueue };\nexport default jobQueue;\n
+import primeGamingWorker from './primeGamingWorker.js';
+
+class JobQueue {
+  constructor() {
+    this.jobs = [];
+    this.isRunning = false;
+    this.checkInterval = null;
+  }
+
+  /**
+   * Register a scheduled job
+   * @param {string} name - Job name
+   * @param {Function} handler - Job handler function
+   * @param {number} intervalMs - Interval in milliseconds
+   */
+  registerJob(name, handler, intervalMs = 60000) {
+    this.jobs.push({
+      name,
+      handler,
+      intervalMs,
+      lastRun: 0,
+      nextRun: Date.now() + intervalMs,
+      isRunning: false,
+      successCount: 0,
+      errorCount: 0,
+    });
+
+    logger.info(`📋 Job registered: ${name} (${intervalMs / 1000 / 60}min interval)`);
+  }
+
+  /**
+   * Execute a job
+   */
+  async executeJob(job) {
+    if (job.isRunning) {
+      logger.warn(`⏳ Job already running: ${job.name}`);
+      return;
+    }
+
+    job.isRunning = true;
+
+    try {
+      const startTime = Date.now();
+      logger.info(`🚀 Running job: ${job.name}`);
+
+      const result = await job.handler();
+
+      const duration = Date.now() - startTime;
+      job.lastRun = Date.now();
+      job.nextRun = Date.now() + job.intervalMs;
+      job.successCount++;
+
+      logger.info(
+        `✅ Job completed: ${job.name} (${duration}ms) - Result: ${JSON.stringify(result)}`,
+      );
+    } catch (error) {
+      job.errorCount++;
+      logger.error(`❌ Job error: ${job.name}`, error.message);
+    } finally {
+      job.isRunning = false;
+    }
+  }
+
+  /**
+   * Start the job queue
+   */
+  run() {
+    if (this.isRunning) {
+      logger.warn('Job queue already running');
+      return;
+    }
+
+    this.isRunning = true;
+    logger.info('\\uD83D\\uDEB2 Job queue started');
+
+    // Run all jobs immediately on startup
+    this.jobs.forEach((job) => {
+      this.executeJob(job);
+    });
+
+    // Check every minute which jobs need to run
+    this.checkInterval = setInterval(() => {
+      const now = Date.now();
+
+      this.jobs.forEach((job) => {
+        if (now >= job.nextRun && !job.isRunning) {
+          this.executeJob(job);
+        }
+      });
+    }, 60 * 1000); // Check every minute
+  }
+
+  /**
+   * Stop the job queue
+   */
+  stop() {
+    if (this.checkInterval) {
+      clearInterval(this.checkInterval);
+      this.isRunning = false;
+      logger.info('⛔ Job queue stopped');
+    }
+  }
+
+  /**
+   * Get job status
+   */
+  getStatus() {
+    return {
+      isRunning: this.isRunning,
+      jobs: this.jobs.map((j) => ({
+        name: j.name,
+        isRunning: j.isRunning,
+        lastRun: new Date(j.lastRun).toISOString(),
+        nextRun: new Date(j.nextRun).toISOString(),
+        successCount: j.successCount,
+        errorCount: j.errorCount,
+      })),
+    };
+  }
+}
+
+// Create singleton instance
+const jobQueue = new JobQueue();
+
+// Register workers
+// Epic Games: Every 2 hours
+jobQueue.registerJob('epic-games', () => epicGamesWorker.getFreeGames(), 2 * 60 * 60 * 1000);
+
+// GOG: Every 3 hours
+jobQueue.registerJob('gog-games', () => gogWorker.getFreeGames(), 3 * 60 * 60 * 1000);
+
+// Steam: Every 4 hours
+jobQueue.registerJob('steam-games', () => steamWorker.getFreeGames(), 4 * 60 * 60 * 1000);
+
+// Prime Gaming: Every 1 day
+jobQueue.registerJob('prime-gaming', () => primeGamingWorker.getFreeGames(), 24 * 60 * 60 * 1000);
+
+export { jobQueue, JobQueue };
+export default jobQueue;

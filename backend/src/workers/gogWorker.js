@@ -1,5 +1,4 @@
 import axios from 'axios';
-import cheerio from 'cheerio';
 import db from '../config/database.js';
 import logger from '../config/logger.js';
 

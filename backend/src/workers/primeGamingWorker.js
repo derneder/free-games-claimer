@@ -11,7 +11,7 @@ export async function fetchPrimeGamingFreeGames() {
     // Note: Prime Gaming requires authentication and dynamic content rendering
     // This is a basic implementation - in production, use Playwright/Puppeteer
 
-    const response = await axios.get(`${PRIME_GAMING_URL}/games`, {
+    await axios.get(`${PRIME_GAMING_URL}/games`, {
       headers: {
         'User-Agent': 'Mozilla/5.0',
       },

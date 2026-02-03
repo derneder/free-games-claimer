@@ -1,6 +1,8 @@
 import axios from 'axios';
 import db from '../config/database.js';
 import logger from '../config/logger.js';
+import { addEpicGamesForUser } from './epicGamesWorker.js';
+import { addGOGGamesForUser } from './gogWorker.js';
 
 const STEAM_API = 'https://api.steampowered.com';
 
@@ -64,4 +66,3 @@ export async function runPeriodicScraping() {
 
 // Run every 6 hours
 setInterval(runPeriodicScraping, 6 * 60 * 60 * 1000);
-export { addEpicGamesForUser as addEpicGames } from './epicGamesWorker.js';

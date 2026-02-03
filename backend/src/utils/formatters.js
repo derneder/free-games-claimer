@@ -72,6 +72,7 @@ export function formatPaginated(data, page, pageSize, total) {
  * @returns {Object} Formatted user object
  */
 export function formatUser(user) {
+  // eslint-disable-next-line no-unused-vars
   const { password, refreshToken, ...rest } = user;
   return rest;
 }
