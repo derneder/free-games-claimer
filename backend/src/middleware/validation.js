@@ -59,7 +59,6 @@ export function validate(schemas) {
     } catch (err) {
       res.status(500).json({
         error: 'Failed to validate input',
-        error: 'Failed to validate input',
       });
     }
   };
