@@ -50,10 +50,10 @@ router.get(
  * @desc Get game by ID
  * @access Private
  */
-  gamesRateLimiter,
 router.get(
   '/:id',
   verifyToken,
+  gamesRateLimiter,
   validate({
     params: Joi.object({
       id: Joi.string().uuid().required(),
@@ -67,10 +67,10 @@ router.get(
  * @desc Add new claimed game
  * @access Private
  */
-  gamesRateLimiter,
 router.post(
   '/',
   verifyToken,
+  gamesRateLimiter,
   validate({
     body: Joi.object({
       title: Joi.string().required(),
@@ -92,10 +92,10 @@ router.post(
  * @desc Delete game
  * @access Private
  */
-  gamesRateLimiter,
 router.delete(
   '/:id',
   verifyToken,
+  gamesRateLimiter,
   validate({
     params: Joi.object({
       id: Joi.string().uuid().required(),
@@ -109,11 +109,6 @@ router.delete(
  * @desc Get games statistics
  * @access Private
  */
-router.get(
-  '/stats/summary',
-  verifyToken,
-  gamesRateLimiter,
-  asyncHandler(gamesController.getStats),
-);
+router.get('/stats/summary', verifyToken, gamesRateLimiter, asyncHandler(gamesController.getStats));
 
 export default router;
