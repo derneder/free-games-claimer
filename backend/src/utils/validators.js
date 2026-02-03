@@ -1,14 +1,14 @@
 /**
  * Validation Utility Functions
- * 
+ *
  * Helper functions for common validation patterns.
- * 
+ *
  * @module src/utils/validators
  */
 
 /**
  * Validate email format
- * 
+ *
  * @param {string} email - Email to validate
  * @returns {boolean} True if valid email
  */
@@ -19,14 +19,14 @@ export function isValidEmail(email) {
 
 /**
  * Validate password strength
- * 
+ *
  * Requirements:
  * - Minimum 8 characters
  * - At least one uppercase letter
  * - At least one lowercase letter
  * - At least one digit
  * - At least one special character
- * 
+ *
  * @param {string} password - Password to validate
  * @returns {Object} Validation result
  */
@@ -53,7 +53,7 @@ export function validatePassword(password) {
 
 /**
  * Validate UUID format
- * 
+ *
  * @param {string} uuid - UUID to validate
  * @returns {boolean} True if valid UUID
  */
@@ -65,7 +65,7 @@ export function isValidUUID(uuid) {
 
 /**
  * Validate URL format
- * 
+ *
  * @param {string} url - URL to validate
  * @returns {boolean} True if valid URL
  */
@@ -80,7 +80,7 @@ export function isValidURL(url) {
 
 /**
  * Validate number range
- * 
+ *
  * @param {number} value - Value to validate
  * @param {number} min - Minimum value (inclusive)
  * @param {number} max - Maximum value (inclusive)

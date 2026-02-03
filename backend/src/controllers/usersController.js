@@ -1,9 +1,9 @@
 /**
  * Users Controller
- * 
+ *
  * Handles HTTP requests for user management endpoints.
  * Processes profile updates and account settings.
- * 
+ *
  * @module src/controllers/usersController
  */
 
@@ -17,7 +17,7 @@ import { isValidEmail } from '../utils/validators.js';
 
 /**
  * Get user profile
- * 
+ *
  * @param {Object} req - Express request (with user attached)
  * @param {Object} res - Express response
  * @returns {Promise<void>}
@@ -40,7 +40,7 @@ export async function getProfile(req, res) {
         isActive: user.isActive,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
-      })
+      }),
     );
   } catch (error) {
     logger.error('Get profile error:', error);
@@ -53,7 +53,7 @@ export async function getProfile(req, res) {
 
 /**
  * Update user profile
- * 
+ *
  * @param {Object} req - Express request (with user attached)
  * @param {Object} res - Express response
  * @returns {Promise<void>}
@@ -106,8 +106,8 @@ export async function updateProfile(req, res) {
           username: user.username,
           updatedAt: user.updatedAt,
         },
-        'Profile updated successfully'
-      )
+        'Profile updated successfully',
+      ),
     );
   } catch (error) {
     logger.error('Update profile error:', error);
@@ -120,7 +120,7 @@ export async function updateProfile(req, res) {
 
 /**
  * Change user password
- * 
+ *
  * @param {Object} req - Express request (with user attached)
  * @param {Object} res - Express response
  * @returns {Promise<void>}
@@ -154,8 +154,8 @@ export async function changePassword(req, res) {
     res.json(
       formatSuccess(
         { message: 'Password changed successfully' },
-        'Password updated'
-      )
+        'Password updated',
+      ),
     );
   } catch (error) {
     logger.error('Change password error:', error);
@@ -168,7 +168,7 @@ export async function changePassword(req, res) {
 
 /**
  * Delete user account
- * 
+ *
  * @param {Object} req - Express request (with user attached)
  * @param {Object} res - Express response
  * @returns {Promise<void>}
@@ -202,8 +202,8 @@ export async function deleteAccount(req, res) {
     res.json(
       formatSuccess(
         { message: 'Account deleted successfully' },
-        'Account deactivated'
-      )
+        'Account deactivated',
+      ),
     );
   } catch (error) {
     logger.error('Delete account error:', error);

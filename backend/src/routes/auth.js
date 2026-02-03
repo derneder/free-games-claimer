@@ -1,9 +1,9 @@
 /**
  * Authentication Routes
- * 
+ *
  * API endpoints for user authentication.
  * Handles registration, login, token refresh, and 2FA.
- * 
+ *
  * @module src/routes/auth
  */
 
@@ -30,7 +30,7 @@ router.post(
       password: Joi.string().min(8).required(),
     }),
   }),
-  asyncHandler(authController.register)
+  asyncHandler(authController.register),
 );
 
 /**
@@ -46,7 +46,7 @@ router.post(
       password: Joi.string().required(),
     }),
   }),
-  asyncHandler(authController.login)
+  asyncHandler(authController.login),
 );
 
 /**
@@ -61,7 +61,7 @@ router.post(
       refreshToken: Joi.string().required(),
     }),
   }),
-  asyncHandler(authController.refreshToken)
+  asyncHandler(authController.refreshToken),
 );
 
 /**
@@ -72,7 +72,7 @@ router.post(
 router.get(
   '/profile',
   verifyToken,
-  asyncHandler(authController.getProfile)
+  asyncHandler(authController.getProfile),
 );
 
 /**
@@ -83,7 +83,7 @@ router.get(
 router.post(
   '/2fa/setup',
   verifyToken,
-  asyncHandler(authController.setup2FA)
+  asyncHandler(authController.setup2FA),
 );
 
 /**
@@ -99,7 +99,7 @@ router.post(
       token: Joi.string().length(6).required(),
     }),
   }),
-  asyncHandler(authController.verify2FA)
+  asyncHandler(authController.verify2FA),
 );
 
 /**
@@ -110,7 +110,7 @@ router.post(
 router.post(
   '/logout',
   verifyToken,
-  asyncHandler(authController.logout)
+  asyncHandler(authController.logout),
 );
 
 export default router;

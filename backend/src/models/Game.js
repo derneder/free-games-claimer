@@ -1,9 +1,9 @@
 /**
  * Game Model
- * 
+ *
  * Represents a claimed game.
  * Handles game data structure and database operations.
- * 
+ *
  * @module src/models/Game
  */
 
@@ -16,7 +16,7 @@ import { query } from '../config/database.js';
 export class Game {
   /**
    * Constructor
-   * 
+   *
    * @param {Object} data - Game data
    */
   constructor(data) {
@@ -37,7 +37,7 @@ export class Game {
 
   /**
    * Create new game
-   * 
+   *
    * @param {Object} gameData - Game data
    * @returns {Promise<Game>} Created game
    */
@@ -58,7 +58,7 @@ export class Game {
         game.claimedAt,
         game.expiresAt,
         game.url,
-      ]
+      ],
     );
 
     return game;
@@ -66,7 +66,7 @@ export class Game {
 
   /**
    * Find game by ID
-   * 
+   *
    * @param {string} id - Game ID
    * @returns {Promise<Game|null>} Game object or null
    */
@@ -77,7 +77,7 @@ export class Game {
 
   /**
    * List games for user with pagination
-   * 
+   *
    * @param {string} userId - User ID
    * @param {number} page - Page number
    * @param {number} pageSize - Items per page
@@ -87,7 +87,7 @@ export class Game {
     const offset = (page - 1) * pageSize;
     const result = await query(
       'SELECT * FROM games WHERE userId = $1 ORDER BY claimedAt DESC LIMIT $2 OFFSET $3',
-      [userId, pageSize, offset]
+      [userId, pageSize, offset],
     );
     const countResult = await query('SELECT COUNT(*) FROM games WHERE userId = $1', [
       userId,
@@ -100,7 +100,7 @@ export class Game {
 
   /**
    * Delete game
-   * 
+   *
    * @returns {Promise<void>}
    */
   async delete() {

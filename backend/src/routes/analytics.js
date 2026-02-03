@@ -21,7 +21,7 @@ router.get(
   catchAsync(async (req, res) => {
     const stats = await analyticsService.getSystemStats();
     res.json({ success: true, data: stats });
-  })
+  }),
 );
 
 /**
@@ -34,7 +34,7 @@ router.get(
   catchAsync(async (req, res) => {
     const analytics = await analyticsService.getUserAnalytics(req.user.id);
     res.json({ success: true, data: analytics });
-  })
+  }),
 );
 
 /**
@@ -48,7 +48,7 @@ router.get(
   catchAsync(async (req, res) => {
     const metrics = await analyticsService.getPerformanceMetrics();
     res.json({ success: true, data: metrics });
-  })
+  }),
 );
 
 module.exports = router;

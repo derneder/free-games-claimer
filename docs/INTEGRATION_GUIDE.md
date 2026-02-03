@@ -104,9 +104,9 @@ ADMIN_EMAIL=admin@example.com
 CSRF_SECRET=your_csrf_secret_here
 ```
 
-### Step 1.5: Add Swagger JSDoc Comments to Auth API
+### Step 1.5: Add Swagger JSDoc Comments to Auth Routes
 
-In `backend/src/api/auth.js`, add at the top of your POST /api/auth/register endpoint:
+In `backend/src/routes/auth.js`, add Swagger documentation comments for your endpoints:
 
 ```javascript
 /**

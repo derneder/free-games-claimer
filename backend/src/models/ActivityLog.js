@@ -1,9 +1,9 @@
 /**
  * ActivityLog Model
- * 
+ *
  * Represents user activity for audit trail.
  * Logs all important actions in the system.
- * 
+ *
  * @module src/models/ActivityLog
  */
 
@@ -16,7 +16,7 @@ import { query } from '../config/database.js';
 export class ActivityLog {
   /**
    * Constructor
-   * 
+   *
    * @param {Object} data - Activity log data
    */
   constructor(data) {
@@ -33,7 +33,7 @@ export class ActivityLog {
 
   /**
    * Log an activity
-   * 
+   *
    * @param {Object} data - Activity data
    * @returns {Promise<ActivityLog>} Created activity log
    */
@@ -51,7 +51,7 @@ export class ActivityLog {
         log.resourceId,
         log.ipAddress,
         log.userAgent,
-      ]
+      ],
     );
 
     return log;
@@ -59,7 +59,7 @@ export class ActivityLog {
 
   /**
    * Get user activity
-   * 
+   *
    * @param {string} userId - User ID
    * @param {number} page - Page number
    * @param {number} pageSize - Items per page
@@ -69,11 +69,11 @@ export class ActivityLog {
     const offset = (page - 1) * pageSize;
     const result = await query(
       'SELECT * FROM activityLogs WHERE userId = $1 ORDER BY createdAt DESC LIMIT $2 OFFSET $3',
-      [userId, pageSize, offset]
+      [userId, pageSize, offset],
     );
     const countResult = await query(
       'SELECT COUNT(*) FROM activityLogs WHERE userId = $1',
-      [userId]
+      [userId],
     );
     return {
       logs: result.rows.map((row) => new ActivityLog(row)),

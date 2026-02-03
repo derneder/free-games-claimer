@@ -10,7 +10,7 @@ export async function fetchPrimeGamingFreeGames() {
 
     // Note: Prime Gaming requires authentication and dynamic content rendering
     // This is a basic implementation - in production, use Playwright/Puppeteer
-    
+
     const response = await axios.get(`${PRIME_GAMING_URL}/games`, {
       headers: {
         'User-Agent': 'Mozilla/5.0',
@@ -21,7 +21,7 @@ export async function fetchPrimeGamingFreeGames() {
     // Parse HTML or use Prime Gaming API if available
     // For now, return empty array
     logger.info('🌟 Prime Gaming games (placeholder)');
-    
+
     return [];
   } catch (error) {
     logger.error('❌ Prime Gaming fetch failed:', error.message);
@@ -31,7 +31,7 @@ export async function fetchPrimeGamingFreeGames() {
 
 export async function addPrimeGamingForUser(userId) {
   const games = await fetchPrimeGamingFreeGames();
-  
+
   if (games.length === 0) return 0;
 
   const gamesToInsert = games.map((g) => ({
@@ -43,6 +43,6 @@ export async function addPrimeGamingForUser(userId) {
 
   const ids = await db('games').insert(gamesToInsert).onConflict().ignore();
   logger.info(`✅ Added ${ids.length} Prime Gaming games for user ${userId}`);
-  
+
   return ids.length;
 }

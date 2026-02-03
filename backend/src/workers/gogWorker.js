@@ -31,7 +31,7 @@ export async function fetchGOGFreeGames() {
 
 export async function addGOGGamesForUser(userId) {
   const games = await fetchGOGFreeGames();
-  
+
   if (games.length === 0) return 0;
 
   const gamesToInsert = games.map((g) => ({
@@ -43,6 +43,6 @@ export async function addGOGGamesForUser(userId) {
 
   const ids = await db('games').insert(gamesToInsert).onConflict().ignore();
   logger.info(`✅ Added ${ids.length} GOG games for user ${userId}`);
-  
+
   return ids.length;
 }

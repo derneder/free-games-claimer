@@ -40,19 +40,19 @@ bot.command('start', async (ctx) => {
     ];
 
     await ctx.reply(
-      `🎮 Welcome to Free Games Claimer PRO!\n\n` +
-      `I'll help you collect free games from:\n` +
-      `• 🏴󠁥󠁳󠁣󠁴󠁿 Epic Games\n` +
-      `• 🕹️ GOG\n` +
-      `• 🚂 Steam\n` +
-      `• 👑 Prime Gaming\n\n` +
-      `Choose an action:`,
+      '🎮 Welcome to Free Games Claimer PRO!\n\n' +
+      'I\'ll help you collect free games from:\n' +
+      '• 🏴󠁥󠁳󠁣󠁴󠁿 Epic Games\n' +
+      '• 🕹️ GOG\n' +
+      '• 🚂 Steam\n' +
+      '• 👑 Prime Gaming\n\n' +
+      'Choose an action:',
       {
         reply_markup: {
           keyboard,
           resize_keyboard: true,
         },
-      }
+      },
     );
   } catch (error) {
     logger.error('Error in /start:', error);
@@ -80,10 +80,10 @@ bot.hears('📊 Stats', async (ctx) => {
       .count('* as count')
       .groupBy('source');
 
-    let message = `📊 Your Statistics:\n\n`;
+    let message = '📊 Your Statistics:\n\n';
     message += `🎮 Total Games: ${totalGames}\n`;
     message += `💰 Total Value: $${(totalValue || 0).toFixed(2)}\n\n`;
-    message += `Distribution by Source:\n`;
+    message += 'Distribution by Source:\n';
 
     distribution.forEach((d) => {
       message += `• ${d.source}: ${d.count}\n`;
@@ -111,7 +111,7 @@ bot.hears('🎮 Recent Games', async (ctx) => {
       return ctx.reply('📭 No games yet. Click "Run Collection" to start!');
     }
 
-    let message = `🎮 Your 5 Latest Games:\n\n`;
+    let message = '🎮 Your 5 Latest Games:\n\n';
     games.forEach((game, index) => {
       message += `${index + 1}. ${game.title}\n`;
       message += `   Source: ${game.source}\n`;
@@ -156,12 +156,12 @@ bot.hears('🔄 Run Collection', async (ctx) => {
 
 // ⚙️ Settings
 bot.hears('⚙️ Settings', async (ctx) => {
-  const message = 
-    `⚙️ Settings\n\n` +
-    `🔔 Notifications: Enabled\n` +
-    `📅 Frequency: Daily at 10:00\n` +
-    `🎮 Sources: All enabled\n\n` +
-    `Use /settings to change preferences.`;
+  const message =
+    '⚙️ Settings\n\n' +
+    '🔔 Notifications: Enabled\n' +
+    '📅 Frequency: Daily at 10:00\n' +
+    '🎮 Sources: All enabled\n\n' +
+    'Use /settings to change preferences.';
 
   await ctx.reply(message);
 });
@@ -169,12 +169,12 @@ bot.hears('⚙️ Settings', async (ctx) => {
 // ℹ️ Help
 bot.hears('ℹ️ Help', async (ctx) => {
   const message =
-    `ℹ️ Help\n\n` +
-    `📊 Stats - View your game collection statistics\n` +
-    `🎮 Recent - See your latest added games\n` +
-    `🔄 Run - Start automatic game collection\n` +
-    `⚙️ Settings - Configure preferences\n\n` +
-    `Questions? Visit https://github.com/derneder/free-games-claimer`;
+    'ℹ️ Help\n\n' +
+    '📊 Stats - View your game collection statistics\n' +
+    '🎮 Recent - See your latest added games\n' +
+    '🔄 Run - Start automatic game collection\n' +
+    '⚙️ Settings - Configure preferences\n\n' +
+    'Questions? Visit https://github.com/derneder/free-games-claimer';
 
   await ctx.reply(message);
 });

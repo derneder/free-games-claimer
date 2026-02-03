@@ -16,7 +16,7 @@ export async function blacklistToken(token) {
       const ttl = decoded.exp - Math.floor(Date.now() / 1000);
       if (ttl > 0) {
         await redis.setex(`blacklist:${token}`, ttl, 'true');
-        logger.info(`🔘 Token blacklisted`);
+        logger.info('🔘 Token blacklisted');
       }
     }
   } catch (error) {
@@ -53,7 +53,7 @@ export async function storeUsedRefreshToken(refreshToken, userId) {
         await redis.setex(
           `used_refresh:${userId}:${refreshToken}`,
           ttl,
-          'true'
+          'true',
         );
       }
     }
@@ -102,11 +102,11 @@ export async function invalidateAllUserTokens(userId) {
   try {
     const pattern = `user_refresh:${userId}:*`;
     const keys = await redis.keys(pattern);
-    
+
     for (const key of keys) {
       await redis.del(key);
     }
-    
+
     logger.info(`🚪 All refresh tokens invalidated for user ${userId}`);
   } catch (error) {
     logger.error('Error invalidating all user tokens:', error);
@@ -131,15 +131,15 @@ export async function storeRefreshToken(userId, refreshToken, metadata = {}) {
           created_at: new Date().toISOString(),
           user_agent: metadata.userAgent || 'Unknown',
           ip_address: metadata.ipAddress || 'Unknown',
-          device_name: metadata.deviceName || 'Unknown Device'
+          device_name: metadata.deviceName || 'Unknown Device',
         };
-        
+
         await redis.setex(
           `user_refresh:${userId}:${tokenId}`,
           ttl,
-          JSON.stringify(data)
+          JSON.stringify(data),
         );
-        
+
         logger.info(`💾 Refresh token stored for user ${userId}`);
       }
     }
@@ -161,7 +161,7 @@ export async function checkTokenRotation(req, res, next) {
 
     const token = authHeader.substring(7);
     const isBlacklisted = await isTokenBlacklisted(token);
-    
+
     if (isBlacklisted) {
       logger.warn(`⚠️ Attempt to use blacklisted token from IP: ${req.ip}`);
       return res.status(401).json({ error: 'Token has been revoked' });
@@ -182,5 +182,5 @@ export default {
   getUserRefreshTokens,
   invalidateAllUserTokens,
   storeRefreshToken,
-  checkTokenRotation
+  checkTokenRotation,
 };

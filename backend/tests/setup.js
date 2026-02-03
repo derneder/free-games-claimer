@@ -1,6 +1,6 @@
 /**
  * Jest Setup File
- * 
+ *
  * Configures test environment before running tests.
  */
 

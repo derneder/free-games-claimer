@@ -16,7 +16,7 @@ export const apiLimiter = rateLimit({
   },
   onLimitReached: (req, res, options) => {
     logger.warn(`Rate limit reached for IP: ${req.ip}`);
-  }
+  },
 });
 
 // ============ AUTH LIMITER (Strict) ============
@@ -26,7 +26,7 @@ export const authLimiter = rateLimit({
     prefix: 'rl:auth:', // Rate limit: auth
     sendCommand: async (client, args) => {
       return client.sendCommand(args);
-    }
+    },
   }),
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 5, // Only 5 attempts per 15 minutes
@@ -36,16 +36,16 @@ export const authLimiter = rateLimit({
     logger.warn(`❌ Auth rate limit hit for IP: ${req.ip}`);
     res.status(429).json({
       error: 'Too many attempts. Try again in 15 minutes.',
-      retryAfter: req.rateLimit.resetTime
+      retryAfter: req.rateLimit.resetTime,
     });
-  }
+  },
 });
 
 // ============ 2FA LIMITER (Very Strict) ============
 export const twoFactorLimiter = rateLimit({
   store: new RedisStore({
     client: redis,
-    prefix: 'rl:2fa:'
+    prefix: 'rl:2fa:',
   }),
   windowMs: 10 * 60 * 1000, // 10 minutes
   max: 3, // Only 3 attempts
@@ -55,16 +55,16 @@ export const twoFactorLimiter = rateLimit({
     logger.error(`🔒 2FA rate limit hit for user: ${req.body.email}`);
     res.status(429).json({
       error: '2FA verification limit exceeded',
-      lockoutMinutes: 10
+      lockoutMinutes: 10,
     });
-  }
+  },
 });
 
 // ============ SCRAPING LIMITER (For game collection) ============
 export const scrapingLimiter = rateLimit({
   store: new RedisStore({
     client: redis,
-    prefix: 'rl:scrape:'
+    prefix: 'rl:scrape:',
   }),
   windowMs: 60 * 60 * 1000, // 1 hour
   max: 3, // Only 3 scraping operations per hour
@@ -73,52 +73,52 @@ export const scrapingLimiter = rateLimit({
     logger.warn(`🔄 Scraping rate limit hit for user: ${req.user?.id}`);
     res.status(429).json({
       error: 'Scraping rate limit exceeded',
-      resetTime: req.rateLimit.resetTime
+      resetTime: req.rateLimit.resetTime,
     });
-  }
+  },
 });
 
 // ============ DOWNLOAD LIMITER (CSV/JSON export) ============
 export const downloadLimiter = rateLimit({
   store: new RedisStore({
     client: redis,
-    prefix: 'rl:download:'
+    prefix: 'rl:download:',
   }),
   windowMs: 10 * 60 * 1000, // 10 minutes
   max: 10, // 10 downloads per 10 minutes
-  message: 'Too many downloads. Please wait before downloading again.'
+  message: 'Too many downloads. Please wait before downloading again.',
 });
 
 // ============ ADMIN OPERATIONS LIMITER ============
 export const adminLimiter = rateLimit({
   store: new RedisStore({
     client: redis,
-    prefix: 'rl:admin:'
+    prefix: 'rl:admin:',
   }),
   windowMs: 60 * 60 * 1000, // 1 hour
   max: 50, // 50 operations per hour
-  message: 'Admin operation rate limit exceeded'
+  message: 'Admin operation rate limit exceeded',
 });
 
 // ============ TELEGRAM WEBHOOK LIMITER ============
 export const telegramLimiter = rateLimit({
   store: new RedisStore({
     client: redis,
-    prefix: 'rl:telegram:'
+    prefix: 'rl:telegram:',
   }),
   windowMs: 1 * 60 * 1000, // 1 minute
   max: 30, // 30 webhook calls per minute
   skip: (req) => {
     // Skip rate limiting for specific telegram tokens
     return req.body?.message?.from?.is_bot === true;
-  }
+  },
 });
 
 // ============ GLOBAL RATE LIMITER (Fallback) ============
 export const globalLimiter = rateLimit({
   store: new RedisStore({
     client: redis,
-    prefix: 'rl:global:'
+    prefix: 'rl:global:',
   }),
   windowMs: 1 * 60 * 1000, // 1 minute
   max: 300, // 300 requests per minute
@@ -126,7 +126,7 @@ export const globalLimiter = rateLimit({
   skip: (req) => {
     // Skip health check endpoint
     return req.path === '/api/health';
-  }
+  },
 });
 
 // ============ CUSTOM RATE LIMITER FACTORY ============
@@ -134,7 +134,7 @@ export function createLimiter(options = {}) {
   return rateLimit({
     store: new RedisStore({
       client: redis,
-      prefix: options.prefix || 'rl:custom:'
+      prefix: options.prefix || 'rl:custom:',
     }),
     windowMs: options.windowMs || 15 * 60 * 1000,
     max: options.max || 100,
@@ -142,7 +142,7 @@ export function createLimiter(options = {}) {
     handler: options.handler,
     skip: options.skip,
     keyGenerator: options.keyGenerator || ((req) => req.ip),
-    ...options
+    ...options,
   });
 }
 

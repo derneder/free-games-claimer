@@ -1,9 +1,9 @@
 /**
  * Authentication Middleware
- * 
+ *
  * Verifies JWT tokens and validates user authentication.
  * Attaches user information to request object.
- * 
+ *
  * @module src/middleware/auth
  */
 
@@ -13,7 +13,7 @@ import { logger } from '../config/logger.js';
 
 /**
  * Verify JWT token and attach user to request
- * 
+ *
  * @param {Object} req - Express request object
  * @param {Object} res - Express response object
  * @param {Function} next - Express next middleware
@@ -60,7 +60,7 @@ export function verifyToken(req, res, next) {
 
 /**
  * Extract token from request headers or cookies
- * 
+ *
  * @param {Object} req - Express request object
  * @returns {string|null} JWT token or null
  */
@@ -81,7 +81,7 @@ function extractToken(req) {
 
 /**
  * Check if user is admin
- * 
+ *
  * @param {Object} req - Express request object
  * @param {Object} res - Express response object
  * @param {Function} next - Express next middleware
@@ -100,7 +100,7 @@ export function requireAdmin(req, res, next) {
 
 /**
  * Generate JWT token
- * 
+ *
  * @param {Object} payload - Token payload
  * @param {string} expiresIn - Token expiration (optional)
  * @returns {string} JWT token
@@ -111,7 +111,7 @@ export function generateToken(payload, expiresIn = config.jwt.expiration) {
 
 /**
  * Generate refresh token
- * 
+ *
  * @param {Object} payload - Token payload
  * @returns {string} Refresh token
  */

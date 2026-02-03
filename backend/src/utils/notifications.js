@@ -10,7 +10,7 @@ const NOTIFICATION_TYPES = {
   RATE_LIMIT_HIT: 'rate_limit',
   SECURITY_ALERT: 'security_alert',
   SYSTEM_ERROR: 'system_error',
-  NEW_FEATURE: 'new_feature'
+  NEW_FEATURE: 'new_feature',
 };
 
 /**
@@ -24,7 +24,7 @@ export async function notifyAdmins(notification) {
       title,
       message,
       severity = 'info', // info, warning, error, critical
-      metadata = {}
+      metadata = {},
     } = notification;
 
     // Get all admin users
@@ -47,7 +47,7 @@ export async function notifyAdmins(notification) {
         severity,
         metadata: JSON.stringify(metadata),
         is_read: false,
-        created_at: new Date()
+        created_at: new Date(),
       });
 
       // Send Telegram notification
@@ -56,7 +56,7 @@ export async function notifyAdmins(notification) {
           type,
           title,
           message,
-          severity
+          severity,
         });
       }
     }
@@ -81,14 +81,14 @@ async function sendTelegramNotification(chatId, notification) {
       info: 'ℹ️',
       warning: '⚠️',
       error: '❌',
-      critical: '🚨'
+      critical: '🚨',
     };
 
     const emoji = severityEmoji[severity] || 'ℹ️';
     const text = `${emoji} *${title}*\n\n${message}`;
 
     await bot.telegram.sendMessage(chatId, text, {
-      parse_mode: 'Markdown'
+      parse_mode: 'Markdown',
     });
   } catch (error) {
     logger.error('Error sending Telegram notification:', error);
@@ -109,8 +109,8 @@ export async function notifyNewUserRegistration(user) {
       userId: user.id,
       email: user.email,
       username: user.username,
-      timestamp: new Date().toISOString()
-    }
+      timestamp: new Date().toISOString(),
+    },
   });
 }
 
@@ -128,8 +128,8 @@ export async function notifyUserDeactivation(user, adminId) {
       userId: user.id,
       email: user.email,
       deactivatedBy: adminId,
-      timestamp: new Date().toISOString()
-    }
+      timestamp: new Date().toISOString(),
+    },
   });
 }
 
@@ -147,8 +147,8 @@ export async function notifyFailedLoginAttempt(email, ipAddress) {
     metadata: {
       email,
       ipAddress,
-      timestamp: new Date().toISOString()
-    }
+      timestamp: new Date().toISOString(),
+    },
   });
 }
 
@@ -166,8 +166,8 @@ export async function notifyRateLimitHit(endpoint, ipAddress) {
     metadata: {
       endpoint,
       ipAddress,
-      timestamp: new Date().toISOString()
-    }
+      timestamp: new Date().toISOString(),
+    },
   });
 }
 
@@ -184,8 +184,8 @@ export async function notifySecurityAlert(description, metadata = {}) {
     severity: 'critical',
     metadata: {
       ...metadata,
-      timestamp: new Date().toISOString()
-    }
+      timestamp: new Date().toISOString(),
+    },
   });
 }
 
@@ -203,8 +203,8 @@ export async function notifySystemError(errorMessage, service = 'Unknown') {
     metadata: {
       service,
       error: errorMessage,
-      timestamp: new Date().toISOString()
-    }
+      timestamp: new Date().toISOString(),
+    },
   });
 }
 
@@ -222,7 +222,7 @@ export async function getUnreadNotifications(adminId) {
 
     return notifications.map(n => ({
       ...n,
-      metadata: JSON.parse(n.metadata || '{}')
+      metadata: JSON.parse(n.metadata || '{}'),
     }));
   } catch (error) {
     logger.error('Error fetching unread notifications:', error);
@@ -240,7 +240,7 @@ export async function markAsRead(notificationId) {
       .where({ id: notificationId })
       .update({
         is_read: true,
-        read_at: new Date()
+        read_at: new Date(),
       });
   } catch (error) {
     logger.error('Error marking notification as read:', error);
@@ -253,7 +253,7 @@ export async function markAsRead(notificationId) {
 export async function cleanupOldNotifications() {
   try {
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-    
+
     const deleted = await db('notifications')
       .where('created_at', '<', thirtyDaysAgo)
       .delete();
@@ -275,5 +275,5 @@ export default {
   notifySystemError,
   getUnreadNotifications,
   markAsRead,
-  cleanupOldNotifications
+  cleanupOldNotifications,
 };

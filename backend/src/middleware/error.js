@@ -1,9 +1,9 @@
 /**
  * Error Handling Middleware
- * 
+ *
  * Global error handler for Express application.
  * Catches and formats errors consistently.
- * 
+ *
  * @module src/middleware/error
  */
 
@@ -11,7 +11,7 @@ import { logger } from '../config/logger.js';
 
 /**
  * Application error class
- * 
+ *
  * @class AppError
  * @param {string} message - Error message
  * @param {number} statusCode - HTTP status code
@@ -28,7 +28,7 @@ export class AppError extends Error {
 
 /**
  * Global error handler middleware
- * 
+ *
  * @param {Error} err - Error object
  * @param {Object} req - Express request object
  * @param {Object} res - Express response object
@@ -61,9 +61,9 @@ export function globalErrorHandler(err, req, res, _next) {
 
 /**
  * Async error wrapper for route handlers
- * 
+ *
  * Catches async errors and passes them to error handler
- * 
+ *
  * @param {Function} handler - Async route handler
  * @returns {Function} Express middleware
  */
