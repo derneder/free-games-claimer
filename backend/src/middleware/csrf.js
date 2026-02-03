@@ -1,7 +1,7 @@
 import helmet from 'helmet';
-import csrf from 'csurf';
+import { doubleCsrf } from 'csrf-csrf';
 import cookieParser from 'cookie-parser';
-import logger from '../config/logger.js';
+import { logger } from '../config/logger.js';
 
 /**
  * Helmet middleware для безопасности headers
@@ -36,21 +36,39 @@ export const helmetMiddleware = helmet({
 export const cookieParserMiddleware = cookieParser();
 
 /**
- * CSRF protection middleware
+ * CSRF protection using csrf-csrf double CSRF implementation
  */
-export const csrfProtection = csrf({
-  cookie: {
+const { doubleCsrfProtection, generateToken } = doubleCsrf({
+  getSecret: () => {
+    const secret = process.env.SESSION_SECRET;
+    if (!secret) {
+      throw new Error('SESSION_SECRET environment variable is required for CSRF protection');
+    }
+    return secret;
+  },
+  cookieName: process.env.NODE_ENV === 'production'
+    ? '__Host-psifi.x-csrf-token'
+    : 'psifi.x-csrf-token',
+  cookieOptions: {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
   },
+  size: 64,
+  ignoredMethods: ['GET', 'HEAD', 'OPTIONS'],
 });
+
+/**
+ * Export CSRF protection middleware
+ */
+export { doubleCsrfProtection, generateToken };
 
 /**
  * Middleware для логирования CSRF ошибок
  */
 export const csrfErrorHandler = (err, req, res, next) => {
-  if (err.code !== 'EBADCSRFTOKEN') {
+  // csrf-csrf throws errors with code 'EBADCSRFTOKEN' or messages containing 'csrf'
+  if (err.code !== 'EBADCSRFTOKEN' && !err.message?.toLowerCase().includes('csrf')) {
     return next(err);
   }
 
@@ -68,14 +86,6 @@ export const csrfErrorHandler = (err, req, res, next) => {
 };
 
 /**
- * Middleware для добавления CSRF token
- */
-export const csrfTokenMiddleware = (req, res, next) => {
-  res.locals.csrfToken = req.csrfToken();
-  next();
-};
-
-/**
  * Исключения для CSRF protection
  */
 const csrfExcludedRoutes = ['/api/health', '/api/telegram', '/webhook'];
@@ -90,5 +100,5 @@ export const conditionalCsrf = (req, res, next) => {
     return next();
   }
 
-  return csrfProtection(req, res, next);
+  return doubleCsrfProtection(req, res, next);
 };

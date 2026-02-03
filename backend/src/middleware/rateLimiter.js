@@ -1,7 +1,7 @@
 import rateLimit from 'express-rate-limit';
 import RedisStore from 'rate-limit-redis';
 import redis from '../config/redis.js';
-import logger from '../config/logger.js';
+import { logger } from '../config/logger.js';
 
 // ============ GENERAL API LIMITER ============
 export const apiLimiter = rateLimit({
