@@ -9,7 +9,7 @@ describe('Auth API', () => {
   });
 
   afterEach(async () => {
-    // Очистка БД после каждого теста
+    // Clean up database after each test
     await query('TRUNCATE TABLE "users" RESTART IDENTITY CASCADE');
   });
 

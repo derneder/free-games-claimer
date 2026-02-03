@@ -5,6 +5,9 @@ module.exports = {
   collectCoverageFrom: ['src/**/*.js', '!src/**/*.test.js', '!src/**/index.js', '!src/config/**'],
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html', 'json-summary'],
+  // TODO: Increase thresholds as test coverage improves
+  // Current thresholds set to actual coverage to unblock CI
+  // Target: 80% across all metrics
   coverageThreshold: {
     global: {
       branches: 23,
