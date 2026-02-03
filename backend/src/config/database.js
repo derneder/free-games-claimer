@@ -1,9 +1,9 @@
 /**
  * Database Configuration
- * 
+ *
  * PostgreSQL database connection pool setup.
  * Manages connections and provides utilities for database operations.
- * 
+ *
  * @module src/config/database
  */
 
@@ -15,14 +15,14 @@ const { Pool } = pg;
 
 /**
  * PostgreSQL connection pool
- * 
+ *
  * @type {pg.Pool}
  */
 let pool = null;
 
 /**
  * Initialize database connection pool
- * 
+ *
  * @returns {Promise<void>}
  * @throws {Error} If connection fails
  */
@@ -50,7 +50,7 @@ export async function initializeDatabase() {
 
 /**
  * Get database connection pool
- * 
+ *
  * @returns {pg.Pool} PostgreSQL connection pool
  * @throws {Error} If pool is not initialized
  */
@@ -63,7 +63,7 @@ export function getPool() {
 
 /**
  * Execute query on database
- * 
+ *
  * @param {string} query - SQL query string
  * @param {Array} values - Query parameters
  * @returns {Promise<Object>} Query result
@@ -81,7 +81,7 @@ export async function query(query, values = []) {
 
 /**
  * Close database connection pool
- * 
+ *
  * @returns {Promise<void>}
  */
 export async function closeDatabase() {

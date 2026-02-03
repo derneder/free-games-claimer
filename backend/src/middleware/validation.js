@@ -1,9 +1,9 @@
 /**
  * Validation Middleware
- * 
+ *
  * Input validation using Joi schemas.
  * Validates request body, params, and query.
- * 
+ *
  * @module src/middleware/validation
  */
 
@@ -11,7 +11,7 @@ import Joi from 'joi';
 
 /**
  * Create validation middleware
- * 
+ *
  * @param {Object} schemas - Object containing 'body', 'params', 'query' schemas
  * @returns {Function} Express middleware
  */

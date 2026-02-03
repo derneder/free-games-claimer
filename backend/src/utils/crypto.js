@@ -1,8 +1,8 @@
 /**
  * Cryptography Utilities
- * 
+ *
  * Helper functions for encryption, hashing, and secure operations.
- * 
+ *
  * @module src/utils/crypto
  */
 
@@ -11,7 +11,7 @@ import crypto from 'crypto';
 
 /**
  * Hash password using bcrypt
- * 
+ *
  * @param {string} password - Password to hash
  * @param {number} saltRounds - Number of salt rounds (default: 10)
  * @returns {Promise<string>} Hashed password
@@ -22,7 +22,7 @@ export async function hashPassword(password, saltRounds = 10) {
 
 /**
  * Compare password with hash
- * 
+ *
  * @param {string} password - Password to compare
  * @param {string} hash - Password hash
  * @returns {Promise<boolean>} True if passwords match
@@ -33,7 +33,7 @@ export async function comparePassword(password, hash) {
 
 /**
  * Generate random token
- * 
+ *
  * @param {number} length - Token length in bytes (default: 32)
  * @returns {string} Random token
  */
@@ -43,7 +43,7 @@ export function generateRandomToken(length = 32) {
 
 /**
  * Generate random code (e.g., for 2FA)
- * 
+ *
  * @param {number} length - Code length (default: 6)
  * @returns {string} Random code
  */
@@ -58,7 +58,7 @@ export function generateRandomCode(length = 6) {
 
 /**
  * Encrypt string using AES-256
- * 
+ *
  * @param {string} text - Text to encrypt
  * @param {string} key - Encryption key (32 bytes)
  * @returns {string} Encrypted text
@@ -73,7 +73,7 @@ export function encrypt(text, key) {
 
 /**
  * Decrypt string using AES-256
- * 
+ *
  * @param {string} text - Text to decrypt
  * @param {string} key - Encryption key (32 bytes)
  * @returns {string} Decrypted text
@@ -89,7 +89,7 @@ export function decrypt(text, key) {
 
 /**
  * Generate SHA256 hash
- * 
+ *
  * @param {string} text - Text to hash
  * @returns {string} SHA256 hash
  */
@@ -99,7 +99,7 @@ export function sha256(text) {
 
 /**
  * Generate HMAC SHA256
- * 
+ *
  * @param {string} text - Text to hash
  * @param {string} secret - Secret key
  * @returns {string} HMAC SHA256 hash

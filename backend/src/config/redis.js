@@ -1,9 +1,9 @@
 /**
  * Redis Configuration
- * 
+ *
  * Redis client setup for caching and session management.
  * Provides utilities for cache operations.
- * 
+ *
  * @module src/config/redis
  */
 
@@ -13,14 +13,14 @@ import { logger } from './logger.js';
 
 /**
  * Redis client instance
- * 
+ *
  * @type {Object}
  */
 let redisClient = null;
 
 /**
  * Initialize Redis connection
- * 
+ *
  * @returns {Promise<void>}
  * @throws {Error} If connection fails
  */
@@ -46,7 +46,7 @@ export async function initializeRedis() {
 
 /**
  * Get Redis client
- * 
+ *
  * @returns {Object} Redis client
  * @throws {Error} If client is not initialized
  */
@@ -59,7 +59,7 @@ export function getRedisClient() {
 
 /**
  * Set cache value
- * 
+ *
  * @param {string} key - Cache key
  * @param {*} value - Value to cache
  * @param {number} ttl - Time to live in seconds (optional)
@@ -77,7 +77,7 @@ export async function setCache(key, value, ttl = null) {
 
 /**
  * Get cache value
- * 
+ *
  * @param {string} key - Cache key
  * @returns {Promise<*>} Cached value or null
  */
@@ -93,7 +93,7 @@ export async function getCache(key) {
 
 /**
  * Delete cache value
- * 
+ *
  * @param {string} key - Cache key
  * @returns {Promise<void>}
  */
@@ -108,7 +108,7 @@ export async function deleteCache(key) {
 
 /**
  * Clear all cache
- * 
+ *
  * @returns {Promise<void>}
  */
 export async function clearCache() {
@@ -122,7 +122,7 @@ export async function clearCache() {
 
 /**
  * Close Redis connection
- * 
+ *
  * @returns {Promise<void>}
  */
 export async function closeRedis() {

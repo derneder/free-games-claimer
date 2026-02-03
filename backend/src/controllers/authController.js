@@ -1,9 +1,9 @@
 /**
  * Authentication Controller
- * 
+ *
  * Handles HTTP requests for authentication endpoints.
  * Processes registration, login, token refresh, and 2FA.
- * 
+ *
  * @module src/controllers/authController
  */
 
@@ -19,7 +19,7 @@ import { getRedisClient } from '../config/redis.js';
 
 /**
  * Register new user
- * 
+ *
  * @param {Object} req - Express request
  * @param {Object} res - Express response
  * @returns {Promise<void>}
@@ -39,8 +39,8 @@ export async function register(req, res) {
             refreshToken: result.refreshToken,
           },
         },
-        'User registered successfully'
-      )
+        'User registered successfully',
+      ),
     );
   } catch (error) {
     logger.error('Registration error:', error);
@@ -53,7 +53,7 @@ export async function register(req, res) {
 
 /**
  * Login user
- * 
+ *
  * @param {Object} req - Express request
  * @param {Object} res - Express response
  * @returns {Promise<void>}
@@ -73,8 +73,8 @@ export async function login(req, res) {
             refreshToken: result.refreshToken,
           },
         },
-        'Login successful'
-      )
+        'Login successful',
+      ),
     );
   } catch (error) {
     logger.error('Login error:', error);
@@ -87,7 +87,7 @@ export async function login(req, res) {
 
 /**
  * Refresh access token
- * 
+ *
  * @param {Object} req - Express request
  * @param {Object} res - Express response
  * @returns {Promise<void>}
@@ -124,8 +124,8 @@ export async function refreshToken(req, res) {
             refreshToken: newRefreshToken,
           },
         },
-        'Tokens refreshed'
-      )
+        'Tokens refreshed',
+      ),
     );
   } catch (error) {
     logger.error('Token refresh error:', error);
@@ -138,7 +138,7 @@ export async function refreshToken(req, res) {
 
 /**
  * Get current user profile
- * 
+ *
  * @param {Object} req - Express request (with user attached)
  * @param {Object} res - Express response
  * @returns {Promise<void>}
@@ -160,7 +160,7 @@ export async function getProfile(req, res) {
         twoFaEnabled: user.twoFaEnabled,
         isActive: user.isActive,
         createdAt: user.createdAt,
-      })
+      }),
     );
   } catch (error) {
     logger.error('Get profile error:', error);
@@ -173,7 +173,7 @@ export async function getProfile(req, res) {
 
 /**
  * Setup two-factor authentication
- * 
+ *
  * @param {Object} req - Express request (with user attached)
  * @param {Object} res - Express response
  * @returns {Promise<void>}
@@ -197,7 +197,7 @@ export async function setup2FA(req, res) {
     await redis.setEx(
       `2fa_temp:${user.id}`,
       300, // 5 minutes
-      JSON.stringify(secret)
+      JSON.stringify(secret),
     );
 
     res.json(
@@ -206,8 +206,8 @@ export async function setup2FA(req, res) {
           secret: secret.base32,
           qrCode: secret.otpauth_url,
         },
-        '2FA setup initiated'
-      )
+        '2FA setup initiated',
+      ),
     );
   } catch (error) {
     logger.error('2FA setup error:', error);
@@ -220,7 +220,7 @@ export async function setup2FA(req, res) {
 
 /**
  * Verify 2FA token and enable
- * 
+ *
  * @param {Object} req - Express request (with user attached)
  * @param {Object} res - Express response
  * @returns {Promise<void>}
@@ -274,8 +274,8 @@ export async function verify2FA(req, res) {
     res.json(
       formatSuccess(
         { message: '2FA enabled successfully' },
-        '2FA is now active'
-      )
+        '2FA is now active',
+      ),
     );
   } catch (error) {
     logger.error('2FA verification error:', error);
@@ -288,7 +288,7 @@ export async function verify2FA(req, res) {
 
 /**
  * Logout user
- * 
+ *
  * @param {Object} req - Express request (with user attached)
  * @param {Object} res - Express response
  * @returns {Promise<void>}
@@ -305,8 +305,8 @@ export async function logout(req, res) {
     res.json(
       formatSuccess(
         { message: 'Logged out successfully' },
-        'Logout successful'
-      )
+        'Logout successful',
+      ),
     );
   } catch (error) {
     logger.error('Logout error:', error);

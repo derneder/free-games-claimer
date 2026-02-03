@@ -10,7 +10,7 @@ export async function fetchSteamFreeGames() {
 
     const response = await axios.get(
       `${STEAM_API}/ISteamApps/GetAppList/v2/`,
-      { timeout: 10000 }
+      { timeout: 10000 },
     );
 
     const games = response.data?.applist?.apps || [];
@@ -32,7 +32,7 @@ export async function fetchSteamFreeGames() {
 
 export async function addSteamGamesForUser(userId) {
   const games = await fetchSteamFreeGames();
-  
+
   if (games.length === 0) return 0;
 
   const gamesToInsert = games.map((g) => ({
@@ -44,21 +44,21 @@ export async function addSteamGamesForUser(userId) {
 
   const ids = await db('games').insert(gamesToInsert).onConflict().ignore();
   logger.info(`✅ Added ${ids.length} Steam games for user ${userId}`);
-  
+
   return ids.length;
 }
 
 export async function runPeriodicScraping() {
   logger.info('🔁 Starting periodic game scraping...');
-  
+
   const users = await db('users').select('id');
-  
+
   for (const user of users) {
     await addEpicGamesForUser(user.id);
     await addGOGGamesForUser(user.id);
     await addSteamGamesForUser(user.id);
   }
-  
+
   logger.info('✅ Periodic scraping completed');
 }
 

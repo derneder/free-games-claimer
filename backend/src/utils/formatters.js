@@ -1,14 +1,14 @@
 /**
  * Response Formatting Utilities
- * 
+ *
  * Helper functions for consistent API response formatting.
- * 
+ *
  * @module src/utils/formatters
  */
 
 /**
  * Format success response
- * 
+ *
  * @param {*} data - Response data
  * @param {string} message - Success message (optional)
  * @returns {Object} Formatted response
@@ -23,7 +23,7 @@ export function formatSuccess(data, message = null) {
 
 /**
  * Format error response
- * 
+ *
  * @param {string} code - Error code
  * @param {string} message - Error message
  * @param {Object} details - Additional details (optional)
@@ -42,7 +42,7 @@ export function formatError(code, message, details = null) {
 
 /**
  * Format paginated response
- * 
+ *
  * @param {Array} data - Response data
  * @param {number} page - Current page
  * @param {number} pageSize - Items per page
@@ -67,7 +67,7 @@ export function formatPaginated(data, page, pageSize, total) {
 
 /**
  * Format user response (hide sensitive fields)
- * 
+ *
  * @param {Object} user - User object
  * @returns {Object} Formatted user object
  */
@@ -78,7 +78,7 @@ export function formatUser(user) {
 
 /**
  * Format game response
- * 
+ *
  * @param {Object} game - Game object
  * @returns {Object} Formatted game object
  */

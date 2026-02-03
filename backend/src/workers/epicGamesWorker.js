@@ -48,7 +48,7 @@ export async function fetchEpicGames() {
 
 export async function addEpicGamesForUser(userId) {
   const games = await fetchEpicGames();
-  
+
   if (games.length === 0) return 0;
 
   const gamesToInsert = games.map((g) => ({
@@ -60,6 +60,6 @@ export async function addEpicGamesForUser(userId) {
 
   const ids = await db('games').insert(gamesToInsert).onConflict().ignore();
   logger.info(`✅ Added ${ids.length} Epic Games for user ${userId}`);
-  
+
   return ids.length;
 }

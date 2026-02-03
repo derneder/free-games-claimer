@@ -75,7 +75,7 @@ export async function getCollaborativeFilteringRecommendations(userId, limit = 5
     // Calculate similarity for each game
     const scored = allGames.map(game => ({
       ...game,
-      score: cosineSimilarity(userVector, buildGameVector(game))
+      score: cosineSimilarity(userVector, buildGameVector(game)),
     }));
 
     // Sort by score and return top N
@@ -108,7 +108,7 @@ export async function getContentBasedRecommendations(gameId, limit = 5) {
 
     const scored = similarGames.map(g => ({
       ...g,
-      score: cosineSimilarity(gameVector, buildGameVector(g))
+      score: cosineSimilarity(gameVector, buildGameVector(g)),
     }));
 
     return scored
@@ -173,13 +173,13 @@ export async function getPersonalizedRecommendations(userId, limit = 10) {
     const [collaborative, trending, popular] = await Promise.all([
       getCollaborativeFilteringRecommendations(userId, Math.ceil(limit * 0.5)),
       getTrendingGames(Math.ceil(limit * 0.25)),
-      getPopularGames(Math.ceil(limit * 0.25))
+      getPopularGames(Math.ceil(limit * 0.25)),
     ]);
 
     // Merge and deduplicate
     const merged = [...collaborative, ...trending, ...popular];
     const unique = Array.from(
-      new Map(merged.map(g => [g.id, g])).values()
+      new Map(merged.map(g => [g.id, g])).values(),
     ).slice(0, limit);
 
     // Cache for 6 hours
@@ -224,14 +224,14 @@ export async function trainRecommendationModel() {
         (game.steam_price_usd || 0) / maxPrice,
         (game.rating || 0) / 100,
         (game.claimed_count || 0) / maxClaims,
-        game.platform === 'windows' ? 0.9 : 0.5
+        game.platform === 'windows' ? 0.9 : 0.5,
       ];
 
       await db('games')
         .where('id', game.id)
         .update({
           feature_vector: JSON.stringify(vector),
-          updated_at: new Date()
+          updated_at: new Date(),
         });
     }
 
@@ -248,5 +248,5 @@ export default {
   getPopularGames,
   getPersonalizedRecommendations,
   invalidateRecommendationCache,
-  trainRecommendationModel
+  trainRecommendationModel,
 };

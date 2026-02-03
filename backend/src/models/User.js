@@ -1,9 +1,9 @@
 /**
  * User Model
- * 
+ *
  * Represents a user in the system.
  * Handles user data structure and database operations.
- * 
+ *
  * @module src/models/User
  */
 
@@ -17,7 +17,7 @@ import { hashPassword, comparePassword } from '../utils/crypto.js';
 export class User {
   /**
    * Constructor
-   * 
+   *
    * @param {Object} data - User data
    */
   constructor(data) {
@@ -35,7 +35,7 @@ export class User {
 
   /**
    * Find user by email
-   * 
+   *
    * @param {string} email - User email
    * @returns {Promise<User|null>} User object or null
    */
@@ -46,7 +46,7 @@ export class User {
 
   /**
    * Find user by ID
-   * 
+   *
    * @param {string} id - User ID
    * @returns {Promise<User|null>} User object or null
    */
@@ -57,7 +57,7 @@ export class User {
 
   /**
    * Create new user
-   * 
+   *
    * @param {Object} userData - User data
    * @returns {Promise<User>} Created user
    */
@@ -70,7 +70,7 @@ export class User {
 
     await query(
       'INSERT INTO users (id, email, username, password, role, isActive) VALUES ($1, $2, $3, $4, $5, $6)',
-      [user.id, user.email, user.username, user.password, user.role, user.isActive]
+      [user.id, user.email, user.username, user.password, user.role, user.isActive],
     );
 
     return user;
@@ -78,7 +78,7 @@ export class User {
 
   /**
    * Update user
-   * 
+   *
    * @returns {Promise<void>}
    */
   async save() {
@@ -94,13 +94,13 @@ export class User {
         this.isActive,
         this.updatedAt,
         this.id,
-      ]
+      ],
     );
   }
 
   /**
    * Verify password
-   * 
+   *
    * @param {string} password - Password to verify
    * @returns {Promise<boolean>} True if password matches
    */
@@ -110,7 +110,7 @@ export class User {
 
   /**
    * List all users with pagination
-   * 
+   *
    * @param {number} page - Page number
    * @param {number} pageSize - Items per page
    * @returns {Promise<Object>} Users and total count
@@ -119,7 +119,7 @@ export class User {
     const offset = (page - 1) * pageSize;
     const result = await query(
       'SELECT * FROM users ORDER BY createdAt DESC LIMIT $1 OFFSET $2',
-      [pageSize, offset]
+      [pageSize, offset],
     );
     const countResult = await query('SELECT COUNT(*) FROM users');
     return {

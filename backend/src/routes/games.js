@@ -1,9 +1,9 @@
 /**
  * Games Routes
- * 
+ *
  * API endpoints for game management.
  * Handles game listing, adding, and deletion.
- * 
+ *
  * @module src/routes/games
  */
 
@@ -32,7 +32,7 @@ router.get(
       sortOrder: Joi.string().valid('asc', 'desc').default('desc'),
     }),
   }),
-  asyncHandler(gamesController.listGames)
+  asyncHandler(gamesController.listGames),
 );
 
 /**
@@ -48,7 +48,7 @@ router.get(
       id: Joi.string().uuid().required(),
     }),
   }),
-  asyncHandler(gamesController.getGame)
+  asyncHandler(gamesController.getGame),
 );
 
 /**
@@ -72,7 +72,7 @@ router.post(
       expiresAt: Joi.date().optional(),
     }),
   }),
-  asyncHandler(gamesController.addGame)
+  asyncHandler(gamesController.addGame),
 );
 
 /**
@@ -88,7 +88,7 @@ router.delete(
       id: Joi.string().uuid().required(),
     }),
   }),
-  asyncHandler(gamesController.deleteGame)
+  asyncHandler(gamesController.deleteGame),
 );
 
 /**
@@ -99,7 +99,7 @@ router.delete(
 router.get(
   '/stats/summary',
   verifyToken,
-  asyncHandler(gamesController.getStats)
+  asyncHandler(gamesController.getStats),
 );
 
 export default router;

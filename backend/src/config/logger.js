@@ -1,9 +1,9 @@
 /**
  * Logger Configuration
- * 
+ *
  * Winston logger setup for consistent logging across the application.
  * Handles both console and file logging with proper formatting.
- * 
+ *
  * @module src/config/logger
  */
 
@@ -14,7 +14,7 @@ const { combine, timestamp, errors, json, colorize, printf } = winston.format;
 
 /**
  * Custom format for development mode
- * 
+ *
  * @type {winston.Logform.Format}
  */
 const devFormat = printf(({ level, message, timestamp, ...meta }) => {
@@ -24,7 +24,7 @@ const devFormat = printf(({ level, message, timestamp, ...meta }) => {
 
 /**
  * Winston logger instance
- * 
+ *
  * @type {winston.Logger}
  */
 export const logger = winston.createLogger({
@@ -32,7 +32,7 @@ export const logger = winston.createLogger({
   format: combine(
     timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
     errors({ stack: true }),
-    config.nodeEnv === 'development' ? devFormat : json()
+    config.nodeEnv === 'development' ? devFormat : json(),
   ),
   defaultMeta: { service: 'free-games-claimer-api' },
   transports: [
@@ -44,23 +44,23 @@ export const logger = winston.createLogger({
     // File transports (production)
     ...(config.nodeEnv !== 'test'
       ? [
-          new winston.transports.File({
-            filename: 'logs/error.log',
-            level: 'error',
-            format: json(),
-          }),
-          new winston.transports.File({
-            filename: 'logs/combined.log',
-            format: json(),
-          }),
-        ]
+        new winston.transports.File({
+          filename: 'logs/error.log',
+          level: 'error',
+          format: json(),
+        }),
+        new winston.transports.File({
+          filename: 'logs/combined.log',
+          format: json(),
+        }),
+      ]
       : []),
   ],
 });
 
 /**
  * Express middleware for request logging
- * 
+ *
  * @param {Object} req - Express request object
  * @param {Object} res - Express response object
  * @param {Function} next - Express next middleware

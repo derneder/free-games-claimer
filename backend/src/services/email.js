@@ -96,7 +96,7 @@ async function sendNewGameNotification(email, game) {
  */
 async function sendPasswordResetEmail(email, token) {
   const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
-  
+
   const mailOptions = {
     from: process.env.SMTP_FROM,
     to: email,

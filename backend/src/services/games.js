@@ -1,9 +1,9 @@
 /**
  * Games Service
- * 
+ *
  * Business logic for game management.
  * Handles game claiming, listing, and deletion.
- * 
+ *
  * @module src/services/games
  */
 
@@ -13,7 +13,7 @@ import { AppError } from '../middleware/error.js';
 
 /**
  * Add game to user library
- * 
+ *
  * @param {string} userId - User ID
  * @param {Object} gameData - Game data
  * @returns {Promise<Game>} Created game
@@ -43,7 +43,7 @@ export async function addGame(userId, gameData) {
 
 /**
  * Get user's games
- * 
+ *
  * @param {string} userId - User ID
  * @param {number} page - Page number
  * @param {number} pageSize - Items per page
@@ -55,7 +55,7 @@ export async function getUserGames(userId, page = 1, pageSize = 20) {
 
 /**
  * Delete game
- * 
+ *
  * @param {string} userId - User ID
  * @param {string} gameId - Game ID
  * @throws {AppError} If game not found or unauthorized

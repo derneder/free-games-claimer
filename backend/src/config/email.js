@@ -9,8 +9,8 @@ const transporter = nodemailer.createTransport({
   secure: process.env.SMTP_SECURE === 'true' || false,
   auth: {
     user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS
-  }
+    pass: process.env.SMTP_PASS,
+  },
 });
 
 // Verify connection
@@ -33,7 +33,7 @@ export async function sendEmail(options) {
       subject,
       html,
       text,
-      from = process.env.SMTP_FROM || 'noreply@freegamesclaimer.com'
+      from = process.env.SMTP_FROM || 'noreply@freegamesclaimer.com',
     } = options;
 
     const result = await transporter.sendMail({
@@ -41,7 +41,7 @@ export async function sendEmail(options) {
       to,
       subject,
       html,
-      text
+      text,
     });
 
     logger.info(`📧 Email sent to ${to}`);
@@ -76,7 +76,7 @@ export async function sendWelcomeEmail(email, username) {
     await sendEmail({
       to: email,
       subject: 'Welcome to Free Games Claimer!',
-      html
+      html,
     });
   } catch (error) {
     logger.error('Error sending welcome email:', error);
@@ -91,7 +91,7 @@ export async function sendWelcomeEmail(email, username) {
 export async function sendPasswordResetEmail(email, resetToken) {
   try {
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
-    
+
     const html = `
       <!DOCTYPE html>
       <html>
@@ -110,7 +110,7 @@ export async function sendPasswordResetEmail(email, resetToken) {
     await sendEmail({
       to: email,
       subject: 'Password Reset Request',
-      html
+      html,
     });
   } catch (error) {
     logger.error('Error sending password reset email:', error);
@@ -143,7 +143,7 @@ export async function send2FASetupEmail(email, qrCodeUrl) {
     await sendEmail({
       to: email,
       subject: 'Two-Factor Authentication Enabled',
-      html
+      html,
     });
   } catch (error) {
     logger.error('Error sending 2FA email:', error);
@@ -178,7 +178,7 @@ export async function sendNewGameNotification(email, game) {
     await sendEmail({
       to: email,
       subject: `New Free Game: ${game.title}`,
-      html
+      html,
     });
   } catch (error) {
     logger.error('Error sending game notification email:', error);
@@ -211,7 +211,7 @@ export async function sendActivityAlert(email, activity) {
     await sendEmail({
       to: email,
       subject: 'Account Activity Alert',
-      html
+      html,
     });
   } catch (error) {
     logger.error('Error sending activity alert:', error);
@@ -247,7 +247,7 @@ export async function sendWeeklyDigest(email, digestData) {
     await sendEmail({
       to: email,
       subject: 'Weekly Free Games Digest',
-      html
+      html,
     });
   } catch (error) {
     logger.error('Error sending weekly digest:', error);

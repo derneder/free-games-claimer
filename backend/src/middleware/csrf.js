@@ -88,8 +88,8 @@ const csrfExcludedRoutes = [
  * Conditional CSRF protection
  */
 export const conditionalCsrf = (req, res, next) => {
-  const isExcluded = csrfExcludedRoutes.some(route => 
-    req.path.startsWith(route)
+  const isExcluded = csrfExcludedRoutes.some(route =>
+    req.path.startsWith(route),
   );
 
   if (isExcluded) {

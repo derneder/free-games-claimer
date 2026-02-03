@@ -1,9 +1,9 @@
 /**
  * Users Routes
- * 
+ *
  * API endpoints for user management.
  * Handles profile updates and user settings.
- * 
+ *
  * @module src/routes/users
  */
 
@@ -26,7 +26,7 @@ router.use(verifyToken);
  */
 router.get(
   '/profile',
-  asyncHandler(usersController.getProfile)
+  asyncHandler(usersController.getProfile),
 );
 
 /**
@@ -42,7 +42,7 @@ router.put(
       email: Joi.string().email().optional(),
     }).min(1),
   }),
-  asyncHandler(usersController.updateProfile)
+  asyncHandler(usersController.updateProfile),
 );
 
 /**
@@ -59,7 +59,7 @@ router.post(
       confirmPassword: Joi.string().valid(Joi.ref('newPassword')).required(),
     }),
   }),
-  asyncHandler(usersController.changePassword)
+  asyncHandler(usersController.changePassword),
 );
 
 /**
@@ -74,7 +74,7 @@ router.delete(
       password: Joi.string().required(),
     }),
   }),
-  asyncHandler(usersController.deleteAccount)
+  asyncHandler(usersController.deleteAccount),
 );
 
 export default router;

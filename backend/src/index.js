@@ -1,9 +1,9 @@
 /**
  * Free Games Claimer - Backend Entry Point
- * 
+ *
  * Initializes Express application, sets up middleware,
  * connects to databases, and starts the HTTP server.
- * 
+ *
  * @module src/index
  */
 
@@ -40,7 +40,7 @@ app.use(
     origin: config.corsOrigin,
     credentials: true,
     optionsSuccessStatus: 200,
-  })
+  }),
 );
 
 // Compression
@@ -113,7 +113,7 @@ async function startServer() {
     // Start listening
     const server = app.listen(config.port, config.host, () => {
       logger.info(
-        `🚀 Server running at http://${config.host}:${config.port} [${config.nodeEnv}]`
+        `🚀 Server running at http://${config.host}:${config.port} [${config.nodeEnv}]`,
       );
       logger.info(`📚 API Documentation: http://${config.host}:${config.port}/api-docs`);
       logger.info(`API Prefix: ${apiPrefix}`);

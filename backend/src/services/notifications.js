@@ -49,21 +49,21 @@ async function sendNotification(userId, user, type, data) {
     // Send email if enabled
     if (user.notificationsEmail) {
       switch (type) {
-        case 'welcome':
-          await emailService.sendWelcomeEmail(user.email, user.username);
-          break;
-        case 'new_game':
-          await emailService.sendNewGameNotification(user.email, data.game);
-          break;
-        case 'password_reset':
-          await emailService.sendPasswordResetEmail(user.email, data.token);
-          break;
-        case 'email_verification':
-          await emailService.sendEmailVerification(user.email, data.code);
-          break;
-        case 'daily_digest':
-          await emailService.sendDailyDigest(user.email, data.digest);
-          break;
+      case 'welcome':
+        await emailService.sendWelcomeEmail(user.email, user.username);
+        break;
+      case 'new_game':
+        await emailService.sendNewGameNotification(user.email, data.game);
+        break;
+      case 'password_reset':
+        await emailService.sendPasswordResetEmail(user.email, data.token);
+        break;
+      case 'email_verification':
+        await emailService.sendEmailVerification(user.email, data.code);
+        break;
+      case 'daily_digest':
+        await emailService.sendDailyDigest(user.email, data.digest);
+        break;
       }
     }
   } catch (error) {
@@ -82,7 +82,7 @@ async function sendNotification(userId, user, type, data) {
 async function getUserNotifications(userId, page = 1, pageSize = 20) {
   try {
     const offset = (page - 1) * pageSize;
-    
+
     const { count, rows } = await Notification.findAndCountAll({
       where: { userId },
       order: [['createdAt', 'DESC']],
@@ -135,7 +135,7 @@ async function markAllAsRead(userId) {
   try {
     await Notification.update(
       { read: true },
-      { where: { userId, read: false } }
+      { where: { userId, read: false } },
     );
   } catch (error) {
     logger.error(`Failed to mark all notifications as read: ${error.message}`);

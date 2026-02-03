@@ -18,11 +18,11 @@ router.get(
   authenticate,
   catchAsync(async (req, res) => {
     const { page = 1, pageSize = 20 } = req.query;
-    
+
     const result = await notificationsService.getUserNotifications(
       req.user.id,
       parseInt(page),
-      parseInt(pageSize)
+      parseInt(pageSize),
     );
 
     res.json({
@@ -30,7 +30,7 @@ router.get(
       data: result.notifications,
       pagination: result.pagination,
     });
-  })
+  }),
 );
 
 /**
@@ -42,7 +42,7 @@ router.get(
   authenticate,
   catchAsync(async (req, res) => {
     const { Notification } = require('../models');
-    
+
     const count = await Notification.count({
       where: {
         userId: req.user.id,
@@ -54,7 +54,7 @@ router.get(
       success: true,
       unreadCount: count,
     });
-  })
+  }),
 );
 
 /**
@@ -66,12 +66,12 @@ router.patch(
   authenticate,
   catchAsync(async (req, res) => {
     const notification = await notificationsService.markAsRead(req.params.id);
-    
+
     res.json({
       success: true,
       data: notification,
     });
-  })
+  }),
 );
 
 /**
@@ -83,12 +83,12 @@ router.patch(
   authenticate,
   catchAsync(async (req, res) => {
     await notificationsService.markAllAsRead(req.user.id);
-    
+
     res.json({
       success: true,
       message: 'All notifications marked as read',
     });
-  })
+  }),
 );
 
 /**
@@ -100,12 +100,12 @@ router.delete(
   authenticate,
   catchAsync(async (req, res) => {
     await notificationsService.deleteNotification(req.params.id);
-    
+
     res.json({
       success: true,
       message: 'Notification deleted',
     });
-  })
+  }),
 );
 
 module.exports = router;

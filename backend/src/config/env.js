@@ -1,9 +1,9 @@
 /**
  * Environment Configuration
- * 
+ *
  * Centralized configuration management using environment variables.
  * Validates required variables and provides defaults.
- * 
+ *
  * @module src/config/env
  */
 
@@ -23,7 +23,7 @@ dotenv.config({ path: envFile });
 
 /**
  * Validate required environment variables
- * 
+ *
  * @param {string} variable - Environment variable name
  * @returns {string} Environment variable value
  * @throws {Error} If required variable is not set
@@ -38,7 +38,7 @@ function requireEnv(variable) {
 
 /**
  * Configuration object
- * 
+ *
  * @type {Object}
  * @property {string} nodeEnv - Node environment (development, test, production)
  * @property {number} port - Server port

@@ -1,9 +1,9 @@
 /**
  * Authentication Service
- * 
+ *
  * Business logic for user authentication.
  * Handles login, registration, and token management.
- * 
+ *
  * @module src/services/auth
  */
 
@@ -15,7 +15,7 @@ import { validatePassword, isValidEmail } from '../utils/validators.js';
 
 /**
  * Register new user
- * 
+ *
  * @param {string} email - User email
  * @param {string} username - Username
  * @param {string} password - User password
@@ -66,7 +66,7 @@ export async function registerUser(email, username, password) {
 
 /**
  * Login user
- * 
+ *
  * @param {string} email - User email
  * @param {string} password - User password
  * @returns {Promise<Object>} Tokens and user data

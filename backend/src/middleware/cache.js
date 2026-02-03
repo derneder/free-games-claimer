@@ -25,7 +25,7 @@ export function cacheMiddleware(duration = 300) {
 
       // Try to get from cache
       const cachedData = await redis.get(cacheKey);
-      
+
       if (cachedData) {
         logger.debug(`💾 Cache HIT for ${req.originalUrl}`);
         return res.json(JSON.parse(cachedData));
@@ -41,7 +41,7 @@ export function cacheMiddleware(duration = 300) {
           redis.setex(
             cacheKey,
             duration,
-            JSON.stringify(data)
+            JSON.stringify(data),
           ).catch(err => logger.error('Cache store error:', err));
 
           logger.debug(`📞 Cache SET for ${req.originalUrl} (${duration}s)`);
@@ -104,11 +104,11 @@ export async function getCacheStats() {
   try {
     const info = await redis.info('stats');
     const keys = await redis.keys('cache:*');
-    
+
     return {
       totalCacheKeys: keys.length,
       cachePattern: 'cache:*',
-      info
+      info,
     };
   } catch (error) {
     logger.error('Error getting cache stats:', error);
@@ -133,8 +133,8 @@ export function cacheGames(duration = 600) {
 
       const originalJson = res.json.bind(res);
       res.json = function(data) {
-        redis.setex(cacheKey, duration, JSON.stringify(data)).catch(err => 
-          logger.error('Cache error:', err)
+        redis.setex(cacheKey, duration, JSON.stringify(data)).catch(err =>
+          logger.error('Cache error:', err),
         );
         return originalJson(data);
       };
@@ -165,8 +165,8 @@ export function cacheAnalytics(duration = 1800) {
 
       const originalJson = res.json.bind(res);
       res.json = function(data) {
-        redis.setex(cacheKey, duration, JSON.stringify(data)).catch(err => 
-          logger.error('Analytics cache error:', err)
+        redis.setex(cacheKey, duration, JSON.stringify(data)).catch(err =>
+          logger.error('Analytics cache error:', err),
         );
         return originalJson(data);
       };

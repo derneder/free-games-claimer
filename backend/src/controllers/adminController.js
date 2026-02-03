@@ -1,9 +1,9 @@
 /**
  * Admin Controller
- * 
+ *
  * Handles HTTP requests for admin endpoints.
  * Manages users, system stats, and activity logs.
- * 
+ *
  * @module src/controllers/adminController
  */
 
@@ -18,7 +18,7 @@ import { isValidUUID } from '../utils/validators.js';
 
 /**
  * Get system statistics
- * 
+ *
  * @param {Object} req - Express request (with admin user attached)
  * @param {Object} res - Express response
  * @returns {Promise<void>}
@@ -33,8 +33,8 @@ export async function getSystemStats(req, res) {
           ...stats,
           timestamp: new Date().toISOString(),
         },
-        'System statistics retrieved'
-      )
+        'System statistics retrieved',
+      ),
     );
   } catch (error) {
     logger.error('Get system stats error:', error);
@@ -44,7 +44,7 @@ export async function getSystemStats(req, res) {
 
 /**
  * List all users
- * 
+ *
  * @param {Object} req - Express request (with admin user attached)
  * @param {Object} res - Express response
  * @returns {Promise<void>}
@@ -70,7 +70,7 @@ export async function listUsers(req, res) {
     let countSql = 'SELECT COUNT(*) FROM users';
     const countParams = [];
     if (isActive !== undefined) {
-      countSql += ` WHERE isActive = $1`;
+      countSql += ' WHERE isActive = $1';
       countParams.push(isActive);
     }
     const countResult = await query(countSql, countParams);
@@ -91,8 +91,8 @@ export async function listUsers(req, res) {
         users,
         page,
         pageSize,
-        parseInt(countResult.rows[0].count, 10)
-      )
+        parseInt(countResult.rows[0].count, 10),
+      ),
     );
   } catch (error) {
     logger.error('List users error:', error);
@@ -102,7 +102,7 @@ export async function listUsers(req, res) {
 
 /**
  * Get user details
- * 
+ *
  * @param {Object} req - Express request (with admin user attached)
  * @param {Object} res - Express response
  * @returns {Promise<void>}
@@ -131,7 +131,7 @@ export async function getUser(req, res) {
         twoFaEnabled: user.twoFaEnabled,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
-      })
+      }),
     );
   } catch (error) {
     logger.error('Get user error:', error);
@@ -144,7 +144,7 @@ export async function getUser(req, res) {
 
 /**
  * Deactivate user account
- * 
+ *
  * @param {Object} req - Express request (with admin user attached)
  * @param {Object} res - Express response
  * @returns {Promise<void>}
@@ -175,8 +175,8 @@ export async function deactivateUser(req, res) {
     res.json(
       formatSuccess(
         { message: 'User account deactivated' },
-        'User deactivated successfully'
-      )
+        'User deactivated successfully',
+      ),
     );
   } catch (error) {
     logger.error('Deactivate user error:', error);
@@ -189,7 +189,7 @@ export async function deactivateUser(req, res) {
 
 /**
  * Activate user account
- * 
+ *
  * @param {Object} req - Express request (with admin user attached)
  * @param {Object} res - Express response
  * @returns {Promise<void>}
@@ -223,8 +223,8 @@ export async function activateUser(req, res) {
     res.json(
       formatSuccess(
         { message: 'User account activated' },
-        'User activated successfully'
-      )
+        'User activated successfully',
+      ),
     );
   } catch (error) {
     logger.error('Activate user error:', error);
@@ -237,7 +237,7 @@ export async function activateUser(req, res) {
 
 /**
  * Get activity logs
- * 
+ *
  * @param {Object} req - Express request (with admin user attached)
  * @param {Object} res - Express response
  * @returns {Promise<void>}
@@ -282,8 +282,8 @@ export async function getActivityLogs(req, res) {
         result.rows,
         page,
         pageSize,
-        parseInt(countResult.rows[0].count, 10)
-      )
+        parseInt(countResult.rows[0].count, 10),
+      ),
     );
   } catch (error) {
     logger.error('Get activity logs error:', error);
@@ -293,7 +293,7 @@ export async function getActivityLogs(req, res) {
 
 /**
  * Get user activity logs
- * 
+ *
  * @param {Object} req - Express request (with admin user attached)
  * @param {Object} res - Express response
  * @returns {Promise<void>}
@@ -310,7 +310,7 @@ export async function getUserActivityLogs(req, res) {
     const result = await ActivityLog.getUserActivity(userId, page, pageSize);
 
     res.json(
-      formatPaginated(result.logs, page, pageSize, result.total)
+      formatPaginated(result.logs, page, pageSize, result.total),
     );
   } catch (error) {
     logger.error('Get user activity logs error:', error);

@@ -1,9 +1,9 @@
 /**
  * Games Controller
- * 
+ *
  * Handles HTTP requests for games endpoints.
  * Processes game listing, claiming, and deletion.
- * 
+ *
  * @module src/controllers/gamesController
  */
 
@@ -17,7 +17,7 @@ import { isValidUUID } from '../utils/validators.js';
 
 /**
  * List user's games
- * 
+ *
  * @param {Object} req - Express request (with user attached)
  * @param {Object} res - Express response
  * @returns {Promise<void>}
@@ -33,8 +33,8 @@ export async function listGames(req, res) {
         result.games.map(formatGame),
         page,
         pageSize,
-        result.total
-      )
+        result.total,
+      ),
     );
   } catch (error) {
     logger.error('List games error:', error);
@@ -44,7 +44,7 @@ export async function listGames(req, res) {
 
 /**
  * Get single game
- * 
+ *
  * @param {Object} req - Express request (with user attached)
  * @param {Object} res - Express response
  * @returns {Promise<void>}
@@ -79,7 +79,7 @@ export async function getGame(req, res) {
 
 /**
  * Add new game
- * 
+ *
  * @param {Object} req - Express request (with user attached)
  * @param {Object} res - Express response
  * @returns {Promise<void>}
@@ -91,7 +91,7 @@ export async function addGame(req, res) {
     const game = await gamesService.addGame(req.user.id, gameData);
 
     res.status(201).json(
-      formatSuccess(formatGame(game), 'Game added successfully')
+      formatSuccess(formatGame(game), 'Game added successfully'),
     );
   } catch (error) {
     logger.error('Add game error:', error);
@@ -104,7 +104,7 @@ export async function addGame(req, res) {
 
 /**
  * Delete game
- * 
+ *
  * @param {Object} req - Express request (with user attached)
  * @param {Object} res - Express response
  * @returns {Promise<void>}
@@ -120,7 +120,7 @@ export async function deleteGame(req, res) {
     await gamesService.deleteGame(req.user.id, id);
 
     res.json(
-      formatSuccess({ message: 'Game deleted successfully' }, 'Game removed')
+      formatSuccess({ message: 'Game deleted successfully' }, 'Game removed'),
     );
   } catch (error) {
     logger.error('Delete game error:', error);
@@ -133,7 +133,7 @@ export async function deleteGame(req, res) {
 
 /**
  * Get games statistics
- * 
+ *
  * @param {Object} req - Express request (with user attached)
  * @param {Object} res - Express response
  * @returns {Promise<void>}
@@ -145,7 +145,7 @@ export async function getStats(req, res) {
     // Get total games
     const gamesResult = await query(
       'SELECT COUNT(*) as total, SUM(price) as totalValue FROM games WHERE userId = $1',
-      [userId]
+      [userId],
     );
 
     const stats = gamesResult.rows[0];
@@ -158,7 +158,7 @@ export async function getStats(req, res) {
        FROM games 
        WHERE userId = $1 
        GROUP BY platform`,
-      [userId]
+      [userId],
     );
 
     // Get games by source
@@ -169,7 +169,7 @@ export async function getStats(req, res) {
        FROM games 
        WHERE userId = $1 
        GROUP BY source`,
-      [userId]
+      [userId],
     );
 
     res.json(
@@ -178,7 +178,7 @@ export async function getStats(req, res) {
         totalValue: parseFloat(stats.totalValue) || 0,
         platforms: platformsResult.rows,
         sources: sourcesResult.rows,
-      })
+      }),
     );
   } catch (error) {
     logger.error('Get stats error:', error);
