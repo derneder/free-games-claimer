@@ -1,77 +1,122 @@
 version: '3.8'
 
 services:
+  # PostgreSQL Database
   postgres:
-    image: postgres:16-alpine
+    image: postgres:15-alpine
+    container_name: freegames-postgres
     environment:
-      POSTGRES_USER: ${DB_USER:-fgc}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-fgc123}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
       POSTGRES_DB: ${DB_NAME:-free_games}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - '${DB_PORT:-5432}:5432'
+      - "5432:5432"
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U ${DB_USER:-fgc}']
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - freegames-network
 
+  # Redis Cache
   redis:
     image: redis:7-alpine
-    ports:
-      - '${REDIS_PORT:-6379}:6379'
+    container_name: freegames-redis
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-redis123}
     volumes:
       - redis_data:/data
+    ports:
+      - "6379:6379"
     healthcheck:
-      test: ['CMD', 'redis-cli', 'ping']
+      test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - freegames-network
 
+  # Backend API
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    container_name: freegames-backend
     environment:
-      NODE_ENV: development
-      PORT: 3000
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_USER: ${DB_USER:-fgc}
-      DB_PASSWORD: ${DB_PASSWORD:-fgc123}
-      DB_NAME: ${DB_NAME:-free_games}
-      REDIS_URL: redis://redis:6379
-      JWT_SECRET: ${JWT_SECRET:-your-secret-key-change-this-in-production}
-      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
-      FRONTEND_URL: http://localhost:5173
+      NODE_ENV: ${NODE_ENV:-development}
+      DATABASE_URL: postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@postgres:5432/${DB_NAME:-free_games}
+      REDIS_URL: redis://:${REDIS_PASSWORD:-redis123}@redis:6379
+      JWT_SECRET: ${JWT_SECRET:-your-secret-key-change-in-production}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-your-refresh-secret-key}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      TELEGRAM_WEBHOOK_URL: ${TELEGRAM_WEBHOOK_URL}
+      SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173}
+      API_URL: ${API_URL:-http://localhost:3000}
     ports:
-      - '3000:3000'
+      - "3000:3000"
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
     volumes:
-      - ./backend:/app
-    command: npm run dev
+      - ./backend/src:/app/src
+      - ./backend/logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    networks:
+      - freegames-network
 
+  # Frontend App
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    container_name: freegames-frontend
     environment:
-      VITE_API_URL: http://localhost:3000/api
+      VITE_API_URL: ${API_URL:-http://localhost:3000/api}
     ports:
-      - '5173:5173'
+      - "5173:5173"
+    depends_on:
+      - backend
     volumes:
-      - ./frontend:/app
-    command: npm run dev
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+    networks:
+      - freegames-network
+
+  # Nginx Reverse Proxy (Optional, for production)
+  nginx:
+    image: nginx:alpine
+    container_name: freegames-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - freegames-network
+    profiles:
+      - production
 
 volumes:
   postgres_data:
   redis_data:
 
 networks:
-  default:
-    name: fgc-network
+  freegames-network:
+    driver: bridge
