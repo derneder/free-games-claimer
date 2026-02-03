@@ -4,6 +4,7 @@ import redis from '../config/redis.js';
 import { logger } from '../config/logger.js';
 
 // ============ GENERAL API LIMITER ============
+// Note: This one doesn't use Redis, so it's safe to create immediately
 export const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // 100 requests per windowMs
@@ -20,148 +21,193 @@ export const apiLimiter = rateLimit({
   },
 });
 
-// ============ AUTH LIMITER (Strict) ============
-export const authLimiter = rateLimit({
-  store: new RedisStore({
-    client: redis,
-    prefix: 'rl:auth:',
-    sendCommand: (...args) => redis.sendCommand(args),
-  }),
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // Only 5 attempts per 15 minutes
-  skipSuccessfulRequests: true, // Don't count successful attempts
-  message: 'Too many login/register attempts, please try again later.',
-  handler: (req, res) => {
-    logger.warn(`❌ Auth rate limit hit for IP: ${req.ip}`);
-    res.status(429).json({
-      error: 'Too many attempts. Try again in 15 minutes.',
-      retryAfter: req.rateLimit.resetTime,
+// ============ LAZY INITIALIZATION FOR REDIS-BACKED LIMITERS ============
+// These limiters use Redis and must be created lazily to avoid initialization errors
+
+let _authLimiter = null;
+export const authLimiter = (req, res, next) => {
+  if (!_authLimiter) {
+    _authLimiter = rateLimit({
+      store: new RedisStore({
+        client: redis,
+        prefix: 'rl:auth:',
+        sendCommand: (...args) => redis.sendCommand(args),
+      }),
+      windowMs: 15 * 60 * 1000, // 15 minutes
+      max: 5, // Only 5 attempts per 15 minutes
+      skipSuccessfulRequests: true, // Don't count successful attempts
+      message: 'Too many login/register attempts, please try again later.',
+      handler: (req, res) => {
+        logger.warn(`❌ Auth rate limit hit for IP: ${req.ip}`);
+        res.status(429).json({
+          error: 'Too many attempts. Try again in 15 minutes.',
+          retryAfter: req.rateLimit.resetTime,
+        });
+      },
     });
-  },
-});
+  }
+  return _authLimiter(req, res, next);
+};
 
-// ============ 2FA LIMITER (Very Strict) ============
-export const twoFactorLimiter = rateLimit({
-  store: new RedisStore({
-    client: redis,
-    prefix: 'rl:2fa:',
-    sendCommand: (...args) => redis.sendCommand(args),
-  }),
-  windowMs: 10 * 60 * 1000, // 10 minutes
-  max: 3, // Only 3 attempts
-  skipSuccessfulRequests: true,
-  message: '2FA verification attempts exceeded. Try again later.',
-  handler: (req, res) => {
-    logger.error(`🔒 2FA rate limit hit for user: ${req.body.email}`);
-    res.status(429).json({
-      error: '2FA verification limit exceeded',
-      lockoutMinutes: 10,
+let _twoFactorLimiter = null;
+export const twoFactorLimiter = (req, res, next) => {
+  if (!_twoFactorLimiter) {
+    _twoFactorLimiter = rateLimit({
+      store: new RedisStore({
+        client: redis,
+        prefix: 'rl:2fa:',
+        sendCommand: (...args) => redis.sendCommand(args),
+      }),
+      windowMs: 10 * 60 * 1000, // 10 minutes
+      max: 3, // Only 3 attempts
+      skipSuccessfulRequests: true,
+      message: '2FA verification attempts exceeded. Try again later.',
+      handler: (req, res) => {
+        logger.error(`🔒 2FA rate limit hit for user: ${req.body.email}`);
+        res.status(429).json({
+          error: '2FA verification limit exceeded',
+          lockoutMinutes: 10,
+        });
+      },
     });
-  },
-});
+  }
+  return _twoFactorLimiter(req, res, next);
+};
 
-// ============ SCRAPING LIMITER (For game collection) ============
-export const scrapingLimiter = rateLimit({
-  store: new RedisStore({
-    client: redis,
-    prefix: 'rl:scrape:',
-    sendCommand: (...args) => redis.sendCommand(args),
-  }),
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 3, // Only 3 scraping operations per hour
-  message: 'Too many scraping requests. Please wait before trying again.',
-  handler: (req, res) => {
-    logger.warn(`🔄 Scraping rate limit hit for user: ${req.user?.id}`);
-    res.status(429).json({
-      error: 'Scraping rate limit exceeded',
-      resetTime: req.rateLimit.resetTime,
+let _scrapingLimiter = null;
+export const scrapingLimiter = (req, res, next) => {
+  if (!_scrapingLimiter) {
+    _scrapingLimiter = rateLimit({
+      store: new RedisStore({
+        client: redis,
+        prefix: 'rl:scrape:',
+        sendCommand: (...args) => redis.sendCommand(args),
+      }),
+      windowMs: 60 * 60 * 1000, // 1 hour
+      max: 3, // Only 3 scraping operations per hour
+      message: 'Too many scraping requests. Please wait before trying again.',
+      handler: (req, res) => {
+        logger.warn(`🔄 Scraping rate limit hit for user: ${req.user?.id}`);
+        res.status(429).json({
+          error: 'Scraping rate limit exceeded',
+          resetTime: req.rateLimit.resetTime,
+        });
+      },
     });
-  },
-});
+  }
+  return _scrapingLimiter(req, res, next);
+};
 
-// ============ DOWNLOAD LIMITER (CSV/JSON export) ============
-export const downloadLimiter = rateLimit({
-  store: new RedisStore({
-    client: redis,
-    prefix: 'rl:download:',
-    sendCommand: (...args) => redis.sendCommand(args),
-  }),
-  windowMs: 10 * 60 * 1000, // 10 minutes
-  max: 10, // 10 downloads per 10 minutes
-  message: 'Too many downloads. Please wait before downloading again.',
-  handler: (req, res) => {
-    logger.warn(`Download rate limit hit for IP: ${req.ip}`);
-    res.status(429).json({
-      error: 'Too many downloads. Please wait.',
+let _downloadLimiter = null;
+export const downloadLimiter = (req, res, next) => {
+  if (!_downloadLimiter) {
+    _downloadLimiter = rateLimit({
+      store: new RedisStore({
+        client: redis,
+        prefix: 'rl:download:',
+        sendCommand: (...args) => redis.sendCommand(args),
+      }),
+      windowMs: 10 * 60 * 1000, // 10 minutes
+      max: 10, // 10 downloads per 10 minutes
+      message: 'Too many downloads. Please wait before downloading again.',
+      handler: (req, res) => {
+        logger.warn(`Download rate limit hit for IP: ${req.ip}`);
+        res.status(429).json({
+          error: 'Too many downloads. Please wait.',
+        });
+      },
     });
-  },
-});
+  }
+  return _downloadLimiter(req, res, next);
+};
 
-// ============ ADMIN OPERATIONS LIMITER ============
-export const adminLimiter = rateLimit({
-  store: new RedisStore({
-    client: redis,
-    prefix: 'rl:admin:',
-    sendCommand: (...args) => redis.sendCommand(args),
-  }),
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 50, // 50 operations per hour
-  message: 'Admin operation rate limit exceeded',
-  handler: (req, res) => {
-    logger.warn(`Admin rate limit hit for IP: ${req.ip}`);
-    res.status(429).json({
-      error: 'Admin operation rate limit exceeded',
+let _adminLimiter = null;
+export const adminLimiter = (req, res, next) => {
+  if (!_adminLimiter) {
+    _adminLimiter = rateLimit({
+      store: new RedisStore({
+        client: redis,
+        prefix: 'rl:admin:',
+        sendCommand: (...args) => redis.sendCommand(args),
+      }),
+      windowMs: 60 * 60 * 1000, // 1 hour
+      max: 50, // 50 operations per hour
+      message: 'Admin operation rate limit exceeded',
+      handler: (req, res) => {
+        logger.warn(`Admin rate limit hit for IP: ${req.ip}`);
+        res.status(429).json({
+          error: 'Admin operation rate limit exceeded',
+        });
+      },
     });
-  },
-});
+  }
+  return _adminLimiter(req, res, next);
+};
 
-// ============ TELEGRAM WEBHOOK LIMITER ============
-export const telegramLimiter = rateLimit({
-  store: new RedisStore({
-    client: redis,
-    prefix: 'rl:telegram:',
-    sendCommand: (...args) => redis.sendCommand(args),
-  }),
-  windowMs: 1 * 60 * 1000, // 1 minute
-  max: 30, // 30 webhook calls per minute
-  skip: (req) => {
-    // Skip rate limiting for specific telegram tokens
-    return req.body?.message?.from?.is_bot === true;
-  },
-});
+let _telegramLimiter = null;
+export const telegramLimiter = (req, res, next) => {
+  if (!_telegramLimiter) {
+    _telegramLimiter = rateLimit({
+      store: new RedisStore({
+        client: redis,
+        prefix: 'rl:telegram:',
+        sendCommand: (...args) => redis.sendCommand(args),
+      }),
+      windowMs: 1 * 60 * 1000, // 1 minute
+      max: 30, // 30 webhook calls per minute
+      skip: (req) => {
+        // Skip rate limiting for specific telegram tokens
+        return req.body?.message?.from?.is_bot === true;
+      },
+    });
+  }
+  return _telegramLimiter(req, res, next);
+};
 
-// ============ GLOBAL RATE LIMITER (Fallback) ============
-export const globalLimiter = rateLimit({
-  store: new RedisStore({
-    client: redis,
-    prefix: 'rl:global:',
-    sendCommand: (...args) => redis.sendCommand(args),
-  }),
-  windowMs: 1 * 60 * 1000, // 1 minute
-  max: 300, // 300 requests per minute
-  message: 'Server rate limit exceeded',
-  skip: (req) => {
-    // Skip health check endpoint
-    return req.path === '/api/health';
-  },
-});
+let _globalLimiter = null;
+export const globalLimiter = (req, res, next) => {
+  if (!_globalLimiter) {
+    _globalLimiter = rateLimit({
+      store: new RedisStore({
+        client: redis,
+        prefix: 'rl:global:',
+        sendCommand: (...args) => redis.sendCommand(args),
+      }),
+      windowMs: 1 * 60 * 1000, // 1 minute
+      max: 300, // 300 requests per minute
+      message: 'Server rate limit exceeded',
+      skip: (req) => {
+        // Skip health check endpoint
+        return req.path === '/api/health';
+      },
+    });
+  }
+  return _globalLimiter(req, res, next);
+};
 
 // ============ CUSTOM RATE LIMITER FACTORY ============
 export function createLimiter(options = {}) {
-  return rateLimit({
-    store: new RedisStore({
-      client: redis,
-      prefix: options.prefix || 'rl:custom:',
-      sendCommand: (...args) => redis.sendCommand(args),
-    }),
-    windowMs: options.windowMs || 15 * 60 * 1000,
-    max: options.max || 100,
-    message: options.message || 'Too many requests',
-    handler: options.handler,
-    skip: options.skip,
-    keyGenerator: options.keyGenerator || ((req) => req.ip),
-    ...options,
-  });
+  // This factory creates a lazy limiter middleware
+  let _limiter = null;
+  return (req, res, next) => {
+    if (!_limiter) {
+      _limiter = rateLimit({
+        store: new RedisStore({
+          client: redis,
+          prefix: options.prefix || 'rl:custom:',
+          sendCommand: (...args) => redis.sendCommand(args),
+        }),
+        windowMs: options.windowMs || 15 * 60 * 1000,
+        max: options.max || 100,
+        message: options.message || 'Too many requests',
+        handler: options.handler,
+        skip: options.skip,
+        keyGenerator: options.keyGenerator || ((req) => req.ip),
+        ...options,
+      });
+    }
+    return _limiter(req, res, next);
+  };
 }
 
 /**
