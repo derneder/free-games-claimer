@@ -25,8 +25,14 @@ Before setting up auto-claim, ensure you have:
 
 ### 1. Generate Encryption Key
 
-Generate a secure 256-bit encryption key:
+Generate a secure 256-bit encryption key using the provided script:
 
+```bash
+cd backend
+npm run generate:key
+```
+
+Or manually:
 ```bash
 node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 ```

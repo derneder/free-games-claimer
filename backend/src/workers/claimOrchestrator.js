@@ -245,26 +245,29 @@ async function logClaimAttempt(userId, provider, result) {
  * @returns {void}
  */
 export function scheduleClaims() {
-  const cron = require('node-cron');
-  const schedule = process.env.CLAIM_CRON_SCHEDULE || '0 10 * * *'; // Daily at 10 AM
-  const enabled = process.env.CLAIM_CRON_ENABLED !== 'false';
+  // Import at module level would be better, but keeping here for now to avoid circular deps
+  import('node-cron').then((cronModule) => {
+    const cron = cronModule.default || cronModule;
+    const schedule = process.env.CLAIM_CRON_SCHEDULE || '0 10 * * *'; // Daily at 10 AM
+    const enabled = process.env.CLAIM_CRON_ENABLED !== 'false';
 
-  if (!enabled) {
-    logger.info('Claim scheduler disabled');
-    return;
-  }
-
-  logger.info(`Scheduling claims with pattern: ${schedule}`);
-
-  cron.schedule(schedule, async () => {
-    logger.info('Running scheduled claims...');
-    try {
-      const results = await runAllClaims();
-      logger.info('Scheduled claims completed:', results);
-    } catch (error) {
-      logger.error('Scheduled claims failed:', error);
+    if (!enabled) {
+      logger.info('Claim scheduler disabled');
+      return;
     }
-  });
 
-  logger.info('Claim scheduler started');
+    logger.info(`Scheduling claims with pattern: ${schedule}`);
+
+    cron.schedule(schedule, async () => {
+      logger.info('Running scheduled claims...');
+      try {
+        const results = await runAllClaims();
+        logger.info('Scheduled claims completed:', results);
+      } catch (error) {
+        logger.error('Scheduled claims failed:', error);
+      }
+    });
+
+    logger.info('Claim scheduler started');
+  });
 }

@@ -4,6 +4,10 @@
  * Automated claiming of free games from Epic Games Store.
  * Implements login, 2FA, and claim logic.
  *
+ * NOTE: This claimer uses text-based selectors which are fragile and may break
+ * when Epic Games updates their UI or with different localizations.
+ * See epicSelectors.js for centralized selector management.
+ *
  * @module src/workers/claimers/epicClaimer
  */
 
