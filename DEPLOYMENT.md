@@ -1,194 +1,329 @@
-# 🚀 Deployment Guide
+# 🚀 Production Deployment Guide
 
-## Production Environment
+**Status:** Ready for Production  
+**Last Updated:** 2026-02-03  
 
-### 1. Environment Setup
+---
 
-Update `.env` with production values:
+## 📋 Prerequisites
 
+### Server Requirements
+- Ubuntu 20.04 LTS or CentOS 8+
+- Docker & Docker Compose
+- Nginx (optional, for reverse proxy)
+- PostgreSQL 15 (if not using Docker)
+- Redis 7 (if not using Docker)
+- 2GB+ RAM
+- 20GB+ Storage
+- SSH access
+
+### Domain Setup
+- Domain name
+- SSL certificate (via Let's Encrypt)
+- DNS records configured
+
+---
+
+## 🔧 Pre-Deployment Setup
+
+### 1. Clone Repository
 ```bash
-NODE_ENV=production
-PORT=3000
-FRONTEND_URL=https://your-domain.com
-DB_HOST=your-postgres-host
-DB_USER=prod_user
-DB_PASSWORD=strong_password_here
-JWT_SECRET=use_cryptographically_secure_key
-```
-
-### 2. Build Docker Images
-
-```bash
-docker-compose -f docker-compose.yml build
-```
-
-### 3. Deploy
-
-#### Option A: Heroku
-
-```bash
-heroku login
-heroku create your-app-name
-heroku config:set NODE_ENV=production
-# ... add other env vars
-git push heroku main
-```
-
-#### Option B: AWS/DigitalOcean
-
-```bash
-# Build and push to Docker registry
-docker build -t your-registry/backend ./backend
-docker push your-registry/backend
-
-# Update docker-compose with your registry
-# Deploy with Docker Swarm or Kubernetes
-```
-
-#### Option C: Self-hosted (VPS)
-
-```bash
-# SSH into VPS
-ssh user@your-vps.com
-
-# Clone repo
 git clone https://github.com/derneder/free-games-claimer.git
 cd free-games-claimer
-
-# Update .env for production
-
-# Start with Docker
-docker-compose up -d
-
-# Setup SSL with Let's Encrypt
-sudo certbot certonly --standalone -d your-domain.com
 ```
 
-### 4. Nginx Reverse Proxy
-
-```nginx
-server {
-    listen 443 ssl http2;
-    server_name your-domain.com;
-
-    ssl_certificate /etc/letsencrypt/live/your-domain.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/your-domain.com/privkey.pem;
-
-    location /api {
-        proxy_pass http://localhost:3000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-    }
-
-    location / {
-        proxy_pass http://localhost:5173;
-    }
-}
-```
-
-## Monitoring
-
-### Logs
-
+### 2. Create Environment
 ```bash
-# Docker logs
-docker-compose logs -f backend
-docker-compose logs -f frontend
-
-# System logs
-tail -f /var/log/syslog
+cp .env.prod.example .env.prod
+# Edit with production values
+nano .env.prod
 ```
 
-### Health Check
-
+### 3. Generate Security Keys
 ```bash
-curl https://your-domain.com/api/health
+# Generate JWT secret
+openssl rand -base64 32
+
+# Generate session secret
+openssl rand -base64 32
+
+# Generate Redis password
+openssl rand -base64 16
 ```
 
-### Backup Database
-
+### 4. Setup SSL Certificates
 ```bash
-# Daily backup
-0 2 * * * pg_dump -U $DB_USER $DB_NAME | gzip > /backups/$(date +\%Y\%m\%d).sql.gz
+# Using Let's Encrypt
+certbot certonly --standalone -d your-domain.com
+
+# Create SSL directory
+mkdir -p ssl
+cp /etc/letsencrypt/live/your-domain.com/fullchain.pem ssl/
+cp /etc/letsencrypt/live/your-domain.com/privkey.pem ssl/
+chmod 600 ssl/privkey.pem
 ```
 
-## Security Checklist
+---
 
-- [ ] Change default JWT_SECRET
-- [ ] Enable 2FA for admin accounts
-- [ ] Setup HTTPS/SSL
-- [ ] Configure firewall rules
-- [ ] Enable database backups
-- [ ] Setup monitoring and alerts
-- [ ] Regular security updates
-- [ ] Rate limiting enabled
-- [ ] CORS properly configured
-- [ ] Environment variables not exposed
+## 📦 Deployment Steps
 
-## Performance Optimization
+### 1. Initial Deployment
+```bash
+# Make scripts executable
+chmod +x deploy.sh rollback.sh monitoring.sh backup.sh
+
+# Run deployment
+./deploy.sh v1.0.0
+```
+
+### 2. Verify Deployment
+```bash
+# Check containers
+docker-compose -f docker-compose.prod.yml ps
+
+# Check logs
+docker-compose -f docker-compose.prod.yml logs -f
+
+# Health check
+curl https://your-domain.com/health
+```
+
+### 3. Setup Automatic Backups
+```bash
+# Add to crontab
+crontab -e
+
+# Add this line (daily backup at 2 AM)
+0 2 * * * /path/to/free-games-claimer/backup.sh
+```
+
+### 4. Setup Monitoring
+```bash
+# Run monitoring in background
+nohup ./monitoring.sh &
+
+# Or use systemd
+sudo systemctl start free-games-monitoring
+```
+
+---
+
+## 📊 Monitoring
+
+### Health Checks
+```bash
+# Manual health check
+curl https://your-domain.com/health
+
+# With verbose output
+curl -v https://your-domain.com/health
+```
+
+### View Logs
+```bash
+# Backend logs
+docker-compose logs backend
+
+# Frontend logs
+docker-compose logs frontend
+
+# Database logs
+docker-compose logs postgres
+
+# Nginx logs
+docker-compose logs nginx
+```
+
+### System Monitoring
+```bash
+# Container stats
+docker stats
+
+# Disk usage
+df -h
+
+# Memory usage
+free -h
+
+# Database stats
+docker-compose exec postgres psql -U $DB_USER -d $DB_NAME -c "SELECT * FROM pg_stat_statements LIMIT 10;"
+```
+
+---
+
+## 🔄 Updates
+
+### Regular Updates
+```bash
+# Pull latest code
+git pull origin main
+
+# Deploy new version
+./deploy.sh
+```
+
+### Security Updates
+```bash
+# Update dependencies
+docker-compose -f docker-compose.prod.yml pull
+
+# Rebuild images
+docker-compose -f docker-compose.prod.yml build --no-cache
+
+# Deploy
+./deploy.sh
+```
+
+### Emergency Rollback
+```bash
+# Rollback to previous version
+./rollback.sh
+
+# Or specify backup file
+./rollback.sh /var/backups/free-games/backup_20260203_145300.sql.gz
+```
+
+---
+
+## 💾 Backup & Recovery
+
+### Manual Backup
+```bash
+# Backup database
+./backup.sh
+
+# Verify backup
+ls -lh /var/backups/free-games/
+```
+
+### Restore from Backup
+```bash
+# List available backups
+ls /var/backups/free-games/
+
+# Restore
+./rollback.sh /var/backups/free-games/backup_20260203_145300.sql.gz
+```
+
+---
+
+## 🔐 Security
+
+### SSL/TLS
+- Automatically configured via Let's Encrypt
+- Auto-renewal via certbot
+
+### Firewall
+```bash
+# Allow SSH, HTTP, HTTPS only
+sudo ufw allow 22/tcp
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+sudo ufw enable
+```
 
 ### Database
+- Runs in private network
+- Password protected
+- Encrypted connections
 
+### Environment Variables
+- Never commit .env.prod
+- Use strong random strings
+- Rotate regularly
+
+---
+
+## 📈 Performance Tuning
+
+### Database
 ```sql
--- Add indexes
-CREATE INDEX idx_games_user_id ON games(user_id);
-CREATE INDEX idx_games_obtained_at ON games(obtained_at);
-CREATE INDEX idx_users_telegram_id ON users(telegram_id);
+-- Enable indexes
+CREATE INDEX idx_games_claimedAt ON games(claimedAt DESC);
+CREATE INDEX idx_activityLogs_createdAt ON activityLogs(createdAt DESC);
 
--- Analyze query plans
-EXPLAIN ANALYZE SELECT * FROM games WHERE user_id = 1;
-```
-
-### Redis Caching
-
-```javascript
-// Cache frequently accessed data
-await redis.setex('games:user:1', 3600, JSON.stringify(games));
-```
-
-### Frontend
-
-- Enable gzip compression
-- Minify and bundle assets
-- Use CDN for static files
-- Lazy load images
-
-## Maintenance
-
-### Update Dependencies
-
-```bash
-npm outdated
-npm update
-npm audit fix
-```
-
-### Database Maintenance
-
-```bash
-# Vacuum and analyze
+-- Run VACUUM
 VACUUM ANALYZE;
-
-# Check for missing indexes
-SELECT * FROM pg_stat_user_indexes WHERE idx_scan = 0;
 ```
 
-## Disaster Recovery
-
-### Database Restore
-
+### Redis
 ```bash
-gunzip < /backups/20240203.sql.gz | psql -U $DB_USER $DB_NAME
+# Monitor Redis
+docker-compose exec redis redis-cli monitor
+
+# Get stats
+docker-compose exec redis redis-cli INFO stats
 ```
 
-### Full Rollback
+### Nginx
+- Gzip compression enabled
+- Caching configured
+- Rate limiting active
 
+---
+
+## 🚨 Troubleshooting
+
+### Service Won't Start
 ```bash
-# Git rollback
-git revert <commit-hash>
-git push production main
+# Check logs
+docker-compose logs backend
 
-# Docker rollback
-docker pull your-registry/backend:latest
-docker-compose up -d
+# Check configuration
+cat .env.prod
+
+# Verify database connection
+docker-compose exec backend node -e "require('pg').Client"
 ```
+
+### High CPU Usage
+```bash
+# Check which container
+docker stats
+
+# Check logs for errors
+docker-compose logs
+
+# Restart container
+docker-compose restart backend
+```
+
+### High Memory Usage
+```bash
+# Check Node.js heap
+docker-compose exec backend node -e "console.log(require('os').totalmem())"
+
+# Restart services
+docker-compose restart
+
+# Check for memory leaks
+docker-compose logs backend | grep -i memory
+```
+
+---
+
+## 📞 Support
+
+- Check logs: `docker-compose logs`
+- Review `.github/workflows/deploy.yml`
+- Check `DEVELOPMENT_GUIDE.md`
+- Monitor `monitoring.log`
+
+---
+
+## ✅ Deployment Checklist
+
+- [ ] Prerequisites met
+- [ ] Domain configured
+- [ ] SSL certificate obtained
+- [ ] Environment variables set
+- [ ] Backups configured
+- [ ] Monitoring enabled
+- [ ] Health checks passing
+- [ ] Database migrated
+- [ ] Tests passing
+- [ ] Initial deployment complete
+
+---
+
+**Ready for production deployment!** 🚀

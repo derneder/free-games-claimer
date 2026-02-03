@@ -1,0 +1,36 @@
+# Production environment
+.env.prod
+.env.prod.local
+ssl/
+
+# Backups
+backups/
+/var/backups/
+
+# Logs
+logs/
+/var/log/free-games/
+*.log
+
+# Secrets
+*.key
+*.pem
+*.crt
+secrets/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node
+node_modules/
+npm-debug.log
+
+# Docker
+.dockerignore
