@@ -23,6 +23,7 @@ import authRoutes from './routes/auth.js';
 import gamesRoutes from './routes/games.js';
 import usersRoutes from './routes/users.js';
 import adminRoutes from './routes/admin.js';
+import credentialsRoutes from './routes/credentials.js';
 
 const app = express();
 
@@ -81,6 +82,7 @@ app.use(`${apiPrefix}/auth`, authRoutes);
 app.use(`${apiPrefix}/games`, gamesRoutes);
 app.use(`${apiPrefix}/users`, usersRoutes);
 app.use(`${apiPrefix}/admin`, adminRoutes);
+app.use(`${apiPrefix}/credentials`, credentialsRoutes);
 
 /**
  * 404 Handler
