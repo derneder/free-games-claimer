@@ -131,3 +131,26 @@ export async function closeRedis() {
     logger.info('Redis connection closed');
   }
 }
+
+/**
+ * Default export: Proxy that delegates to the Redis client
+ * This allows importing as `import redis from './config/redis.js'`
+ * and using it directly as `redis.get()`, `redis.set()`, etc.
+ */
+export default new Proxy(
+  {},
+  {
+    get(target, prop) {
+      // Get the actual Redis client and delegate the property access
+      const client = getRedisClient();
+      const value = client[prop];
+
+      // If it's a function, bind it to the client to preserve context
+      if (typeof value === 'function') {
+        return value.bind(client);
+      }
+
+      return value;
+    },
+  }
+);
