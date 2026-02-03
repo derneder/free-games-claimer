@@ -11,8 +11,8 @@
     // string into just a query string, and then redirects the browser
     // to the new url with only a query string and hash fragment
     (function(l) {
-      if (l.search[1] === '/' ) {
-        var decoded = l.search.slice(1).split('&').map(function(s) { 
+      if (l.search[1] === '/') {
+        var decoded = l.search.slice(1).split('&').map(function(s) {
           return s.replace(/~and~/g, '&')
         }).join('?');
         window.history.replaceState(null, null,
