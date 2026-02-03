@@ -1,18 +1,25 @@
 export default {
   testEnvironment: 'node',
-  coverageDirectory: 'coverage',
+  coveragePathIgnorePatterns: ['/node_modules/', '/coverage/'],
   collectCoverageFrom: [
     'src/**/*.js',
     '!src/index.js',
     '!src/config/**',
-    '!src/telegram/**'
+    '!src/swagger.js',
   ],
-  testMatch: ['**/__tests__/**/*.test.js', '**/?(*.)+(spec|test).js'],
-  transform: {},
-  moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/src/$1'
+  coverageThreshold: {
+    global: {
+      branches: 70,
+      functions: 70,
+      lines: 70,
+      statements: 70,
+    },
   },
-  setupFilesAfterEnv: ['<rootDir>/tests/setup.js'],
   testTimeout: 10000,
-  verbose: true
+  transform: {},
+  testMatch: ['**/tests/**/*.test.js'],
+  collectCoverage: false,
+  coverageReporters: ['text', 'lcov', 'html'],
+  watchPathIgnorePatterns: ['/node_modules/', '/coverage/'],
+  testPathIgnorePatterns: ['/node_modules/'],
 };
