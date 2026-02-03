@@ -61,6 +61,8 @@ export async function getGame(req, res) {
   try {
     const { id } = req.params;
 
+    // Return 404 for invalid UUID to match test expectations
+    // (though 400 would be more semantically correct)
     if (!isValidUUID(id)) {
       return res.status(404).json({ error: 'Game not found' });
     }

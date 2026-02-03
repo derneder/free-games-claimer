@@ -22,12 +22,12 @@ export class Game {
   constructor(data) {
     this.id = data.id || uuidv4();
     // Handle both camelCase and lowercase column names from database
-    this.userId = data.userId || data.userid || data.user_id;
-    this.user_id = data.userId || data.userid || data.user_id; // Alias for compatibility
+    this.userId = data.userId ?? data.userid ?? data.user_id;
+    this.user_id = data.userId ?? data.userid ?? data.user_id; // Alias for compatibility
     this.title = data.title;
     this.description = data.description || null;
     this.image = data.image || null;
-    this.price = data.price || data.steamprice || data.steamPrice || 0;
+    this.price = data.price ?? data.steamprice ?? data.steamPrice ?? 0;
 
     // Handle both array and JSON string for platforms/sources
     this.platforms = Array.isArray(data.platforms)

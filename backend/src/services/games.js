@@ -10,6 +10,7 @@
 import { Game } from '../models/Game.js';
 import { ActivityLog } from '../models/ActivityLog.js';
 import { AppError } from '../middleware/error.js';
+import { logger } from '../config/logger.js';
 
 /**
  * Add game to user library
@@ -33,7 +34,6 @@ export async function addGame(userId, gameData) {
   const game = await Game.create({
     ...gameData,
     userId,
-    user_id: userId, // Also set user_id for database compatibility
   });
 
   // Log activity
@@ -115,12 +115,11 @@ export async function bulkImportGames(userId, gamesData) {
       const game = await Game.create({
         ...gameData,
         userId,
-        user_id: userId,
       });
       importedGames.push(game);
     } catch (error) {
       // Log but continue with other games
-      console.error(`Failed to import game ${gameData.title}:`, error);
+      logger.error(`Failed to import game ${gameData.title}:`, error);
     }
   }
 
