@@ -11,10 +11,19 @@ import { Router } from 'express';
 import Joi from 'joi';
 import rateLimit from 'express-rate-limit';
 import rateLimit from 'express-rate-limit';
+import rateLimit from 'express-rate-limit';
 import * as authController from '../controllers/authController.js';
 import { validate } from '../middleware/validation.js';
 import { asyncHandler } from '../middleware/error.js';
 import { verifyToken } from '../middleware/auth.js';
+
+// Rate limiter for authentication-related endpoints to mitigate abuse/DoS
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 50, // limit each IP to 50 requests per window for auth routes
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
 
 const router = Router();
 // Rate limiting for authentication routes
@@ -76,7 +85,7 @@ router.post(
  */
   authRateLimiter,
 router.post(
-  '/login',
+router.post('/2fa/setup', authLimiter, verifyToken, asyncHandler(authController.setup2FA));
   strictAuthLimiter,
   validate({
     body: Joi.object({
